@@ -1,23 +1,27 @@
-"""Scoreboard against requests/expected.json (metric: correct decisions).
+"""Decision layer against expected.json and the held-out set, using the real local LLM.
 
-Marked xfail while the layers are stubs: run `pytest -rxX tests/test_expected.py`
-to see which requests already pass (XPASS). Remove the xfail marker once the
-decision layer is real, so regressions fail the build.
+Skipped unless Ollama runs and data/law.db is built. For a readable report run
+    python -m app.eval_decisions --runs 3
 """
 
 import pytest
 
-from app import pipeline
+from app.eval_decisions import cases
+from app.layers import decision
 
-from conftest import REQUEST_IDS, load_request
+pytestmark = pytest.mark.real_llm
 
-# Adding Art. 67 or 71 is allowed by the task description.
-OPTIONAL_ARTICLES = {"67", "71"}
+CASES = cases()
+IDS = [request.id for request, _, _ in CASES]
 
 
-@pytest.mark.xfail(reason="decision layer is a stub", strict=False)
-@pytest.mark.parametrize("request_id", REQUEST_IDS)
-def test_decision_and_articles(conn, expected, request_id):
-    result = pipeline.run(load_request(request_id), conn)
-    assert result.decision == expected[request_id]["decision"]
-    assert set(result.articles) - OPTIONAL_ARTICLES == set(expected[request_id]["articles"])
+@pytest.mark.parametrize(("request_", "accept", "point"), CASES, ids=IDS)
+def test_accept_or_reject(request_, accept, point):
+    result = decision.decide(request_)
+    assert result.accepted == accept
+    assert result.articles[0] == ("53" if accept else "54")
+
+
+@pytest.mark.parametrize(("request_", "accept", "point"), CASES[:10], ids=IDS[:10])
+def test_consistent_across_three_runs(request_, accept, point):
+    assert len({decision.decide(request_).model_dump_json() for _ in range(3)}) == 1

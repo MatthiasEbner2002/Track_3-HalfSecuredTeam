@@ -22,9 +22,12 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
             decision="REJECT",
             articles=verdict.articles,
             reason=verdict.reason,
+            grounding=verdict.grounding,
+            needs_review=verdict.needs_review,
         )
 
     route = routing.choose_route(request, verdict)
+    articles = verdict.articles + [a for a in routing.ROUTE_ARTICLES[route] if a not in verdict.articles]
     spec = _SPEC_BUILDERS[route](request)
     codes = mapping.map_codes(spec)
     plan = query.generate(spec, codes)
@@ -34,8 +37,10 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
     return PipelineResult(
         request_id=request.id,
         decision=_DECISIONS[route],
-        articles=verdict.articles,
+        articles=articles,
         reason=verdict.reason,
+        grounding=verdict.grounding,
+        needs_review=verdict.needs_review,
         route=route,
         mapping=codes,
         queries=plan.queries,
