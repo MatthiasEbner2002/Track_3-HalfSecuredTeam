@@ -110,6 +110,8 @@ written by someone else is the stronger test.
 
 ## Data extraction (mapping + query layers)
 
+![Data extraction: request text to numbers](../docs/data-extraction.svg)
+
 After an approval, `app/layers/query.py:interpret` turns the request into a
 `QuerySpec` (`app/models.py`), the contract between interpretation and SQL:
 
