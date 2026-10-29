@@ -73,8 +73,18 @@ ConceptKind = Literal[
     "sex",  # patients.sex
     "region",  # patients.region
     "hospital",  # patients.data_holder
+    "composite",  # built from other concepts: where
 ]
 GroupDim = Literal["region", "hospital", "sex", "band"]
+
+
+class Term(BaseModel):
+    concept: str
+    negate: bool = False
+
+
+# AND of OR-groups: [[a], [b, c]] = a AND (b OR c)
+Filter = list[list[Term]]
 
 
 class Concept(BaseModel):
@@ -91,15 +101,7 @@ class Concept(BaseModel):
     value: str | None = None  # sex, region or hospital
     op: Literal[">=", ">", "<=", "<"] | None = None  # measurement threshold on the latest value
     threshold: float | None = None
-
-
-class Term(BaseModel):
-    concept: str
-    negate: bool = False
-
-
-# AND of OR-groups: [[a], [b, c]] = a AND (b OR c)
-Filter = list[list[Term]]
+    where: Filter | None = None  # composite: "patient with A and B" = [[A], [B]]
 
 
 class Metric(BaseModel):
@@ -147,6 +149,24 @@ class QuerySpec(BaseModel):
                     raise ValueError(f"'{m.label}': a mean needs a measurement, got {m.measurement!r}")
             if m.op == "percent" and m.denominator is None:
                 raise ValueError(f"'{m.label}': a percentage needs a denominator")
+        for c in self.concepts.values():
+            if c.kind == "composite":
+                if not c.where:
+                    raise ValueError(f"composite concept '{c.name}' has no parts")
+                used += refs(c.where)
+        seen: set[str] = set()
+
+        def acyclic(name: str, path: tuple[str, ...] = ()) -> None:
+            if name in path:
+                raise ValueError(f"concept '{name}' is defined through itself")
+            c = self.concepts.get(name)
+            if c is not None and c.kind == "composite" and name not in seen:
+                for part in refs(c.where):
+                    acyclic(part, path + (name,))
+                seen.add(name)
+
+        for name in list(self.concepts):
+            acyclic(name)
         if missing := [n for n in used if n not in self.concepts]:
             raise ValueError(f"unknown concepts: {missing}")
         if "band" in self.group_by and not self.bands:

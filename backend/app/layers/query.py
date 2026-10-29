@@ -149,22 +149,38 @@ def compile_spec(spec: QuerySpec) -> QueryPlan:
         used.update(dict.fromkeys(n for n in names if not (m.unit == "stays" and n in stay_level)))
     means = list(dict.fromkeys(m.measurement for m in spec.metrics if m.op == "mean" and m.measurement))
 
+    # composite concepts need their parts computed too; parts come first
+    with_parts: dict[str, None] = {}
+
+    def add(name: str) -> None:
+        c = spec.concepts[name]
+        if c.kind == "composite":
+            for part in _concepts(c.where):
+                add(part)
+        with_parts.setdefault(name)
+
+    for name in used:
+        add(name)
+
     latest: dict[str, str] = {}
-    for loinc in dict.fromkeys(spec.concepts[n].codes[0] for n in [*used, *means]
+    for loinc in dict.fromkeys(spec.concepts[n].codes[0] for n in [*with_parts, *means]
                                if spec.concepts[n].kind == "measurement"
                                and (spec.concepts[n].op is not None or n in means)):
         latest[loinc] = f"l{len(latest)}"
         ctes.append(f"{latest[loinc]} AS ({_latest_cte(sql, loinc)})")
 
-    flag, columns = {}, []
-    for i, name in enumerate(used):
+    expr: dict[str, str] = {}
+    for i, name in enumerate(with_parts):
         c = spec.concepts[name]
-        flag[name] = f"t{i}"
-        if (subquery := _patient_set(sql, c, latest)) is not None:
+        if c.kind == "composite":
+            expr[name] = f"({_bool(c.where, expr)})"
+        elif (subquery := _patient_set(sql, c, latest)) is not None:
             ctes.append(f"s{i} AS ({subquery})")
-            columns.append(f"b.patient_id IN (SELECT patient_id FROM s{i}) AS t{i}")
+            expr[name] = f"(b.patient_id IN (SELECT patient_id FROM s{i}))"
         else:
-            columns.append(f"{_row_expr(sql, c)} AS t{i}")
+            expr[name] = _row_expr(sql, c)
+    flag = {name: f"t{i}" for i, name in enumerate(used)}
+    columns = [f"{expr[name]} AS {col}" for name, col in flag.items()]
     value = {}
     joins = ""
     for i, name in enumerate(means):

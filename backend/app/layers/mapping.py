@@ -50,6 +50,8 @@ KNOWN_MEASUREMENTS = {
     "body mass index": "39156-5",
     "systolic blood pressure": "8480-6",
     "systolic bp": "8480-6",
+    "systolic": "8480-6",
+    "systolic pressure": "8480-6",
     "blood pressure": "8480-6",
     "egfr": "62238-1",
     "kidney function": "62238-1",
@@ -90,7 +92,7 @@ mean average avg share percent percentage proportion prevalence rate fraction am
 also as well both overall still plus there not no without never one decimal decimals place
 stays stay encounters encounter admissions visits visit cases case rows record records
 latest most recent newest last ever were been received receiving given whom which every neither nor
-did do does got still separately distinct unique
+did do does got still separately distinct unique start_date start falls falling begins began
 """.split()) | {"%"}
 NEG = re.compile(r"\b(?:no|not|without|never|non|neither|nor)\b")
 PRONOUN = re.compile(r"\b(?:of them|among them|of these|of those|of whom|of which|those|them|they|their|thereof|these|whom)\b")
@@ -103,12 +105,12 @@ ICD = r"[A-Z]\d{2}(?:\.\d+)?\*?"
 ATC = r"[A-Z]\d{2}(?:[A-Z]{1,2}(?:\d{1,2})?)?\*?"
 SEP = r"(?:\s*,\s*(?:or\s+)?|\s+or\s+|\s*/\s*)"
 NAME = r"(?P<name>[^=:]+?)"
-START = r"(?:starting|beginning|that starts?|which starts?|starts?) with"
+START = r"(?:starting|beginning|begins?|that (?:starts?|begins?)|which (?:starts?|begins?)|starts?) with"
 ICD_RANGE = r"[A-Z]\d{2}\s*(?:-|–|to)\s*[A-Z]?\d{2}"
 ICD_LIST = rf"(?P<codes>(?:{ICD_RANGE}|{ICD})(?:{SEP}(?:{ICD_RANGE}|{ICD}))*)"
 YEAR_ONSET = (r"(?:,? (?:and |with |whose )?(?:an? )?(?:onset(?:_date| date)?(?: is)?|(?:first )?diagnosed|onset year)"
               r" (?:in|during) (?P<year>\d{4}))?")
-YEAR_START = (r"(?:,? (?:and )?(?:that |which |whose )?(?:starting|started|start(?:_date| date)?(?: is)?|beginning|begun|took place)?"
+YEAR_START = (r"(?:,? (?:and )?(?:that |which |whose )?(?:starting|started|start(?:_date| date)?(?: is| falls)?|beginning|begun|took place|falls|falling)?"
               r" ?(?:in|during) (?P<year>\d{4}))?")
 ENC_TYPE = r"'?(?P<type>inpatient|outpatient|emergency)'?"
 MAIN_DX = (rf"(?:(?:a |the )?(?:main|primary) diagnosis(?: \(primary_icd10\))?(?: code)?|primary_icd10|primary ICD-10(?: code)?)"
@@ -146,7 +148,7 @@ RULES: list[tuple[str, re.Pattern]] = [
     ("main_dx", R(rf"{NAME} = (?:an? |any )?(?:(?P<type>inpatient|outpatient|emergency) )?(?:hospital )?(?:stays?|encounters?|admissions?|visits?) (?:with|whose|where) {MAIN_DX}{YEAR_START}")),
     ("encounter", R(rf"{NAME} = (?:an? |any )?encounters? (?:with|of|whose) type(?: is| =)? {ENC_TYPE}(?:,? (?:and|with)(?: a| an)? {MAIN_DX})?{YEAR_START}")),
     ("encounter", R(rf"{NAME} = (?:an? |any )?{ENC_TYPE} (?:encounters?|stays?|visits?|admissions?)(?:,? (?:with|and|whose) {MAIN_DX})?{YEAR_START}")),
-    ("drug", R(rf"{NAME} = (?:any |an? )?(?:(?:medications?|prescriptions?|drugs?) (?:with |whose )?)?(?:an? |the )?ATC(?: codes?)?(?: is)? (?:{START} )?(?P<codes>{ATC}(?:{SEP}{ATC})*)")),
+    ("drug", R(rf"{NAME} = (?:any |an? )?(?:(?:medications?|prescriptions?|drugs?) (?:with |whose )?)?(?:an? |the )?ATC(?: codes?)?(?: is)? (?:{START} )?(?P<codes>{ATC}(?:{SEP}{ATC})*)(?P<ever>,? (?:regardless of|irrespective of|ignoring|independent of|whatever) .+)?")),
     ("sex", R(rf"{NAME} = (?:patients )?(?:of |with )?(?:sex|gender) (?:is |= )?'?(?P<sex>female|male)'?")),
     ("sex", R(rf"{NAME} = (?P<sex>female|male)(?: patients| sex)?")),
     ("region", R(rf"{NAME} = (?:patients )?(?:(?:living|resident|who live) )?in (?:the )?(?:region )?'?(?P<region>[^']+?)'?")),
@@ -158,12 +160,14 @@ RULES: list[tuple[str, re.Pattern]] = [
     ("latest", R(rf"Use (?:each|every|the) patient's (?:latest|most recent|newest|last) (?P<name>[^(]+?)(?: \(LOINC (?P<loinc>\d+-\d)\))?(?: value| measurement)?(?:[;,] .*\b(?:left out|excluded|ignored|not counted))?")),
     ("latest", R(rf"Use (?:the )?(?:latest|most recent|newest|last) (?P<name>[^(]+?)(?: value| measurement)? (?:per|for each|of each|for every) patient(?:[;,] .*\b(?:left out|excluded|ignored|not counted))?")),
     ("measure", R(rf"{NAME} = (?:an? |any |the )?(?:(?:latest|most recent) )?(?:observations?|measurements?|lab values?)?(?: with| whose)? ?(?:the )?LOINC(?: code)?(?: is)? (?P<loinc>\d+-\d)(?:,? (?:latest|most recent) value(?: per patient)?)?")),
+    ("measure2", R(rf"{NAME} = (?:the |each patient's )?(?:latest|most recent|newest|last)(?: (?P<meas>[^(;=]+?))?(?: value| measurement| observation)?(?: of| for)?(?: (?:the )?LOINC(?: code)? (?P<loinc>\d+-\d)| \(LOINC (?P<loinc2>\d+-\d)\))(?: value)?(?: (?:per|for each|of each|for every|of every) patient)?(?:[;,] .*\b(?:left out|excluded|ignored|not counted))?")),
     ("threshold", R(rf"{NAME} = (?:an? |the )?(?:(?:latest|most recent|last) )?(?P<meas>[^=(]+?)(?: \(LOINC (?P<loinc>\d+-\d)\))?(?: value)?(?: (?:is|was|of))? (?P<op>{OP_RE})? ?(?P<val>\d+(?:\.\d+)?){UNIT}?(?: (?P<orw>or (?:more|higher|above|over|less|lower|below)))?{UNIT}?")),
+    ("composite", R(rf"{NAME} = (?:an? |any )?(?:patients?|people|persons?|individuals?|those) (?P<expr>(?:with|who|whose|that|having|without|aged|living|in)\b.+)")),
     ("active", R(rf"(?:a )?(?:medication|prescription|drug) is (?:considered )?active (?:on|at) (?P<date>{DATE}) if .+")),
     ("active", R(r"(?:a )?(?:medication|prescription|drug) (?:counts as|is considered|is) active .+")),
     ("active", R(r"(?:an? )?active(?: medications?| prescriptions?| drugs?)?(?: on \S+ \S+ \d{4})? (?:=|means|is) .*\b(?:start|end)_?(?:date)?\b.*")),
     ("active", R(r"Only (?:count )?(?:active|current) (?:medications|prescriptions|drugs)\b.*")),
-    ("unit", R(r"Count (?:each |every |all )?(?:(?:inpatient|outpatient|emergency) )?(?:stays?|encounters?|admissions?|visits?)(?: separately)?(?: \(not patients\)|,? (?:and )?not (?:the )?patients,?|,? not unique patients,?)?(?: (?:whose start_date is|whose start date is|that started|starting|started|beginning|with start_date|with a start_date) in (?P<year>\d{4}))?")),
+    ("unit", R(r"Count (?:each |every |all )?(?:(?:inpatient|outpatient|emergency) )?(?:stays?|encounters?|admissions?|visits?)(?: separately)?(?: \(not patients\)|,? (?:and )?not (?:the )?patients,?|,? not unique patients,?)?(?: (?:of|for|among) (?P<who>.+?))?(?: (?:whose start_date is|whose start date is|whose start_date falls|whose start date falls|that started|that fall|falling|starting|started|beginning|with start_date|with a start_date) in (?P<year>\d{4}))?")),
     ("unit_patients", R(r"Count (?:unique |distinct |each )?patients(?: \(not (?:stays|encounters|visits)\)|,? not (?:stays|encounters|visits))?(?:,? (?:each|every) patient once| once)?")),
     ("cohort", R(r"(?:The )?(?:Study )?(?:Cohort|population|study population)(?: = | (?:is|consists of|includes|comprises) )(?P<expr>.+)")),
     ("ratio", R(rf"{NAME} = (?P<num>[^/]+?) / (?P<den>[^/]+?)(?: ?(?:×|x|\*) ?100)?(?:,? (?:with |to |rounded to )?one decimal(?: place)?)?")),
@@ -202,6 +206,10 @@ class _Ctx:
     cohort_expr: str | None = None
     report: tuple[str | None, str] | None = None  # (group text, metric text)
     report_size: bool = False
+    composites: dict[str, str] = field(default_factory=dict)  # name -> "with A and B", read after all definitions
+    ever: set[str] = field(default_factory=set)  # drugs counted regardless of start/end date
+    stay_who: str | None = None  # "Count visits of patients with asthma"
+    in_cohort: bool = False
     named: set[str] = field(default_factory=set)  # defined concepts some phrase refers to
     _anon: int = 0
 
@@ -226,7 +234,7 @@ def normalise(sentence: str) -> str:
         return re.sub(r"^(Cohort|Study population|Population): ", r"\1 = ", s, flags=I)
     if m := re.fullmatch(r"([^:=]{1,60}?): (.+)", s):
         return f"{m[1]} = {m[2]}"
-    if m := re.fullmatch(r"([^=]{1,60}?) (?:is|are) (?:defined as|defined by|given by) (.+)", s, I):
+    if m := re.fullmatch(r"([^=]{1,60}?) (?:is|are) (?:defined as|defined by|given by|identified by|identified as|recogni[sz]ed by) (.+)", s, I):
         return f"{m[1]} = {m[2]}"
     if m := re.fullmatch(r"([^=]{1,60}?) (?:means|refers to|denotes) (.+)", s, I):
         return f"{m[1]} = {m[2]}"
@@ -324,6 +332,17 @@ def _apply_rule(ctx: _Ctx, rule: str, m: re.Match) -> None:
         ))
     elif rule == "drug":
         _define(ctx, name, Concept(name="", kind="drug", codes=_codes(g["codes"])))
+        if g.get("ever"):
+            ctx.ever.update(_names(name))
+    elif rule == "measure2":
+        loinc = g.get("loinc") or g.get("loinc2")
+        _define(ctx, name, Concept(name="", kind="measurement", codes=[loinc]))
+        if g.get("meas") and g["meas"].strip().lower() not in ctx.concepts:
+            _define(ctx, g["meas"], Concept(name="", kind="measurement", codes=[loinc]))
+    elif rule == "composite":
+        for n in _names(name):
+            ctx.concepts[n] = Concept(name=n, kind="composite")
+            ctx.composites[n] = g["expr"]
     elif rule == "sex":
         _define(ctx, name, Concept(name="", kind="sex", value=g["sex"].lower()))
     elif rule == "region":
@@ -358,6 +377,7 @@ def _apply_rule(ctx: _Ctx, rule: str, m: re.Match) -> None:
         ctx.unit = "patients"
     elif rule == "unit":
         ctx.unit = "stays"
+        ctx.stay_who = g.get("who")
         ctx.stay_year = int(g["year"]) if g.get("year") else None
     elif rule == "cohort":
         ctx.cohort_expr = g["expr"]
@@ -400,9 +420,11 @@ def _variants(name: str) -> set[str]:
     words = name.split()
     last = words[-1]
     irregular = {"woman": "women", "man": "men", "child": "children", "person": "people"}
-    plural = irregular.get(last) or (last + "es" if last.endswith(("s", "x", "ch")) else last + "s")
+    regular = last + "es" if last.endswith(("s", "x", "ch")) else last + "s"
     singular = {v: k for k, v in irregular.items()}.get(last) or (last[:-1] if last.endswith("s") else last)
-    return {name, " ".join(words[:-1] + [plural]), " ".join(words[:-1] + [singular])}
+    # "persons" and "people" are both in use
+    forms = {last, regular, singular, irregular.get(last, regular)}
+    return {" ".join(words[:-1] + [f]) for f in forms}
 
 
 def _vocabulary(ctx: _Ctx) -> list[tuple[str, str, str]]:
@@ -417,6 +439,9 @@ def _vocabulary(ctx: _Ctx) -> list[tuple[str, str, str]]:
         if not name.startswith("_"):
             for v in _variants(name):
                 vocab[v] = (name, "concept")
+    for name, c in ctx.concepts.items():
+        if c.kind == "measurement" and c.op is None and " " in name and not name.startswith("_"):
+            vocab.setdefault(name.split()[0], (name, "concept"))
     for name in ctx.ratios:
         for v in _variants(name):
             vocab[v] = (name, "ratio")
@@ -467,6 +492,11 @@ def _inline(ctx: _Ctx, text: str) -> tuple[str, list[str], int | None]:
         (r"\b(?:aged )?(\d+)(?: years)? (?:and|or) (?:over|older|above)\b|\baged (\d+)\+", lambda m: Concept(name="", kind="age", min_age=int(m[1] or m[2]))),
         (r"\b(?:aged )?(?:under|below|younger than) (\d+)\b(?: years)?", lambda m: Concept(name="", kind="age", max_age=int(m[1]) - 1)),
     ]
+    def ref_date(m: re.Match) -> str:
+        _check_date(m)
+        return " "
+
+    text = re.sub(rf"\b(?:on|at|as of) (?P<date>{DATE})", ref_date, text, flags=I)
     for pattern, make in rules:
         text = re.sub(pattern, lambda m: age(make(m))(m), text)
     for v in ctx.regions:
@@ -512,8 +542,17 @@ def _phrase(ctx: _Ctx, raw: str) -> _Phrase:
     text = " " + raw.lower().replace("’", "'") + " "
     text, inline, year = _inline(ctx, text)
     text = re.sub(r"(?<=\w)'s\b", "", text)
+    cohort_terms: Filter = []
+    if ctx.cohort_expr and not ctx.in_cohort and (c := re.search(r"\b(?:(?:in|of|from) )?the (?:study )?cohort\b", text)):
+        # "patients in the cohort": the Cohort = ... definition
+        text = text[: c.start()] + " " + text[c.end():]
+        ctx.in_cohort = True
+        try:
+            cohort_terms = _phrase(ctx, ctx.cohort_expr).terms
+        finally:
+            ctx.in_cohort = False
     matches = _find(ctx, text)
-    terms: Filter = [[Term(concept=n)] for n in inline]
+    terms: Filter = [[Term(concept=n)] for n in inline] + cohort_terms
     ratio = None
     measurements = []
     prev_end = 0
@@ -531,7 +570,8 @@ def _phrase(ctx: _Ctx, raw: str) -> _Phrase:
         if year and concept.kind in ("encounter", "diagnosis") and concept.year is None:
             name = ctx.anon(concept.model_copy(update={"year": year}))
             year = None
-        if concept.kind == "drug" and not concept.active and (ctx.active_rule or "active" in gap or "current" in gap):
+        if (concept.kind == "drug" and not concept.active and m.name not in ctx.ever
+                and (ctx.active_rule or "active" in gap or "current" in gap)):
             name = ctx.anon(concept.model_copy(update={"active": True}))
         if concept.kind == "measurement" and concept.op is None:
             measurements.append(name)
@@ -700,12 +740,17 @@ def parse(request: DataRequest, mode: Route, conn: sqlite3.Connection) -> QueryS
             else:
                 raise InterpretError(f"could not interpret: {sentence}")
 
+    for name, expr in ctx.composites.items():
+        ctx.concepts[name] = Concept(name=name, kind="composite", where=_phrase(ctx, expr).terms)
+
     if ctx.unit == "stays" and ctx.stay_year:
         for n, c in ctx.concepts.items():
             if c.kind == "encounter" and c.year is None:
                 ctx.concepts[n] = c.model_copy(update={"year": ctx.stay_year})
 
     cohort: Filter = _phrase(ctx, ctx.cohort_expr).terms if ctx.cohort_expr else []
+    if ctx.stay_who:
+        cohort = _merge(cohort, _phrase(ctx, ctx.stay_who).terms)
     group_by: list[str] = []
     metrics: list[Metric] = []
     if mode == "statistics":
