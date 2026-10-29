@@ -7,11 +7,10 @@ Request -> decision -> (reject) | (accept -> route -> statistics/SPE spec
 import sqlite3
 
 from app import db
-from app.layers import decision, mapping, query, routing, small_cell, spe, statistics
-from app.models import DataRequest, PipelineResult, QueryPlan
+from app.layers import decision, mapping, query, routing
+from app.models import CodeMapping, DataRequest, PipelineResult, QueryPlan
 from app.purpose import assess
 
-_SPEC_BUILDERS = {"statistics": statistics.build_spec, "spe": spe.build_spec}
 _DECISIONS = {"statistics": "APPROVE_STATISTICAL", "spe": "APPROVE_SPE"}
 
 
@@ -33,19 +32,18 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
     route_articles, route_reason = routing.explain(request, route)
     articles = list(dict.fromkeys(verdict.articles + route_articles))
     reason = f"{verdict.reason} {route_reason}".strip()
-    spec = _SPEC_BUILDERS[route](request)
-    codes = mapping.map_codes(spec)
     flags = list(verdict.flags)
+    codes, plan, data = CodeMapping(), QueryPlan(), {}
     try:
         query_spec, source = query.interpret(request, route, conn)
-        plan = query.compile_spec(query_spec)
         if source == "llm":
             flags.append("llm_interpreted")  # rules could not read it; Bob's reading, staff should check
+        codes = mapping.to_code_mapping(query_spec)
+        plan = query.compile_spec(query_spec)
+        rows = {q.name: db.execute(conn, q.sql, q.params) for q in plan.queries}
+        data = query.answer(query_spec, plan, rows, conn)  # small-cell rule applied here
     except mapping.InterpretError as e:
-        plan = QueryPlan()
         flags.append(f"not_interpreted: {e}")
-    raw = {q.name: db.execute(conn, q.sql, q.params) for q in plan.queries}
-    data = small_cell.apply(raw, route)
 
     return PipelineResult(
         request_id=request.id,

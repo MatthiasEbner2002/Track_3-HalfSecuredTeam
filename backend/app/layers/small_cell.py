@@ -14,7 +14,7 @@ def count(n: int) -> int | str:
 
 
 def derived(value: float | None, based_on: int) -> float | str:
-    """A percentage or mean computed over `based_on` patients."""
+    """A mean over `based_on` patients, or a percentage with `based_on` = min(numerator, denominator)."""
     return "suppressed" if value is None or based_on < SMALL_CELL_THRESHOLD else value
 
 

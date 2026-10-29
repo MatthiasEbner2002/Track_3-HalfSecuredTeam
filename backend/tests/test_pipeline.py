@@ -23,7 +23,8 @@ def test_every_request_runs_end_to_end(conn, request_id):
 def test_r01_returns_one_row_per_region(conn, r01):
     result = pipeline.run(r01, conn)
     (regions,) = conn.execute("SELECT COUNT(DISTINCT region) FROM patients").fetchone()
-    assert len(result.data["patients"]) == regions
+    assert len(result.data) == regions
+    assert result.data["Burgenland"] == [532, 33, 6.2]  # small-cell rule and rounding applied
 
 
 def test_reject_branch_stops_before_data(conn, r01, monkeypatch):

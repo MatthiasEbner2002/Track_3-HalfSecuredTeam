@@ -210,4 +210,4 @@ class PipelineResult(BaseModel):
     route: Route | None = None
     mapping: CodeMapping | None = None
     queries: list[Query] = Field(default_factory=list)
-    data: QueryResults | None = None
+    data: dict[str, Any] | None = None  # statistics: {group: [values]}; spe: cohort_size, record_types

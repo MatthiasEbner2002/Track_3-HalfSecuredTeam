@@ -22,39 +22,39 @@
   "expected": {
     "Burgenland": [
       13,
-      7.7
+      "suppressed"
     ],
     "Kärnten": [
       24,
-      8.3
+      "suppressed"
     ],
     "Niederösterreich": [
       60,
-      11.7
+      "suppressed"
     ],
     "Oberösterreich": [
       59,
-      6.8
+      "suppressed"
     ],
     "Salzburg": [
       20,
-      20.0
+      "suppressed"
     ],
     "Steiermark": [
       54,
-      1.9
+      "suppressed"
     ],
     "Tirol": [
       31,
-      3.2
+      "suppressed"
     ],
     "Vorarlberg": [
       15,
-      6.7
+      "suppressed"
     ],
     "Wien": [
       75,
-      8.0
+      "suppressed"
     ]
   }
 }

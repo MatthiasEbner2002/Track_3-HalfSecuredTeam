@@ -267,7 +267,7 @@ def answer(spec: QuerySpec, plan: QueryPlan, rows: dict[str, list[dict]], conn: 
             elif m.op == "percent":
                 num, den = row.get(f"m{i}_num") or 0, row.get(f"m{i}_den") or 0
                 pct = _half_up(Decimal(num) * 100 / Decimal(den)) if den else None
-                values.append(small_cell.derived(pct, den))
+                values.append(small_cell.derived(pct, min(num, den)))  # numerator or denominator < 10
             else:
                 n, total = row.get(f"m{i}_n") or 0, row.get(f"m{i}_sum") or 0
                 mean = _half_up(Decimal(total) / SCALE / n) if n else None
