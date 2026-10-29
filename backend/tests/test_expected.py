@@ -1,8 +1,7 @@
 """Scoreboard against requests/expected.json (metric: correct decisions).
 
-Marked xfail while the layers are stubs: run `pytest -rxX tests/test_expected.py`
-to see which requests already pass (XPASS). Remove the xfail marker once the
-decision layer is real, so regressions fail the build.
+Runs with the NLI model when it is installed, otherwise with the rule floor
+(EHDS_PURPOSE_RULES_ONLY=1 forces that). Both must reach 10 of 10.
 """
 
 import pytest
@@ -15,7 +14,6 @@ from conftest import REQUEST_IDS, load_request
 OPTIONAL_ARTICLES = {"67", "71"}
 
 
-@pytest.mark.xfail(reason="decision layer is a stub", strict=False)
 @pytest.mark.parametrize("request_id", REQUEST_IDS)
 def test_decision_and_articles(conn, expected, request_id):
     result = pipeline.run(load_request(request_id), conn)

@@ -1,0 +1,49 @@
+{
+  "request": {
+    "id": "B039",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Pieter de Vries",
+      "organisation": "University Medical Center Utrecht, Julius Center",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Production of official health statistics for the national health report.",
+    "question": "How many patients have the type 2 diabetes code E11.6x (with complications), by region?",
+    "definitions": [
+      "Complicated type 2 diabetes = any condition with an ICD-10 code starting with E11.6.",
+      "Report per region: patients with complicated type 2 diabetes."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      "<10"
+    ],
+    "Kärnten": [
+      21
+    ],
+    "Niederösterreich": [
+      60
+    ],
+    "Oberösterreich": [
+      40
+    ],
+    "Salzburg": [
+      13
+    ],
+    "Steiermark": [
+      36
+    ],
+    "Tirol": [
+      28
+    ],
+    "Vorarlberg": [
+      "<10"
+    ],
+    "Wien": [
+      70
+    ]
+  }
+}

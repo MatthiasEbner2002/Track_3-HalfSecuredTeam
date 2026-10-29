@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "B051",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Mag. Thomas Huber",
+      "organisation": "Austrian Public Health Institute (GÖG)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Production of official health statistics for the national health report.",
+    "question": "How many inpatient stays started in 2025, by hospital and sex?",
+    "definitions": [
+      "Inpatient stay = encounter with type 'inpatient'.",
+      "Count stays (not patients) whose start_date is in 2025.",
+      "Report per hospital and sex: inpatient stays."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Klinikum Nord|female": [
+      210
+    ],
+    "Klinikum Nord|male": [
+      211
+    ],
+    "Klinikum Süd|female": [
+      195
+    ],
+    "Klinikum Süd|male": [
+      187
+    ],
+    "Klinikum West|female": [
+      143
+    ],
+    "Klinikum West|male": [
+      133
+    ]
+  }
+}

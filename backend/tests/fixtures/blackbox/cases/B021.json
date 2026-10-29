@@ -1,0 +1,53 @@
+{
+  "request": {
+    "id": "B021",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Lukas Berger",
+      "organisation": "Statistik Austria, Health Statistics Unit",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Production of official health statistics for the national health report.",
+    "question": "What is the average HbA1c of adults with type 2 diabetes by 10-year age band?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Age bands on 31 December 2025: 18-29, 30-39, 40-49, 50-59, 60-69, 70-79, 80+.",
+      "Use the latest HbA1c (LOINC 4548-4) per patient.",
+      "Report per band: adults with type 2 diabetes who have a HbA1c value and their mean HbA1c, one decimal."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "18-29": [
+      "<10",
+      "suppressed"
+    ],
+    "30-39": [
+      26,
+      7.3
+    ],
+    "40-49": [
+      73,
+      7.1
+    ],
+    "50-59": [
+      191,
+      7.2
+    ],
+    "60-69": [
+      312,
+      7.1
+    ],
+    "70-79": [
+      295,
+      7.3
+    ],
+    "80+": [
+      249,
+      7.2
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "request": {
+    "id": "B020",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Medical University of Warsaw, Cardiology Research Unit",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Health services research to improve the quality of care for patients with chronic conditions.",
+    "question": "How many patients have an active SGLT2 inhibitor prescription, by region?",
+    "definitions": [
+      "SGLT2 inhibitor = ATC code starting with A10BK.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per region: patients with an active SGLT2 inhibitor."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      "<10"
+    ],
+    "Kärnten": [
+      22
+    ],
+    "Niederösterreich": [
+      61
+    ],
+    "Oberösterreich": [
+      44
+    ],
+    "Salzburg": [
+      22
+    ],
+    "Steiermark": [
+      46
+    ],
+    "Tirol": [
+      33
+    ],
+    "Vorarlberg": [
+      "<10"
+    ],
+    "Wien": [
+      63
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "request": {
+    "id": "B067",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Mag. Thomas Huber",
+      "organisation": "Austrian Public Health Institute (GÖG)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Public health monitoring of chronic disease burden for the regional health authorities.",
+    "question": "Count every outpatient encounter that started during 2025, by age group.",
+    "definitions": [
+      "Outpatient encounter = encounter with type 'outpatient'.",
+      "Count encounters (not patients) whose start_date falls in 2025.",
+      "Age bands on 31 December 2025: 0-17, 18-64, 65+.",
+      "Report per age band: outpatient encounters."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "0-17": [
+      2617
+    ],
+    "18-64": [
+      7264
+    ],
+    "65+": [
+      3463
+    ]
+  }
+}

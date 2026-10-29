@@ -1,0 +1,49 @@
+{
+  "request": {
+    "id": "B007",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Pieter de Vries",
+      "organisation": "University Medical Center Utrecht, Julius Center",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Public health monitoring of chronic disease burden for the regional health authorities.",
+    "question": "How many patients have depression in each region?",
+    "definitions": [
+      "Depression = any condition with an ICD-10 code starting with F32.",
+      "Report per region: patients with depression."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      32
+    ],
+    "Kärnten": [
+      74
+    ],
+    "Niederösterreich": [
+      201
+    ],
+    "Oberösterreich": [
+      195
+    ],
+    "Salzburg": [
+      70
+    ],
+    "Steiermark": [
+      125
+    ],
+    "Tirol": [
+      90
+    ],
+    "Vorarlberg": [
+      53
+    ],
+    "Wien": [
+      239
+    ]
+  }
+}

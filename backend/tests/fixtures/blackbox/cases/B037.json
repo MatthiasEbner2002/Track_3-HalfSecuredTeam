@@ -1,0 +1,60 @@
+{
+  "request": {
+    "id": "B037",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Lukas Berger",
+      "organisation": "Statistik Austria, Health Statistics Unit",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Public health monitoring of chronic disease burden for the regional health authorities.",
+    "question": "What share of patients with type 2 diabetes has any active oral or injectable glucose-lowering drug other than insulin, per region?",
+    "definitions": [
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Non-insulin diabetes drug = ATC code starting with A10BA, A10BK or A10BJ.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per region: patients with type 2 diabetes and % with an active non-insulin diabetes drug, one decimal."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      33,
+      97.0
+    ],
+    "Kärnten": [
+      71,
+      85.9
+    ],
+    "Niederösterreich": [
+      227,
+      85.9
+    ],
+    "Oberösterreich": [
+      173,
+      85.0
+    ],
+    "Salzburg": [
+      75,
+      86.7
+    ],
+    "Steiermark": [
+      164,
+      86.0
+    ],
+    "Tirol": [
+      110,
+      82.7
+    ],
+    "Vorarlberg": [
+      36,
+      75.0
+    ],
+    "Wien": [
+      263,
+      85.6
+    ]
+  }
+}

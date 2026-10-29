@@ -1,0 +1,30 @@
+{
+  "request": {
+    "id": "B087",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Pieter de Vries",
+      "organisation": "University Medical Center Utrecht, Julius Center",
+      "country": "NL"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Training and validating a risk prediction model in a secure processing environment; only model weights and performance metrics are exported.",
+    "question": "Provide pseudonymised observations and medications of adults with obesity whose latest BMI is 35 or higher.",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Obesity = any condition with an ICD-10 code starting with E66.",
+      "Use the latest BMI (LOINC 39156-5) per patient.",
+      "Cohort = adults with obesity whose latest BMI is 35 or higher.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "mode": "spe",
+  "expected": {
+    "cohort_size": 467,
+    "record_types": [
+      "medications",
+      "observations"
+    ]
+  }
+}

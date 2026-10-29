@@ -1,0 +1,44 @@
+{
+  "request": {
+    "id": "B015",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Pieter de Vries",
+      "organisation": "University Medical Center Utrecht, Julius Center",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Production of official health statistics for the national health report.",
+    "question": "How common is asthma in each age band?",
+    "definitions": [
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "Age bands on 31 December 2025: 0-17, 18-39, 40-64, 65+.",
+      "Prevalence = patients with asthma / all patients in the band × 100, one decimal.",
+      "Report per band: patients, patients with asthma and the prevalence."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "0-17": [
+      4445,
+      209,
+      4.7
+    ],
+    "18-39": [
+      5274,
+      328,
+      6.2
+    ],
+    "40-64": [
+      5868,
+      344,
+      5.9
+    ],
+    "65+": [
+      3574,
+      213,
+      6.0
+    ]
+  }
+}

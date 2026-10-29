@@ -1,0 +1,96 @@
+{
+  "request": {
+    "id": "B064",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Sophie Lechner",
+      "organisation": "Danube Institute for Diabetes Research (university research group)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Policy-making: planning hospital capacity and care pathways for the coming years.",
+    "question": "What is the mean BMI of adults with type 2 diabetes, by region and sex?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Use the latest BMI (LOINC 39156-5) per patient; patients without a BMI are left out.",
+      "Report per region and sex: adults with type 2 diabetes who have a BMI and their mean BMI, one decimal."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland|female": [
+      "<10",
+      "suppressed"
+    ],
+    "Burgenland|male": [
+      10,
+      23.9
+    ],
+    "Kärnten|female": [
+      26,
+      26.3
+    ],
+    "Kärnten|male": [
+      16,
+      26.0
+    ],
+    "Niederösterreich|female": [
+      70,
+      27.7
+    ],
+    "Niederösterreich|male": [
+      71,
+      28.2
+    ],
+    "Oberösterreich|female": [
+      57,
+      27.7
+    ],
+    "Oberösterreich|male": [
+      49,
+      27.4
+    ],
+    "Salzburg|female": [
+      22,
+      28.0
+    ],
+    "Salzburg|male": [
+      31,
+      29.5
+    ],
+    "Steiermark|female": [
+      54,
+      27.4
+    ],
+    "Steiermark|male": [
+      56,
+      27.6
+    ],
+    "Tirol|female": [
+      33,
+      28.5
+    ],
+    "Tirol|male": [
+      42,
+      27.1
+    ],
+    "Vorarlberg|female": [
+      "<10",
+      "suppressed"
+    ],
+    "Vorarlberg|male": [
+      10,
+      27.0
+    ],
+    "Wien|female": [
+      95,
+      27.6
+    ],
+    "Wien|male": [
+      87,
+      26.9
+    ]
+  }
+}

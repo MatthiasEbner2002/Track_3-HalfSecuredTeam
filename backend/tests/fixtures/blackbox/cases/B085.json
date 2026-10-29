@@ -1,0 +1,29 @@
+{
+  "request": {
+    "id": "B085",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Lukas Berger",
+      "organisation": "Statistik Austria, Health Statistics Unit",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Scientific research on treatment pathways that requires patient-level longitudinal records; only aggregated results leave the secure environment.",
+    "question": "Provide pseudonymised conditions and medications of children with asthma.",
+    "definitions": [
+      "Child = aged under 18 on 31 December 2025.",
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "Cohort = children with asthma.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "mode": "spe",
+  "expected": {
+    "cohort_size": 209,
+    "record_types": [
+      "conditions",
+      "medications"
+    ]
+  }
+}

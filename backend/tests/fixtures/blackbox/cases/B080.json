@@ -1,0 +1,27 @@
+{
+  "request": {
+    "id": "B080",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Sophie Lechner",
+      "organisation": "Danube Institute for Diabetes Research (university research group)",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Developing and testing a clinical decision-support algorithm; we will only export model parameters and evaluation metrics.",
+    "question": "Provide pseudonymised encounters for patients with COPD aged 40 or older.",
+    "definitions": [
+      "COPD = any condition with an ICD-10 code starting with J44.",
+      "Cohort = patients with COPD aged 40 or older on 31 December 2025.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "mode": "spe",
+  "expected": {
+    "cohort_size": 339,
+    "record_types": [
+      "encounters"
+    ]
+  }
+}
