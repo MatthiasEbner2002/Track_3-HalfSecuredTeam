@@ -4,6 +4,19 @@ An app that takes a health-data request as JSON, decides `REJECT`, `APPROVE_STAT
 or `APPROVE_SPE` with the articles of Regulation (EU) 2025/327, and computes the
 answer from 20,000 synthetic patients under the small-cell rule. Task: `Task_desc.md`.
 
+## Status
+
+- [x] Decision and routing (Art. 54 rejects, statistics, SPE, downgrade): 10/10 on the samples
+- [x] Data extraction from the definitions: 6/6 numbers, black-box 100/100 with the rules alone
+- [x] IBM Bob as fallback for wordings the rules do not know
+- [x] Small-cell rule and opt-outs in the API answer: 0 leaks
+- [ ] Fix the 10 failing `test_purpose.py` tests (the `rag` engine returns no evidence)
+- [ ] Decision engines: compare `rag` and `purpose` on the held-out requests and pick one
+- [ ] SPE: copy the selected records into a separate schema, block downloads
+- [ ] Pages for applicants and staff (only the JSON API exists)
+- [ ] Independent test set
+- [ ] Demo video
+
 ## Getting started
 
 ### 1. Prerequisites
@@ -140,15 +153,3 @@ Measured with the purpose check, rules only (local NLI model not installed).
 The RAG engine (default) also gets 10 of 10 decisions, plus 16 of 16 on held-out requests
 (`python -m app.eval_decisions`), consistent over 3 runs; with `qwen2.5:7b` a decision takes
 5–10 s (~15 s for the first request while the model loads).
-
-Done:
-- Decision and routing (Art. 54 rejects, statistics, SPE, downgrade): 10/10 on the samples.
-- Data extraction: 6/6 numbers; black-box set of 100 new requests 100/100 with the rules alone
-  (IBM Bob as fallback for wordings the rules do not know).
-- Small-cell rule and opt-outs in the API answer: 0 leaks.
-
-To do:
-- SPE: copy the selected records into a separate schema, block downloads.
-- Pages for applicants and staff (only the JSON API exists).
-- Decision engines: compare `rag` and `purpose` on the held-out requests and pick one.
-- Independent test set; demo video.
