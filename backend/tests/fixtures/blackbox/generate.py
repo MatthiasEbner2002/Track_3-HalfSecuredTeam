@@ -204,9 +204,10 @@ class Pct:
 
     def value(self, g, ctx):
         den = self.den & g
-        if len(den) < 10:
+        num = len(self.num & den)
+        if len(den) < 10 or num < 10:  # Task_desc: numerator or denominator below 10
             return "suppressed"
-        return pct_value(len(self.num & den), len(den), ctx)
+        return pct_value(num, len(den), ctx)
 
 
 class PctStays:
@@ -215,9 +216,9 @@ class PctStays:
 
     def value(self, g, ctx):
         den = [x for x in self.den if x[1] in g]
-        if len(den) < 10:
-            return "suppressed"
         num = sum(1 for x in den if x in self.num)
+        if len(den) < 10 or num < 10:  # Task_desc: numerator or denominator below 10
+            return "suppressed"
         return pct_value(num, len(den), ctx)
 
 

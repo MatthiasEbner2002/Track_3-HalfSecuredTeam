@@ -23,7 +23,7 @@
   "expected": {
     "Burgenland": [
       26,
-      30.8
+      "suppressed"
     ],
     "Kärnten": [
       57,
