@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 940" width="1200" height="940" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="940" fill="#ffffff"/>
+
+  <text x="40" y="52" font-size="26" font-weight="700" fill="#0f172a">From English to SQL</text>
+  <text x="40" y="80" font-size="15" fill="#64748b">Each kind of sentence has one fixed binding to a table and column; nothing is guessed from words</text>
+
+  <!-- column headers -->
+  <g font-size="12" font-weight="700" letter-spacing="0.08em">
+    <text x="40" y="122" fill="#64748b">ENGLISH (THE REQUEST)</text>
+    <text x="420" y="122" fill="#b45309">WHAT THE PARSER UNDERSTANDS</text>
+    <text x="680" y="122" fill="#0f766e">SQL</text>
+  </g>
+
+  <!-- row template: english box 40..380, spec box 420..640, sql box 680..1160 -->
+
+  <!-- 1 age -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="136" width="340" height="88" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+    <rect x="420" y="136" width="220" height="88" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+    <rect x="680" y="136" width="480" height="88" rx="10" fill="#f0fdfa" stroke="#99f6e4"/>
+  </g>
+  <text x="56" y="166" font-size="14" fill="#0f172a">“Adult = aged 18 or older on</text>
+  <text x="56" y="186" font-size="14" fill="#0f172a"> 31 December 2025.”</text>
+  <text x="56" y="210" font-size="12" fill="#94a3b8">age</text>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#92400e">
+    <text x="436" y="166">kind: age</text>
+    <text x="436" y="186">min_age: 18</text>
+  </g>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#115e59">
+    <text x="696" y="166">age = 2025 - CAST(substr(birth_date,1,4) AS INT)</text>
+    <text x="696" y="186">… WHERE age &gt;= 18</text>
+  </g>
+  <text x="696" y="210" font-size="12" fill="#0d9488">patients table, computed once per patient</text>
+  <line x1="380" y1="180" x2="416" y2="180" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="640" y1="180" x2="676" y2="180" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 2 diagnosis -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="240" width="340" height="88" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+    <rect x="420" y="240" width="220" height="88" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+    <rect x="680" y="240" width="480" height="88" rx="10" fill="#f0fdfa" stroke="#99f6e4"/>
+  </g>
+  <text x="56" y="270" font-size="14" fill="#0f172a">“Type 2 diabetes = any condition with</text>
+  <text x="56" y="290" font-size="14" fill="#0f172a"> an ICD-10 code starting with E11.”</text>
+  <text x="56" y="314" font-size="12" fill="#94a3b8">diagnosis</text>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#92400e">
+    <text x="436" y="270">kind: diagnosis</text>
+    <text x="436" y="290">codes: [E11]</text>
+  </g>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#115e59">
+    <text x="696" y="270">s1 AS (SELECT patient_id FROM conditions</text>
+    <text x="696" y="290">       WHERE icd10 LIKE 'E11%')</text>
+  </g>
+  <text x="696" y="314" font-size="12" fill="#0d9488">a code prefix: E11 matches E11.9</text>
+  <line x1="380" y1="284" x2="416" y2="284" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="640" y1="284" x2="676" y2="284" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 3 drug -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="344" width="340" height="88" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+    <rect x="420" y="344" width="220" height="88" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+    <rect x="680" y="344" width="480" height="88" rx="10" fill="#f0fdfa" stroke="#99f6e4"/>
+  </g>
+  <text x="56" y="374" font-size="14" fill="#0f172a">“ARB = ATC code starting with C09CA”</text>
+  <text x="56" y="394" font-size="14" fill="#0f172a">“… % with an active ARB”</text>
+  <text x="56" y="418" font-size="12" fill="#94a3b8">drug, active on the reference date</text>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#92400e">
+    <text x="436" y="374">kind: drug</text>
+    <text x="436" y="394">codes: [C09CA]</text>
+    <text x="436" y="414">active: true</text>
+  </g>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#115e59">
+    <text x="696" y="374">s2 AS (SELECT patient_id FROM medications</text>
+    <text x="696" y="394">  WHERE atc LIKE 'C09CA%' AND start_date &lt;= '2025-12-31'</text>
+    <text x="696" y="414">  AND (end_date IS NULL OR end_date &gt;= '2025-12-31'))</text>
+  </g>
+  <line x1="380" y1="388" x2="416" y2="388" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="640" y1="388" x2="676" y2="388" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 4 measurement -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="448" width="340" height="88" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+    <rect x="420" y="448" width="220" height="88" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+    <rect x="680" y="448" width="480" height="88" rx="10" fill="#f0fdfa" stroke="#99f6e4"/>
+  </g>
+  <text x="56" y="478" font-size="14" fill="#0f172a">“Use the latest BMI (LOINC 39156-5)</text>
+  <text x="56" y="498" font-size="14" fill="#0f172a"> per patient.”  “… mean BMI”</text>
+  <text x="56" y="522" font-size="12" fill="#94a3b8">measurement, newest value</text>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#92400e">
+    <text x="436" y="478">kind: measurement</text>
+    <text x="436" y="498">codes: [39156-5]</text>
+    <text x="436" y="518">op: mean</text>
+  </g>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#115e59">
+    <text x="696" y="478">ROW_NUMBER() OVER (PARTITION BY patient_id</text>
+    <text x="696" y="498">                   ORDER BY date DESC) = 1</text>
+    <text x="696" y="518">FROM observations WHERE loinc = '39156-5'</text>
+  </g>
+  <line x1="380" y1="492" x2="416" y2="492" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="640" y1="492" x2="676" y2="492" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 5 encounter -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="552" width="340" height="88" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+    <rect x="420" y="552" width="220" height="88" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+    <rect x="680" y="552" width="480" height="88" rx="10" fill="#f0fdfa" stroke="#99f6e4"/>
+  </g>
+  <text x="56" y="582" font-size="14" fill="#0f172a">“Inpatient stay = encounter with type</text>
+  <text x="56" y="602" font-size="14" fill="#0f172a"> 'inpatient'.” “Count stays … in 2025.”</text>
+  <text x="56" y="626" font-size="12" fill="#94a3b8">stays, not patients</text>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#92400e">
+    <text x="436" y="582">kind: encounter</text>
+    <text x="436" y="602">type: inpatient</text>
+    <text x="436" y="622">year: 2025 · unit: stays</text>
+  </g>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#115e59">
+    <text x="696" y="582">FROM encounters e JOIN flagged k USING (patient_id)</text>
+    <text x="696" y="602">WHERE e.type = 'inpatient'</text>
+    <text x="696" y="622">  AND substr(e.start_date,1,4) = '2025'</text>
+  </g>
+  <line x1="380" y1="596" x2="416" y2="596" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="640" y1="596" x2="676" y2="596" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 6 report line -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="656" width="340" height="108" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect x="420" y="656" width="220" height="108" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+    <rect x="680" y="656" width="480" height="108" rx="10" fill="#f0fdfa" stroke="#99f6e4"/>
+  </g>
+  <text x="56" y="686" font-size="14" fill="#0f172a">“Report per <tspan font-weight="700" fill="#1d4ed8">region</tspan>: <tspan font-weight="700" fill="#1d4ed8">adults</tspan>,</text>
+  <text x="56" y="706" font-size="14" fill="#0f172a"> <tspan font-weight="700" fill="#1d4ed8">adults with type 2 diabetes</tspan></text>
+  <text x="56" y="726" font-size="14" fill="#0f172a"> and the <tspan font-weight="700" fill="#1d4ed8">prevalence</tspan>.”</text>
+  <text x="56" y="750" font-size="12" fill="#94a3b8">defined names + keywords (%, mean, no)</text>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#92400e">
+    <text x="436" y="686">group_by: [region]</text>
+    <text x="436" y="706">1 count  adult</text>
+    <text x="436" y="726">2 count  adult ∧ T2D</text>
+    <text x="436" y="746">3 percent  2 / 1</text>
+  </g>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#115e59">
+    <text x="696" y="686">SELECT region,</text>
+    <text x="696" y="706">  SUM(CASE WHEN adult THEN 1 ELSE 0 END),</text>
+    <text x="696" y="726">  SUM(CASE WHEN adult AND t2d THEN 1 ELSE 0 END)</text>
+    <text x="696" y="746">FROM flagged GROUP BY region</text>
+  </g>
+  <line x1="380" y1="710" x2="416" y2="710" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="640" y1="710" x2="676" y2="710" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- always applied -->
+  <rect x="40" y="790" width="1120" height="104" rx="12" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="60" y="820" font-size="15" font-weight="700" fill="#0f172a">Always added, never read from the request</text>
+  <g font-size="13" fill="#334155">
+    <text x="60" y="848">• <tspan font-family="'JetBrains Mono', Menlo, Consolas, monospace" fill="#115e59">WHERE opted_out = 0</tspan> on every patient (Art. 71)</text>
+    <text x="60" y="872">• reference date 31 December 2025 for age and active drugs</text>
+    <text x="620" y="848">• percentages and means in Python, rounded half up</text>
+    <text x="620" y="872">• small cells: counts below 10 → “&lt;10”; % or mean on fewer than 10 → “suppressed”</text>
+  </g>
+  <text x="40" y="922" font-size="12" fill="#94a3b8">A sentence that fits no rule stops the parser (“could not interpret: …”) and goes to IBM Bob, which must return the same structure.</text>
+</svg>

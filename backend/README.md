@@ -48,6 +48,8 @@ Rebuild the committed databases only after changing their sources:
 
 ## Data extraction
 
+![From English to SQL](../docs/english-to-sql.svg)
+
 - Each definition must fully match a regex rule; the report line is read via the defined names.
   Anything not understood raises `InterpretError`, never skipped.
 - Where the rules give up, IBM Bob (`bob run --mode ask`, request text only) fills the same
