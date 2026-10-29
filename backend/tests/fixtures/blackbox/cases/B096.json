@@ -1,0 +1,24 @@
+{
+  "request": {
+    "id": "B096",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Sophie Lechner",
+      "organisation": "Danube Institute for Diabetes Research (university research group)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on the epidemiology of chronic diseases to inform prevention programmes.",
+    "question": "How many patients with chronic pain take paracetamol, by hospital?",
+    "definitions": [
+      "Paracetamol = ATC code starting with N02BE.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per hospital: patients with an active paracetamol."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "error": true
+  }
+}

@@ -20,10 +20,10 @@ def test_every_request_runs_end_to_end(conn, request_id):
         assert result.data is not None
 
 
-def test_stub_returns_all_data(conn, r01):
+def test_r01_returns_one_row_per_region(conn, r01):
     result = pipeline.run(r01, conn)
-    (patients,) = conn.execute("SELECT COUNT(*) FROM patients").fetchone()
-    assert len(result.data["patients"]) == patients
+    (regions,) = conn.execute("SELECT COUNT(DISTINCT region) FROM patients").fetchone()
+    assert len(result.data["patients"]) == regions
 
 
 def test_reject_branch_stops_before_data(conn, r01, monkeypatch):

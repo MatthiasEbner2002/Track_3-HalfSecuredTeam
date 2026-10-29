@@ -1,0 +1,50 @@
+{
+  "request": {
+    "id": "B047",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Pieter de Vries",
+      "organisation": "University Medical Center Utrecht, Julius Center",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on medication use and treatment gaps in routine care.",
+    "question": "How many patients had at least one inpatient stay in 2025, by region?",
+    "definitions": [
+      "Inpatient stay = encounter with type 'inpatient'.",
+      "Hospitalised patient = patient with at least one inpatient stay whose start_date is in 2025.",
+      "Report per region: hospitalised patients."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      26
+    ],
+    "Kärnten": [
+      64
+    ],
+    "Niederösterreich": [
+      171
+    ],
+    "Oberösterreich": [
+      180
+    ],
+    "Salzburg": [
+      61
+    ],
+    "Steiermark": [
+      127
+    ],
+    "Tirol": [
+      79
+    ],
+    "Vorarlberg": [
+      55
+    ],
+    "Wien": [
+      221
+    ]
+  }
+}

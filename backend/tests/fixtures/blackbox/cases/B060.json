@@ -1,0 +1,76 @@
+{
+  "request": {
+    "id": "B060",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Medical University of Warsaw, Cardiology Research Unit",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on the epidemiology of chronic diseases to inform prevention programmes.",
+    "question": "How many patients have depression, by region and sex?",
+    "definitions": [
+      "Depression = any condition with an ICD-10 code starting with F32.",
+      "Report per region and sex: patients with depression."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland|female": [
+      12
+    ],
+    "Burgenland|male": [
+      20
+    ],
+    "Kärnten|female": [
+      33
+    ],
+    "Kärnten|male": [
+      41
+    ],
+    "Niederösterreich|female": [
+      114
+    ],
+    "Niederösterreich|male": [
+      87
+    ],
+    "Oberösterreich|female": [
+      101
+    ],
+    "Oberösterreich|male": [
+      94
+    ],
+    "Salzburg|female": [
+      37
+    ],
+    "Salzburg|male": [
+      33
+    ],
+    "Steiermark|female": [
+      67
+    ],
+    "Steiermark|male": [
+      58
+    ],
+    "Tirol|female": [
+      47
+    ],
+    "Tirol|male": [
+      43
+    ],
+    "Vorarlberg|female": [
+      31
+    ],
+    "Vorarlberg|male": [
+      22
+    ],
+    "Wien|female": [
+      110
+    ],
+    "Wien|male": [
+      129
+    ]
+  }
+}

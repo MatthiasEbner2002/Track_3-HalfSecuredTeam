@@ -1,0 +1,29 @@
+{
+  "request": {
+    "id": "B082",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Elena Rossi",
+      "organisation": "Istituto Superiore di Sanità",
+      "country": "IT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Scientific research on treatment pathways that requires patient-level longitudinal records; only aggregated results leave the secure environment.",
+    "question": "Provide pseudonymised conditions and medications of women with breast cancer.",
+    "definitions": [
+      "Breast cancer = any condition with an ICD-10 code starting with C50.",
+      "Women = sex 'female'.",
+      "Cohort = women with breast cancer.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "mode": "spe",
+  "expected": {
+    "cohort_size": 114,
+    "record_types": [
+      "conditions",
+      "medications"
+    ]
+  }
+}

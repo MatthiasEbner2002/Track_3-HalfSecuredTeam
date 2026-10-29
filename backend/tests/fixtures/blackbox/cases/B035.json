@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "B035",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Mag. Thomas Huber",
+      "organisation": "Austrian Public Health Institute (GÖG)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on medication use and treatment gaps in routine care.",
+    "question": "How many adults with type 2 diabetes receive neither an SGLT2 inhibitor nor a GLP-1 agonist, by hospital?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "SGLT2 inhibitor = ATC code starting with A10BK.",
+      "GLP-1 agonist = ATC code starting with A10BJ.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per hospital: adults with type 2 diabetes, how many of them have neither an active SGLT2 inhibitor nor an active GLP-1 agonist, and that share in %, one decimal."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Klinikum Nord": [
+      466,
+      278,
+      59.7
+    ],
+    "Klinikum Süd": [
+      405,
+      258,
+      63.7
+    ],
+    "Klinikum West": [
+      281,
+      178,
+      63.3
+    ]
+  }
+}
