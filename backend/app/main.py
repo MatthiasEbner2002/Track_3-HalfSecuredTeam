@@ -8,14 +8,16 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import router
 from app.config import settings
+from app.db import init_db
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    # Startup (later): open the DuckDB connection and load the five CSV files
-    # from settings.data_dir into it.
+    # Startup: load the five CSV files into SQLite (reuses existing DB if up-to-date)
+    init_db(data_dir=settings.data_dir)
     yield
-    # Shutdown (later): close the DuckDB connection.
+    # Shutdown: SQLite connections are closed automatically by the GC;
+    # nothing to do explicitly for the global connection.
 
 
 app = FastAPI(title="EHDS Health Data Access Body", version="0.1.0", lifespan=lifespan)

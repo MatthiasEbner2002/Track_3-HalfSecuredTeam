@@ -40,8 +40,10 @@ def test_health(client: TestClient) -> None:
     assert response.json() == {"status": "ok"}
 
 
-def test_submit_request_parses_and_is_not_implemented(client: TestClient) -> None:
-    # 501 (not 422) proves the body validated against DataRequest.
+def test_submit_request_returns_decision(client: TestClient) -> None:
+    """R01 should be accepted and return APPROVE_STATISTICAL."""
     response = client.post("/api/requests", json=R01)
-    assert response.status_code == 501
-    assert response.json() == {"detail": "Not implemented yet"}
+    assert response.status_code == 200
+    data = response.json()
+    assert data["decision"]["decision"] == "APPROVE_STATISTICAL"
+    assert data["answer"] is not None

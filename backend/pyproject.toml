@@ -8,12 +8,15 @@ dependencies = [
     "fastapi",
     "uvicorn[standard]",
     "pydantic",
+    "pandas",
+    "aiosqlite",
 ]
 
 [dependency-groups]
 dev = [
     "pytest",
     "httpx",
+    "pytest-anyio",
 ]
 
 [tool.pytest.ini_options]
