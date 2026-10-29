@@ -1,23 +1,16 @@
 [project]
 name = "ehds-backend"
 version = "0.1.0"
-description = "EHDS Health Data Access Body: decides health-data requests (Regulation (EU) 2025/327)"
-readme = "README.md"
+description = "EHDS Health Data Access Body prototype (Regulation (EU) 2025/327)"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi",
     "uvicorn[standard]",
-    "pydantic",
-    "pandas",
-    "aiosqlite",
+    "pydantic>=2",
 ]
 
-[dependency-groups]
-dev = [
-    "pytest",
-    "httpx",
-    "pytest-anyio",
-]
+[project.optional-dependencies]
+dev = ["pytest", "httpx"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

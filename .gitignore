@@ -17,3 +17,5 @@ dist/
 .idea/
 .vscode/
 *.swp
+*.egg-info/
+*.db.tmp

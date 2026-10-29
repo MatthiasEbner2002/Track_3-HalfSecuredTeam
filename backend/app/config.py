@@ -1,33 +1,13 @@
-"""Runtime settings, read once from environment variables at import time."""
+"""Paths and constants. Override paths with environment variables if needed."""
 
 import os
-from dataclasses import dataclass
 from pathlib import Path
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
-def _split(value: str) -> tuple[str, ...]:
-    return tuple(item.strip() for item in value.split(",") if item.strip())
+DATA_DIR = Path(os.environ.get("EHDS_DATA_DIR", REPO_ROOT / "data"))
+DB_PATH = Path(os.environ.get("EHDS_DB_PATH", DATA_DIR / "ehds.db"))
+REQUESTS_DIR = Path(os.environ.get("EHDS_REQUESTS_DIR", REPO_ROOT / "requests"))
 
-
-@dataclass(frozen=True)
-class Settings:
-    data_dir: Path  # folder with the five CSV files
-    spe_dir: Path  # one sub-folder per secure processing environment
-    cors_origins: tuple[str, ...]
-    reference_date: str = "2025-12-31"  # date for ages and active medications
-    small_cell_threshold: int = 10  # counts below this are never shown
-
-    @classmethod
-    def from_env(cls) -> "Settings":
-        return cls(
-            data_dir=Path(os.environ.get("EHDS_DATA_DIR", "../data")),
-            spe_dir=Path(os.environ.get("EHDS_SPE_DIR", "./spe")),
-            cors_origins=_split(
-                os.environ.get(
-                    "EHDS_CORS_ORIGINS", "http://localhost:5173,http://localhost:3000"
-                )
-            ),
-        )
-
-
-settings = Settings.from_env()
+REFERENCE_DATE = "2025-12-31"  # date for ages and active medications
+SMALL_CELL_THRESHOLD = 10  # counts below this are shown as "<10"

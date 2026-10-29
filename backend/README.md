@@ -1,49 +1,59 @@
 # Backend
 
-FastAPI backend of the EHDS Health Data Access Body. **Skeleton only:** it starts,
-answers `/health` and exposes the API shape; every `/api` route returns
-`501 Not implemented yet` and every service raises `NotImplementedError`.
+Skeleton of the request pipeline. Every layer is a stub that passes data through,
+so each one can be replaced on its own.
+
+```
+Request -> decision -> REJECT (articles)
+              └ accept -> routing -> statistics | spe        -> ResultSpec ("result needed")
+                                  -> mapping                 -> CodeMapping (ICD-10 / ATC / LOINC)
+                                  -> query                   -> QueryPlan (SQL)
+                                  -> db.execute              -> rows
+                                  -> small_cell              -> rows
+                                  -> PipelineResult
+```
+
+| Layer | File | Stub behaviour |
+|---|---|---|
+| Decision system | `app/layers/decision.py` | accepts everything |
+| Statistics vs SPE | `app/layers/routing.py` | always `statistics` |
+| Statistics spec | `app/layers/statistics.py` | passes request through |
+| SPE spec | `app/layers/spe.py` | asks for all tables |
+| Code mapping | `app/layers/mapping.py` | empty mapping |
+| Query generation | `app/layers/query.py` | `SELECT *` from every table |
+| Small-cell rule | `app/layers/small_cell.py` | returns rows unchanged |
+
+The interfaces between layers live in `app/models.py`; `app/pipeline.py` wires them.
+
+## Setup
+
+```bash
+cd backend
+python3.13 -m venv .venv
+.venv/bin/pip install -e ".[dev]"
+```
+
+## Database
+
+`data/ehds.db` (SQLite) is built from the CSVs in `data/` and committed to git.
+Rebuild after changing a CSV:
+
+```bash
+.venv/bin/python -m app.db
+```
 
 ## Run
 
 ```bash
-cd backend && uv sync && uv run uvicorn app.main:app --reload --port 8000
+.venv/bin/uvicorn app.main:app --reload --port 8000
+curl -X POST localhost:8000/api/requests -H 'Content-Type: application/json' -d @../requests/R01.json
 ```
 
-- Health check: http://localhost:8000/health
-- OpenAPI docs: http://localhost:8000/docs
-
-## Test
+## Tests
 
 ```bash
-uv run pytest
+.venv/bin/pytest -q -rxX
 ```
 
-## Configuration
-
-| Variable | Default | Meaning |
-|---|---|---|
-| `EHDS_DATA_DIR` | `../data` | Folder with the five CSV files (relative to `backend/`) |
-| `EHDS_SPE_DIR` | `./spe` | Where secure processing environments are created (git-ignored) |
-| `EHDS_CORS_ORIGINS` | `http://localhost:5173,http://localhost:3000` | Comma-separated allowed frontend origins |
-
-Fixed in `app/config.py`: reference date `2025-12-31`, small-cell threshold `10`.
-
-## Layout
-
-```
-backend/
-├── app/
-│   ├── main.py            FastAPI app, lifespan, CORS, /health
-│   ├── config.py          Settings from environment variables
-│   ├── api/routes.py      /api routes (stubs)
-│   ├── models/schemas.py  Request and decision models
-│   └── services/
-│       ├── vocab.py       Plain English -> ICD-10 / ATC / LOINC prefixes
-│       ├── interpret.py   Request definitions -> QuerySpec
-│       ├── engine.py      QuerySpec -> SQL -> raw result table
-│       ├── disclosure.py  Small-cell rule and rounding
-│       ├── decide.py      REJECT / APPROVE_STATISTICAL / APPROVE_SPE + articles
-│       └── spe.py         SPE provisioning, download block, audit log
-└── tests/
-```
+`tests/test_expected.py` compares against `requests/expected.json` and is marked
+`xfail` while the decision layer is a stub; `XPASS` lines show what already works.
