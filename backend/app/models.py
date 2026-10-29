@@ -36,6 +36,22 @@ class DataRequest(BaseModel):
     definitions: list[str] = Field(default_factory=list)
 
 
+class LawParagraph(BaseModel):
+    """One chunk of the regulation, the unit of retrieval and grounding.
+
+    kind "paragraph": a paragraph's own text without its points, id "Art. 53(1)"
+    kind "point":     one point with its sub-points, id "Art. 53(1)(e)" or "Art. 54(b)"
+    kind "recital":   one recital, id "Recital 62"
+    """
+
+    id: str
+    kind: Literal["paragraph", "point", "recital"] = "paragraph"
+    article: str  # e.g. "54"; "" for recitals
+    article_title: str = ""
+    text: str
+    lead_in: str = ""  # for points: the paragraph sentence that introduces the list
+
+
 class Evidence(BaseModel):
     """An article point found to apply, with the sentence of the request that shows it."""
 
@@ -52,6 +68,8 @@ class Decision(BaseModel):
     accepted: bool
     articles: list[str] = Field(default_factory=list)
     reason: str = ""
+    grounding: list[LawParagraph] = Field(default_factory=list)  # chunks the reason rests on
+    needs_review: bool = False  # the model's answer could not be verified against the law text
     evidence: list[Evidence] = Field(default_factory=list)  # for staff: why
     flags: list[str] = Field(default_factory=list)  # e.g. "needs_review", "rules_only"
 
@@ -205,6 +223,8 @@ class PipelineResult(BaseModel):
     decision: DecisionType
     articles: list[str]
     reason: str
+    grounding: list[LawParagraph] = Field(default_factory=list)
+    needs_review: bool = False
     evidence: list[Evidence] = Field(default_factory=list)
     flags: list[str] = Field(default_factory=list)
     route: Route | None = None

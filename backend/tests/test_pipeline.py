@@ -42,3 +42,10 @@ def test_spe_branch(conn, r01, monkeypatch):
     result = pipeline.run(r01, conn)
     assert result.decision == "APPROVE_SPE"
     assert result.route == "spe"
+    assert result.articles == ["53", "66", "68", "73"]
+
+
+def test_statistics_adds_art_69_and_keeps_grounding(conn, r01):
+    result = pipeline.run(r01, conn)
+    assert result.articles == ["53", "69"]
+    assert result.grounding

@@ -1,0 +1,114 @@
+[
+  {
+    "id": "H01", "expect": "REJECT", "point": "Art. 54(b)",
+    "applicant": {"name": "Mag. Karl Steiner", "organisation": "Bergbank AG, retail credit risk unit", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "We want to adjust mortgage interest rates for applicants with chronic kidney disease to reflect their expected life span.",
+    "question": "How many adults have chronic kidney disease (eGFR below 60), by 10-year age band?"
+  },
+  {
+    "id": "H02", "expect": "REJECT", "point": "Art. 54(b)",
+    "applicant": {"name": "Sandra Wimmer", "organisation": "Hofer Bau GmbH, recruiting", "country": "AT"},
+    "requested_as": "health data access application", "requested_format": "pseudonymised records",
+    "purpose": "Construction work is physically demanding. We want to screen job applicants for a history of back problems before we make offers.",
+    "question": "Provide records of all adults in Steiermark with a back pain diagnosis."
+  },
+  {
+    "id": "H03", "expect": "REJECT", "point": "Art. 54(d)",
+    "applicant": {"name": "Thomas Gruber", "organisation": "Alpenbräu AG, new products", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "We are developing a sugar-free beer for people with diabetes and want to size the target group per region.",
+    "question": "How many adults have type 2 diabetes, by region?"
+  },
+  {
+    "id": "H04", "expect": "REJECT", "point": "Art. 54(c)",
+    "applicant": {"name": "Dr. Lisa Moser", "organisation": "Cardiopharm Austria GmbH, sales", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "Our field sales team should visit the GPs in the regions with the most hypertension patients first to promote our new combination tablet.",
+    "question": "How many adults have hypertension, by region?"
+  },
+  {
+    "id": "H05", "expect": "REJECT", "point": "Art. 54(b)",
+    "applicant": {"name": "Peter Lang", "organisation": "Donau Leben Versicherung AG, underwriting", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "We want to decide which applicants for life insurance we decline, based on how common heart failure is in their age group.",
+    "question": "What share of adults has heart failure, by 10-year age band?"
+  },
+  {
+    "id": "H06", "expect": "REJECT", "point": null,
+    "applicant": {"name": "Markus Huber", "organisation": "DataLink Solutions GmbH, data broker", "country": "AT"},
+    "requested_as": "health data access application", "requested_format": "pseudonymised records",
+    "purpose": "We will link the pseudonymised records with our customer database by birth date and region to find out which of our customers have HIV and sell these lists.",
+    "question": "Provide pseudonymised records of all patients with an HIV diagnosis, including birth date and region."
+  },
+  {
+    "id": "H07", "expect": "REJECT", "point": "Art. 54(d)",
+    "applicant": {"name": "Eva Brunner", "organisation": "CloudVape Ltd, product development", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "We design new e-cigarette flavours and want to know in which age groups smoking-related disease is lowest, so our launch targets them.",
+    "question": "How many patients have COPD or lung cancer, by 10-year age band?"
+  },
+  {
+    "id": "H08", "expect": "REJECT", "point": "Art. 54(b)",
+    "applicant": {"name": "Robert Fuchs", "organisation": "Wohnbau Kärnten Genossenschaft, tenant selection", "country": "AT"},
+    "requested_as": "health data access application", "requested_format": "pseudonymised records",
+    "purpose": "We want to exclude tenants with a history of severe mental illness from our new housing project.",
+    "question": "Provide records of all adults in Kärnten with schizophrenia or bipolar disorder."
+  },
+  {
+    "id": "H09", "expect": "ACCEPT", "point": "Art. 53(1)(e)",
+    "applicant": {"name": "Dr. Julia Novak", "organisation": "Cardiopharm Austria GmbH, drug safety (pharmacovigilance)", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "Post-authorisation safety study requested by the medicines agency: we monitor bleeding events in patients on our anticoagulant.",
+    "question": "How many patients on apixaban had an inpatient stay for bleeding in 2025, by age band?"
+  },
+  {
+    "id": "H10", "expect": "ACCEPT", "point": "Art. 53(1)(e)",
+    "applicant": {"name": "Dr. Stefan Pichler", "organisation": "RhythmAI GmbH, medical device start-up", "country": "AT"},
+    "requested_as": "health data access application", "requested_format": "pseudonymised records",
+    "purpose": "We train and validate an AI model that detects atrial fibrillation early so that cardiologists can start anticoagulation before a stroke happens. Training needs patient-level data.",
+    "question": "Provide pseudonymised conditions and medications of adults with atrial fibrillation."
+  },
+  {
+    "id": "H11", "expect": "ACCEPT", "point": null,
+    "applicant": {"name": "Mag. Andrea Koller", "organisation": "Regional health planning authority Oberösterreich", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "We plan dialysis capacity for the next five years and need the number of patients with advanced kidney disease per region.",
+    "question": "How many adults have an eGFR below 30, by region?"
+  },
+  {
+    "id": "H12", "expect": "ACCEPT", "point": "Art. 53(1)(d)",
+    "applicant": {"name": "Prof. Maria Egger", "organisation": "University of Applied Sciences, nursing programme", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "Our nursing students learn descriptive statistics on real-world patterns of chronic disease in a course module.",
+    "question": "How many adults have hypertension, type 2 diabetes or both, by sex?"
+  },
+  {
+    "id": "H13", "expect": "ACCEPT", "point": null,
+    "applicant": {"name": "Dr. Florian Bauer", "organisation": "Austrian social health insurance fund, department for prevention", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "We evaluate whether our diabetes prevention programme reduced hospital admissions, to decide whether to extend it to all regions.",
+    "question": "How many patients with type 2 diabetes had an inpatient stay in 2023, 2024 and 2025, by region?"
+  },
+  {
+    "id": "H14", "expect": "ACCEPT", "point": "Art. 53(1)(a)",
+    "applicant": {"name": "Dr. Nadine Haas", "organisation": "Public health agency, tobacco control unit", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "We evaluate our anti-smoking campaign and want to see whether COPD diagnoses among younger adults are going down.",
+    "question": "How many new COPD diagnoses were there per year from 2020 to 2025 among adults under 50?"
+  },
+  {
+    "id": "H15", "expect": "ACCEPT", "point": "Art. 53(1)(a)",
+    "applicant": {"name": "Dr. Paul Winkler", "organisation": "Institute for Occupational Health (university)", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "We study depression among health care workers to recommend better working conditions to employers and the ministry.",
+    "question": "How many adults have a depression diagnosis, by region and sex?"
+  },
+  {
+    "id": "H16", "expect": "ACCEPT", "point": "Art. 53(1)(c)",
+    "applicant": {"name": "Mag. Clara Reiter", "organisation": "National statistics office, population statistics", "country": "AT"},
+    "requested_as": "health data request", "requested_format": "anonymised statistics",
+    "purpose": "Official statistics on the prevalence of chronic diseases for the national health report.",
+    "question": "How many adults have hypertension, type 2 diabetes, COPD or heart failure, by region?"
+  }
+]

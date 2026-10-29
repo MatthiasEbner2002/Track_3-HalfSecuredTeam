@@ -13,7 +13,6 @@ from app.purpose.assess import config
 
 HEALTH_DATA_REQUEST = "health data request"
 
-
 def choose_route(request: DataRequest, decision: Decision) -> Route:
     if request.requested_as == HEALTH_DATA_REQUEST:
         return "statistics"

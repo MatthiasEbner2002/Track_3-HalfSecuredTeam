@@ -22,6 +22,8 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
             decision="REJECT",
             articles=verdict.articles,
             reason=verdict.reason,
+            grounding=verdict.grounding,
+            needs_review=verdict.needs_review,
             evidence=verdict.evidence,
             flags=verdict.flags,
         )
@@ -48,6 +50,8 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
         decision=_DECISIONS[route],
         articles=articles,
         reason=reason,
+        grounding=verdict.grounding,
+        needs_review=verdict.needs_review,
         evidence=verdict.evidence + ([spe_why] if (spe_why := assess(request).spe_justification) and route == "spe" else []),
         flags=flags,
         route=route,
