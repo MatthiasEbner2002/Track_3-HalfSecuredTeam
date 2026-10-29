@@ -1,6 +1,10 @@
-"""Decision system (grounded RAG): accept or reject a request and cite the law.
+"""Decision system: accept or reject a request and cite the law.
 
-Three small steps instead of one big question:
+Two engines, chosen with EHDS_DECISION_ENGINE (config.DECISION_ENGINE):
+- "rag" (default): grounded RAG over the regulation with a local LLM, below.
+- "purpose": the purpose check in app/purpose (IBM Bob / local NLI model / rules).
+
+The "rag" engine takes three small steps instead of one big question:
 
 1. Extract (LLM): who is asking and what they will do with the results (the
    end use, as opposed to the analysis itself), read
@@ -18,8 +22,8 @@ The decision follows from the chosen point (Art. 54 rejects, Art. 53 accepts).
 The reason is assembled in code from the point's verbatim text, so it cannot
 contradict the decision.
 
-Articles returned here are the base set. The routing layer adds the ones that
-depend on the route (Art. 69 for statistics, Art. 68 and 73 for an SPE).
+Articles returned here are the base set (54 or 53). The routing layer adds the
+ones that depend on the request type and route (66, 68, 69, 73).
 """
 
 import re
@@ -27,12 +31,13 @@ from dataclasses import dataclass
 from functools import cache
 from typing import Protocol
 
-from app.config import RETRIEVAL_TOP_K
+from app.config import DECISION_ENGINE, RETRIEVAL_TOP_K
 from app.models import DataRequest, Decision, LawParagraph
+from app.purpose import assess
+from app.purpose.assess import config
 from app.rag.ollama import OllamaEmbedder, OllamaLLM
 from app.rag.store import Retriever
 
-ACCESS_APPLICATION = "health data access application"
 PERMITTED = "Art. 53(1)"
 PROHIBITED = "Art. 54"
 
@@ -127,7 +132,7 @@ def match(llm: LLM, facts: dict[str, str], permitted: list[LawParagraph], prohib
     return Match(point, verified)
 
 
-def decide(
+def decide_rag(
     request: DataRequest, retriever: Retriever | None = None, llm: LLM | None = None
 ) -> Decision:
     retriever = retriever or _default_retriever()
@@ -152,6 +157,7 @@ def decide(
             f"{p.id} prohibits “{point_text(p)}”.",
             grounding=[p],
             needs_review=not result.verified,
+            flags=[] if result.verified else ["needs_review"],
         )
 
     articles = ["53"]
@@ -159,10 +165,44 @@ def decide(
         reason = f"Accepted: permitted purpose under {p.id}. {use} {p.id} allows “{point_text(p)}”."
     else:
         reason = f"Accepted: no prohibited use under Art. 54 found. {use}"
-    if request.requested_as == ACCESS_APPLICATION:
-        articles.append("66")
-        reason += " Handled as a health data access application (Art. 66)."
     return Decision(
         accepted=True, articles=articles, reason=reason, grounding=[p] if p else [],
-        needs_review=not result.verified,
+        needs_review=not result.verified, flags=[] if result.verified else ["needs_review"],
     )
+
+
+def _join(labels: list[str]) -> str:
+    labels = list(dict.fromkeys(labels))
+    return labels[0] if len(labels) == 1 else ", ".join(labels[:-1]) + " and " + labels[-1]
+
+
+def decide_purpose(request: DataRequest) -> Decision:
+    """Purpose check engine: reject prohibited purposes (Art. 54), otherwise accept under Art. 53."""
+    result = assess(request)
+    reasons = config()["reasons"]
+
+    if result.prohibited:
+        return Decision(
+            accepted=False,
+            articles=["54"],
+            reason=reasons["reject"].format(labels=_join([e.label for e in result.prohibited])),
+            evidence=result.prohibited,
+            flags=result.flags,
+        )
+
+    if result.allowed:
+        labels = _join([e.label for e in result.allowed])
+        verb = "are allowed purposes" if len(result.allowed) > 1 else "is an allowed purpose"
+        text = reasons["allowed"].format(labels=labels, verb=verb)
+        reason = text[0].upper() + text[1:]
+    else:
+        reason = reasons["no_allowed_purpose"]
+    return Decision(accepted=True, articles=["53"], reason=reason, evidence=result.allowed, flags=result.flags)
+
+
+def decide(
+    request: DataRequest, retriever: Retriever | None = None, llm: LLM | None = None
+) -> Decision:
+    if DECISION_ENGINE == "purpose":
+        return decide_purpose(request)
+    return decide_rag(request, retriever, llm)

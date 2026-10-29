@@ -1,0 +1,51 @@
+{
+  "request": {
+    "id": "B049",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Charles University, Department of Epidemiology",
+      "country": "CZ"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Public health monitoring of chronic disease burden for the regional health authorities.",
+    "question": "How many emergency visits did patients with asthma make in 2025, by region?",
+    "definitions": [
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "Emergency visit = encounter with type 'emergency'.",
+      "Count visits (not patients) of patients with asthma whose start_date is in 2025.",
+      "Report per region: emergency visits of patients with asthma."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      "<10"
+    ],
+    "Kärnten": [
+      "<10"
+    ],
+    "Niederösterreich": [
+      20
+    ],
+    "Oberösterreich": [
+      16
+    ],
+    "Salzburg": [
+      "<10"
+    ],
+    "Steiermark": [
+      "<10"
+    ],
+    "Tirol": [
+      "<10"
+    ],
+    "Vorarlberg": [
+      "<10"
+    ],
+    "Wien": [
+      21
+    ]
+  }
+}

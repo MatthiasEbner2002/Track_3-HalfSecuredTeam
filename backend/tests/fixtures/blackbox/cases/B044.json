@@ -1,0 +1,32 @@
+{
+  "request": {
+    "id": "B044",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Medical University of Warsaw, Cardiology Research Unit",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Health services research to improve the quality of care for patients with chronic conditions.",
+    "question": "How many emergency visits were there in 2024 at each hospital?",
+    "definitions": [
+      "Emergency visit = encounter with type 'emergency'.",
+      "Count visits (not patients) whose start_date is in 2024.",
+      "Report per hospital: emergency visits."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Klinikum Nord": [
+      464
+    ],
+    "Klinikum Süd": [
+      410
+    ],
+    "Klinikum West": [
+      266
+    ]
+  }
+}

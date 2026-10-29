@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "B030",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "INSERM Clinical Epidemiology Team",
+      "country": "FR"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on the epidemiology of chronic diseases to inform prevention programmes.",
+    "question": "How many adults with hypertension do not take any ACE inhibitor or ARB, per age band?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "RAS blocker = ATC code starting with C09AA or C09CA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Age bands on 31 December 2025: 18-49, 50-64, 65+.",
+      "Report per band: adults with hypertension, how many of them have no active RAS blocker and that share in %, one decimal."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "18-49": [
+      359,
+      97,
+      27.0
+    ],
+    "50-64": [
+      1057,
+      274,
+      25.9
+    ],
+    "65+": [
+      2046,
+      545,
+      26.6
+    ]
+  }
+}

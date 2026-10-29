@@ -1,0 +1,59 @@
+{
+  "request": {
+    "id": "B027",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Mag. Thomas Huber",
+      "organisation": "Austrian Public Health Institute (GÖG)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Production of official health statistics for the national health report.",
+    "question": "What is the mean eGFR of patients with chronic kidney disease, by region?",
+    "definitions": [
+      "Chronic kidney disease = any condition with an ICD-10 code starting with N18.",
+      "Use the latest eGFR (LOINC 62238-1) per patient; patients without an eGFR are left out.",
+      "Report per region: patients with chronic kidney disease who have an eGFR and their mean eGFR, one decimal."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      15,
+      42.9
+    ],
+    "Kärnten": [
+      15,
+      44.1
+    ],
+    "Niederösterreich": [
+      86,
+      45.7
+    ],
+    "Oberösterreich": [
+      61,
+      45.2
+    ],
+    "Salzburg": [
+      18,
+      45.2
+    ],
+    "Steiermark": [
+      66,
+      42.8
+    ],
+    "Tirol": [
+      40,
+      43.5
+    ],
+    "Vorarlberg": [
+      17,
+      43.8
+    ],
+    "Wien": [
+      96,
+      45.8
+    ]
+  }
+}

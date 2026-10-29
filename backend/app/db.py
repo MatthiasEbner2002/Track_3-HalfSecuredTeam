@@ -116,7 +116,7 @@ def connect(db_path: Path = DB_PATH) -> sqlite3.Connection:
     return conn
 
 
-def execute(conn: sqlite3.Connection, sql: str, params: tuple = ()) -> list[dict[str, Any]]:
+def execute(conn: sqlite3.Connection, sql: str, params: tuple | dict = ()) -> list[dict[str, Any]]:
     """Run one query and return the rows as plain dicts."""
     return [dict(row) for row in conn.execute(sql, params)]
 

@@ -1,0 +1,61 @@
+{
+  "request": {
+    "id": "B075",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Mag. Thomas Huber",
+      "organisation": "Austrian Public Health Institute (GÖG)",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Training and validating a risk prediction model in a secure processing environment; only model weights and performance metrics are exported.",
+    "question": "Provide pseudonymised records of all adults with asthma and their inhaler prescriptions.",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "ICS/LABA = ATC code starting with R03AK.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per region: adults with asthma, % with an active ICS/LABA, one decimal."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      26,
+      30.8
+    ],
+    "Kärnten": [
+      57,
+      50.9
+    ],
+    "Niederösterreich": [
+      157,
+      35.0
+    ],
+    "Oberösterreich": [
+      170,
+      34.7
+    ],
+    "Salzburg": [
+      50,
+      42.0
+    ],
+    "Steiermark": [
+      120,
+      45.0
+    ],
+    "Tirol": [
+      80,
+      41.3
+    ],
+    "Vorarlberg": [
+      35,
+      42.9
+    ],
+    "Wien": [
+      190,
+      41.6
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "request": {
+    "id": "B055",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Pieter de Vries",
+      "organisation": "University Medical Center Utrecht, Julius Center",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Public health monitoring of chronic disease burden for the regional health authorities.",
+    "question": "How many patients were newly diagnosed with type 2 diabetes in 2024, by sex?",
+    "definitions": [
+      "New type 2 diabetes = any condition with an ICD-10 code starting with E11 and an onset_date in 2024.",
+      "Report per sex: patients with new type 2 diabetes."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "female": [
+      14
+    ],
+    "male": [
+      21
+    ]
+  }
+}

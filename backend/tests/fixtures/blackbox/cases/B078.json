@@ -1,0 +1,29 @@
+{
+  "request": {
+    "id": "B078",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "INSERM Clinical Epidemiology Team",
+      "country": "FR"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Training and validating a risk prediction model in a secure processing environment; only model weights and performance metrics are exported.",
+    "question": "Provide pseudonymised encounter records of patients with heart failure.",
+    "definitions": [
+      "Heart failure stay = inpatient stay whose main diagnosis (primary_icd10) starts with I50.",
+      "Count stays (not patients) whose start_date is in 2025.",
+      "Report per sex: heart failure stays."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "female": [
+      83
+    ],
+    "male": [
+      74
+    ]
+  }
+}

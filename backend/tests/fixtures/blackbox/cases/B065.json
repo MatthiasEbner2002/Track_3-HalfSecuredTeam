@@ -1,0 +1,69 @@
+{
+  "request": {
+    "id": "B065",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Charles University, Department of Epidemiology",
+      "country": "CZ"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on medication use and treatment gaps in routine care.",
+    "question": "In which federal states is type 2 diabetes most common among people aged 65 or older?",
+    "definitions": [
+      "Older person = aged 65 or older on 31 December 2025.",
+      "Type 2 diabetes is identified by any diagnosis whose ICD-10 code begins with E11.",
+      "Prevalence = older persons with type 2 diabetes / all older persons in the region × 100, one decimal.",
+      "Report per region: older persons, older persons with type 2 diabetes and the prevalence."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      122,
+      18,
+      14.8
+    ],
+    "Kärnten": [
+      220,
+      40,
+      18.2
+    ],
+    "Niederösterreich": [
+      684,
+      140,
+      20.5
+    ],
+    "Oberösterreich": [
+      571,
+      102,
+      17.9
+    ],
+    "Salzburg": [
+      224,
+      42,
+      18.8
+    ],
+    "Steiermark": [
+      523,
+      107,
+      20.5
+    ],
+    "Tirol": [
+      311,
+      82,
+      26.4
+    ],
+    "Vorarlberg": [
+      143,
+      22,
+      15.4
+    ],
+    "Wien": [
+      776,
+      162,
+      20.9
+    ]
+  }
+}

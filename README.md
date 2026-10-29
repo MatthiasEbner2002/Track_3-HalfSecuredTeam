@@ -79,6 +79,7 @@ Environment variables, all optional:
 
 | Variable | Default | Use |
 |---|---|---|
+| `EHDS_DECISION_ENGINE` | `rag` | `purpose` switches to the purpose check (NLI model / IBM Bob / rules) |
 | `EHDS_LLM_MODEL` | `qwen2.5:7b` | e.g. `qwen2.5:3b` on a small laptop (less accurate) |
 | `EHDS_EMBED_MODEL` | `nomic-embed-text` | rebuild `law.db` after changing it |
 | `EHDS_OLLAMA_URL` | `http://localhost:11434` | Ollama on another machine |
@@ -97,10 +98,11 @@ Request ─► decision ─► REJECT (Art. 54, quoted reason)
               └► accept ─► routing ─► statistics | SPE ─► code mapping ─► query ─► small-cell rule ─► result
 ```
 
-Each box is one module in `backend/app/layers/`. The **decision layer** is
-implemented (grounded RAG over the regulation with a local LLM); the other layers
-are stubs that pass all data through and are being replaced one at a time.
-Details: [backend/README.md](backend/README.md).
+Each box is one module in `backend/app/layers/`. The **decision layer** has two
+engines: grounded RAG over the regulation with a local LLM (default) and the purpose
+check (NLI model / IBM Bob / rules). **Routing**, **mapping** and **query** turn the
+request definitions into SQL with the small-cell rule. Details:
+[backend/README.md](backend/README.md).
 
 | Path | Content |
 |---|---|

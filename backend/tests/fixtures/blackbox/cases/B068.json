@@ -1,0 +1,62 @@
+{
+  "request": {
+    "id": "B068",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Medical University of Warsaw, Cardiology Research Unit",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Health services research to improve the quality of care for patients with chronic conditions.",
+    "question": "Which share of men aged 50 to 69 with hypertension is treated with an ARB, per region?",
+    "definitions": [
+      "Men = sex 'male'.",
+      "Age 50 to 69 = aged 50 to 69 on 31 December 2025.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "ARB = ATC code starting with C09CA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per region: men aged 50 to 69 with hypertension and the share with an active ARB in %, one decimal."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      23,
+      34.8
+    ],
+    "Kärnten": [
+      36,
+      33.3
+    ],
+    "Niederösterreich": [
+      143,
+      26.6
+    ],
+    "Oberösterreich": [
+      106,
+      37.7
+    ],
+    "Salzburg": [
+      51,
+      27.5
+    ],
+    "Steiermark": [
+      102,
+      30.4
+    ],
+    "Tirol": [
+      58,
+      32.8
+    ],
+    "Vorarlberg": [
+      32,
+      31.3
+    ],
+    "Wien": [
+      171,
+      28.7
+    ]
+  }
+}

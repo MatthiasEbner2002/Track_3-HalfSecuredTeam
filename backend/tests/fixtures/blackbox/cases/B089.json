@@ -1,0 +1,30 @@
+{
+  "request": {
+    "id": "B089",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Charles University, Department of Epidemiology",
+      "country": "CZ"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Developing and testing a clinical decision-support algorithm; we will only export model parameters and evaluation metrics.",
+    "question": "Provide pseudonymised conditions and encounters of men aged 50 to 69 with hypertension and type 2 diabetes.",
+    "definitions": [
+      "Men = sex 'male'.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Cohort = men aged 50 to 69 on 31 December 2025 with hypertension and type 2 diabetes.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "mode": "spe",
+  "expected": {
+    "cohort_size": 85,
+    "record_types": [
+      "conditions",
+      "encounters"
+    ]
+  }
+}

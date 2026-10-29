@@ -1,0 +1,37 @@
+{
+  "request": {
+    "id": "B076",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Medical University of Warsaw, Cardiology Research Unit",
+      "country": "PL"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Scientific research on treatment pathways that requires patient-level longitudinal records; only aggregated results leave the secure environment.",
+    "question": "Provide pseudonymised records of patients with COPD and their medications.",
+    "definitions": [
+      "COPD = any condition with an ICD-10 code starting with J44.",
+      "Tiotropium = ATC code starting with R03BB.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Age bands on 31 December 2025: 0-59, 60-74, 75+.",
+      "Report per band: patients with COPD, % with active tiotropium, one decimal."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "0-59": [
+      75,
+      50.7
+    ],
+    "60-74": [
+      149,
+      53.7
+    ],
+    "75+": [
+      117,
+      57.3
+    ]
+  }
+}

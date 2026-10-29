@@ -46,9 +46,10 @@ def test_permitted_point_accepts(fake_retriever):
     assert result.reason.startswith("Accepted: permitted purpose under Art. 53(1)(e).")
 
 
-def test_access_application_adds_art_66(fake_retriever):
+def test_access_application_gets_base_article_only(fake_retriever):
+    """Art. 66 depends on the route (statistics downgrade or SPE), so routing adds it."""
     result = decision.decide(load_request("R09"), fake_retriever, FakeLLM())
-    assert result.articles == ["53", "66"]
+    assert result.articles == ["53"]
 
 
 def test_words_not_in_the_law_need_review(fake_retriever):

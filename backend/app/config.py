@@ -13,6 +13,9 @@ REQUESTS_DIR = Path(os.environ.get("EHDS_REQUESTS_DIR", REPO_ROOT / "requests"))
 LAW_SOURCE = Path(os.environ.get("EHDS_LAW_SOURCE", REPO_ROOT / "eulex.html"))
 LAW_DB_PATH = Path(os.environ.get("EHDS_LAW_DB_PATH", DATA_DIR / "law.db"))
 
+# Decision engine: "rag" (regulation RAG + local LLM below) or "purpose" (app/purpose).
+DECISION_ENGINE = os.environ.get("EHDS_DECISION_ENGINE", "rag")
+
 # Local LLM via Ollama. Temperature 0 and a fixed seed keep decisions reproducible.
 OLLAMA_URL = os.environ.get("EHDS_OLLAMA_URL", "http://localhost:11434")
 LLM_MODEL = os.environ.get("EHDS_LLM_MODEL", "qwen2.5:7b")

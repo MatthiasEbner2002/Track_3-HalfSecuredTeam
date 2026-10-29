@@ -1,0 +1,32 @@
+{
+  "request": {
+    "id": "B012",
+    "submitted": "2026-10-29T18:30:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Medical University of Warsaw, Cardiology Research Unit",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on the epidemiology of chronic diseases to inform prevention programmes.",
+    "question": "How many patients with chronic kidney disease are there per age band?",
+    "definitions": [
+      "Chronic kidney disease = any condition with an ICD-10 code starting with N18.",
+      "Age bands on 31 December 2025: 18-64, 65-79, 80+.",
+      "Report per age band: patients with chronic kidney disease."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "18-64": [
+      70
+    ],
+    "65-79": [
+      167
+    ],
+    "80+": [
+      177
+    ]
+  }
+}

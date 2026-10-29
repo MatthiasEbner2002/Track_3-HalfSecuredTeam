@@ -1,7 +1,8 @@
-"""Decision layer against expected.json and the held-out set, using the real local LLM.
+"""RAG decision engine against expected.json and the held-out set, using the real local LLM.
 
 Skipped unless Ollama runs and data/law.db is built. For a readable report run
     python -m app.eval_decisions --runs 3
+The purpose engine has its own scoreboard in test_expected_purpose.py.
 """
 
 import pytest
@@ -17,11 +18,11 @@ IDS = [request.id for request, _, _ in CASES]
 
 @pytest.mark.parametrize(("request_", "accept", "point"), CASES, ids=IDS)
 def test_accept_or_reject(request_, accept, point):
-    result = decision.decide(request_)
+    result = decision.decide_rag(request_)
     assert result.accepted == accept
     assert result.articles[0] == ("53" if accept else "54")
 
 
 @pytest.mark.parametrize(("request_", "accept", "point"), CASES[:10], ids=IDS[:10])
 def test_consistent_across_three_runs(request_, accept, point):
-    assert len({decision.decide(request_).model_dump_json() for _ in range(3)}) == 1
+    assert len({decision.decide_rag(request_).model_dump_json() for _ in range(3)}) == 1

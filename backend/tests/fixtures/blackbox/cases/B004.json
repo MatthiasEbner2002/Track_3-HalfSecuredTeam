@@ -1,0 +1,50 @@
+{
+  "request": {
+    "id": "B004",
+    "submitted": "2026-10-29T19:50:00+01:00",
+    "applicant": {
+      "name": "Dr. Lukas Fischer",
+      "organisation": "National statistics office, health statistics unit",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Official statistics on hospital use for the annual health report.",
+    "question": "How many inpatient stays started in 2025, by the patient's region?",
+    "definitions": [
+      "Inpatient stay = encounter with type 'inpatient'.",
+      "Count stays (not patients) whose start_date is in 2025.",
+      "Report per region: inpatient stays."
+    ]
+  },
+  "mode": "statistics",
+  "expected": {
+    "Burgenland": [
+      28
+    ],
+    "Kärnten": [
+      69
+    ],
+    "Niederösterreich": [
+      187
+    ],
+    "Oberösterreich": [
+      194
+    ],
+    "Salzburg": [
+      69
+    ],
+    "Steiermark": [
+      140
+    ],
+    "Tirol": [
+      86
+    ],
+    "Vorarlberg": [
+      61
+    ],
+    "Wien": [
+      245
+    ]
+  }
+}
