@@ -1,0 +1,21 @@
+[project]
+name = "ehds-backend"
+version = "0.1.0"
+description = "EHDS Health Data Access Body: decides health-data requests (Regulation (EU) 2025/327)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "httpx",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
