@@ -26,8 +26,7 @@ Rebuild the committed databases only after changing their sources:
 
 | Variable | Default | Use |
 |---|---|---|
-| `EHDS_DECISION_ENGINE` | `rag` | `purpose` for the purpose check |
-| `EHDS_LLM_MODEL` | `qwen2.5:7b` | Ollama model for `rag` |
+| `EHDS_LLM_MODEL` | `qwen2.5:7b` | Ollama model for the decision RAG |
 | `EHDS_OLLAMA_URL` | `http://localhost:11434` | Ollama on another machine |
 | `EHDS_LLM` | `on` | `off` disables IBM Bob in data extraction |
 | `EHDS_PURPOSE_ENGINES` | from `config.yaml` | e.g. `nli,rules` |
