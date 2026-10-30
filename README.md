@@ -8,12 +8,11 @@ Task: [`Task_desc.md`](Task_desc.md). Details: [`backend/README.md`](backend/REA
 
 Done:
 
-- [x] Decision, all four steps, RAG only: Claude Haiku 5.5 via OpenRouter, local embeddings (no
-  IBM Bob, no NLI model): Art. 54 / 53 point picked
-  by the local LLM from retrieved law text and quoted; SPE vs. downgrade judged against
-  Art. 66(2)/66(3) with a quote that must appear verbatim in the request (otherwise downgrade
-  + staff flag); route articles (69, 66, 68, 73) grounded in the law text; decisions cached per
-  request; `503` with a fix-it message when Ollama is down
+- [x] Decision, all four steps, grounded RAG: Claude Haiku 5.5 via OpenRouter, local embeddings
+  (no IBM Bob, no NLI model): Art. 54 / 53 point picked by the LLM from retrieved law text and
+  quoted; SPE vs. downgrade judged against Art. 66(2)/66(3) with a quote that must appear verbatim
+  in the request (otherwise downgrade + staff flag); route articles (69, 66, 68, 73) grounded in
+  the law text; answers cached; `503` with a fix-it message when Ollama or OpenRouter fails
 - [x] Data extraction from the definitions: 6/6 numbers, black-box 100/100 with the rules alone
   (hospital grouping, main diagnosis `primary_icd10`, stays vs. patients covered)
 - [x] Small-cell rule and opt-outs in every statistical answer
@@ -35,7 +34,7 @@ To do, in priority order:
    tighter end-use prompt; tune on the `dev` split only
 6. [ ] **Data-extraction fallback without Bob**: `llm_mapping.py` still calls the `bob` CLI, which
    is not installed, so a sentence the rules cannot read gives no numbers; fill the same
-   `QuerySpec` with the local Ollama model instead
+   `QuerySpec` with the OpenRouter LLM instead (same validation)
 7. [ ] **Cleanup**: delete or archive the unused `app/purpose/` and the stubs
    `layers/statistics.py`, `layers/spe.py`, `small_cell.apply`
 8. [ ] **Persistence**: submissions and SPE environments survive a restart
@@ -63,15 +62,52 @@ missing/invalid.
 ## Architecture
 
 ```
-request ─▶ decision ──────▶ routing ──────────────────▶ data extraction ─▶ answer + reason
-           Art. 54 / 53:     statistics (Art. 69),       rules, then IBM Bob,
-           RAG + Claude      SPE (Art. 66(3), 68, 73)    QuerySpec → SQLite
-           (OpenRouter)      or downgrade (66(2), 69):
-                             RAG + Claude (OpenRouter)
-
+                 ┌──────────────── decision (steps 1–4) ────────────────┐
+request JSON ─▶  │ 1. Art. 54 / 53   RAG: retrieve points, LLM picks one │ ─▶ REJECT (Art. 54) ─▶ reason
+                 │ 2–4. route        health data request → statistics   │
+                 │                   access application → LLM checks    │
+                 │                   Art. 66(3) justification → SPE     │
+                 │                   or downgrade to statistics         │
+                 └───────────────────────────────────────────────────────┘
+                                      │ APPROVE_STATISTICAL / APPROVE_SPE
+                                      ▼
+                 definitions ─▶ rule parser ─▶ QuerySpec ─▶ SQL compiler ─▶ SQLite (data/ehds.db)
+                                                                              │
+                     statistics: aggregates ─▶ small-cell rule ─▶ answer ◀────┤
+                     SPE: cohort patient IDs ─▶ exact count + record types ◀──┘
 ```
 
+Everything runs in one FastAPI app (`backend/app/main.py`) on one central SQLite database
+built from the five CSVs. The only external call is the LLM on OpenRouter, and it only ever
+receives request text and law text, never patient data.
+
+### Components
+
+| Component | Where | Approach |
+|---|---|---|
+| Law corpus | `app/rag/corpus.py`, `app/rag/store.py`, `data/law.db` | `eulex.html` (Regulation (EU) 2025/327) parsed into 406 chunks: each paragraph and each lettered point of Chapter IV (Art. 50–81) on its own, plus the recitals. Embedded once with `nomic-embed-text` (local Ollama) and committed; retrieval is cosine similarity over the chunks |
+| Decision, steps 1–2 | `app/layers/decision.py` | Three small steps instead of one big question. **Extract** (LLM): actor, analysis and *end use* of the results, from organisation and purpose only. **Retrieve**: the end use is the query for the 3 closest points of Art. 53(1) and of Art. 54. **Match** (LLM): one of those 6 points by id (enum in the schema, so no invented articles), plus the words of the point that cover the use. **Code decides**: Art. 54 point → `REJECT`, Art. 53 point → accept; the reason quotes the point verbatim from `law.db`; words not found in the point → `needs_review` |
+| Routing, steps 3–4 | `app/layers/routing.py` | Health data request → statistics (Art. 69(1)). Access application → Art. 66(2)/66(3) fetched by id, the LLM judges whether the application shows that anonymised statistics are not enough and quotes the sentence. Quote found verbatim in the request → `APPROVE_SPE` (66, 68, 73); otherwise downgrade to `APPROVE_STATISTICAL` (66, 69), flagged `spe_quote_unverified` when a justification was claimed but could not be quoted. Route articles come with their law text as grounding |
+| LLM client | `app/rag/openrouter.py` | `anthropic/claude-haiku-5.5` via OpenRouter, strict JSON schema, routed only to endpoints that enforce it. Answers cached on disk by (model, prompt, schema), plus an in-memory cache per request, so the same request always gets the same decision |
+| Data extraction | `app/layers/mapping.py`, `app/models.py` | Each definition sentence must fully match an ordered regex rule; named concepts (diagnosis → ICD-10 prefix, drug → ATC prefix and "active on 31.12.2025", measurement → LOINC with "latest value", age, sex, region, hospital, inpatient stay / main diagnosis, composites with AND/OR/NOT) become a `QuerySpec` (pydantic, the contract). Plain-English names are bound to the codes the definitions give; measurements also resolve from a built-in name → LOINC table. The "Report per …" line is read by finding the defined names and the operation (count, %, mean, negation). Any sentence not understood raises an error instead of being skipped; codes that match nothing in the data are rejected. Nothing is written per request |
+| Fallback interpretation | `app/layers/llm_mapping.py` | Where the rules give up, an LLM may fill the same `QuerySpec` under the same validation. Currently wired to IBM Bob, which is not installed, so it is inactive (todo 6) |
+| SQL compiler | `app/layers/query.py` | `QuerySpec` → SQLite SQL: a base view without opted-out patients, age on 31.12.2025, one patient-ID CTE per concept, one 0/1 flag per patient, grouping by region / hospital / sex / age band (or two of them), patients or stays as the unit |
+| Small-cell rule | `app/layers/query.py`, `app/layers/small_cell.py` | Every requested group listed, also empty ones; counts below 10 → `<10`; percentages with numerator or denominator below 10 and means over fewer than 10 patients → `suppressed`; rounding in Python with `Decimal`, one decimal, half up. Answers name each value by its metric |
+| SPE | `app/layers/query.py` (cohort query) | The cohort's patient IDs give the exact patient count and the requested record types. Copying them into a separate environment and blocking downloads are todos 1–2 |
+| API | `app/main.py` | `POST /api/requests` runs the whole pipeline and returns decision, articles, reason, grounding, evidence, flags, generated SQL and the answer; `/api/samples` serves the sample requests to the UI; `/api/submissions` keeps submissions in memory (placeholder results) |
+| Staff UI | `app/static/index.html` | Single page served at `/`: pick a task request or an end-to-end case, run it, see decision, reason, evidence, flags and SQL next to the expected answer, or run a batch |
+
 ![Data extraction: request text to numbers](docs/data-extraction.svg)
+
+### Test and evaluation assets
+
+| Set | Where | Checks |
+|---|---|---|
+| Unit tests | `backend/tests/` | Layers on fakes (no network); `-m real_llm` runs against OpenRouter and Ollama |
+| Task requests | `requests/R01–R10`, `expected.json` | Decision, articles and numbers |
+| Held-out decisions | `tests/data/heldout_requests.json`, `tests/fixtures/eval/requests.json` | Accept/reject and full decision on requests not used for development (`dev` / `test` split) |
+| Black-box extraction | `tests/fixtures/blackbox/` | 100 requests written separately, numbers computed independently of the parser |
+| End-to-end | `tests/fixtures/e2e/` | 200 cases through the whole pipeline (`run.py`, `--no-llm` for routing and data only) |
 
 ## Metrics
 
