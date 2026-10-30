@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "E113",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Petra Steiner",
+      "organisation": "National statistics office, population statistics",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Official statistics on the prevalence of chronic diseases for the national health report.",
+    "question": "What is the mean BMI of adults with obesity, by sex?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Obesity = any condition with an ICD-10 code starting with E66.",
+      "Use the latest BMI (LOINC 39156-5) per patient; patients without a BMI are left out.",
+      "Report per sex: adults with obesity who have a BMI and their mean BMI, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(c)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "female": [
+        814,
+        33.6
+      ],
+      "male": [
+        755,
+        33.3
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B024"
+}

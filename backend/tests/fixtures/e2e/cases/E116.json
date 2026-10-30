@@ -1,0 +1,69 @@
+{
+  "request": {
+    "id": "E116",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "DI Markus Pichler",
+      "organisation": "Institute for Occupational Health (university)",
+      "country": "SI"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We study chronic disease among working-age adults to recommend better prevention at the workplace to the ministry.",
+    "question": "Among patients with atrial fibrillation, what share takes phenprocoumon, per region?",
+    "definitions": [
+      "Atrial fibrillation = any condition with an ICD-10 code starting with I48.",
+      "Phenprocoumon = ATC code starting with B01AA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per region: patients with atrial fibrillation and % with active phenprocoumon, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        13,
+        "suppressed"
+      ],
+      "Kärnten": [
+        24,
+        "suppressed"
+      ],
+      "Niederösterreich": [
+        60,
+        "suppressed"
+      ],
+      "Oberösterreich": [
+        59,
+        "suppressed"
+      ],
+      "Salzburg": [
+        20,
+        "suppressed"
+      ],
+      "Steiermark": [
+        54,
+        "suppressed"
+      ],
+      "Tirol": [
+        31,
+        "suppressed"
+      ],
+      "Vorarlberg": [
+        15,
+        "suppressed"
+      ],
+      "Wien": [
+        75,
+        "suppressed"
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B017"
+}

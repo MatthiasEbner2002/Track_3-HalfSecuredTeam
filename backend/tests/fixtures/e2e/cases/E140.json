@@ -1,0 +1,43 @@
+{
+  "request": {
+    "id": "E140",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Lukas Berger",
+      "organisation": "Danube Institute for Diabetes Research (university research group)",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Scientific research on the epidemiology of chronic diseases to inform prevention programmes.",
+    "question": "Count every outpatient encounter that started during 2025, by age group.",
+    "definitions": [
+      "Outpatient encounter = encounter with type 'outpatient'.",
+      "Count encounters (not patients) whose start_date falls in 2025.",
+      "Age bands on 31 December 2025: 0-17, 18-64, 65+.",
+      "Report per age band: outpatient encounters."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "0-17": [
+        2617
+      ],
+      "18-64": [
+        7264
+      ],
+      "65+": [
+        3463
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B067"
+}

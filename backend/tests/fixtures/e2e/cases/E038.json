@@ -1,0 +1,29 @@
+{
+  "request": {
+    "id": "E038",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Petra Steiner",
+      "organisation": "CloudVape Ltd, product development",
+      "country": "FR"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We design new e-cigarette flavours and want to know in which age groups smoking-related disease is most common.",
+    "question": "How many patients have heart failure, by sex?",
+    "definitions": [
+      "Heart failure = any condition with an ICD-10 code starting with I50.",
+      "Report per sex: patients with heart failure."
+    ]
+  },
+  "expected": {
+    "point": "54(d)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B009"
+}

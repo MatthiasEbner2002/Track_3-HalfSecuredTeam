@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "E156",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "Medical University of Vienna, biostatistics",
+      "country": "SI"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Survival analysis of time from diagnosis to first hospital admission; statistics are not enough because the model needs individual-level follow-up times.",
+    "question": "Provide pseudonymised conditions and medications of patients aged 65 or older with atrial fibrillation who have no active oral anticoagulant.",
+    "definitions": [
+      "Atrial fibrillation = any condition with an ICD-10 code starting with I48.",
+      "Oral anticoagulant = ATC code starting with B01AA or B01AF.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Cohort = patients aged 65 or older on 31 December 2025 with atrial fibrillation and no active oral anticoagulant.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 89,
+      "record_types": [
+        "conditions",
+        "medications"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B086"
+}

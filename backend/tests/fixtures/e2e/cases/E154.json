@@ -1,0 +1,61 @@
+{
+  "request": {
+    "id": "E154",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Elena Rossi",
+      "organisation": "Regional government, health department",
+      "country": "CZ"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We evaluate the regional screening programme and need prevalence figures by region and age band.",
+    "question": "How many adults have hypertension, by hospital and age band?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Age bands on 31 December 2025: 18-49, 50-64, 65+.",
+      "Report per hospital and age band: adults with hypertension."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord|18-49": [
+        134
+      ],
+      "Klinikum Nord|50-64": [
+        419
+      ],
+      "Klinikum Nord|65+": [
+        819
+      ],
+      "Klinikum Süd|18-49": [
+        124
+      ],
+      "Klinikum Süd|50-64": [
+        372
+      ],
+      "Klinikum Süd|65+": [
+        715
+      ],
+      "Klinikum West|18-49": [
+        101
+      ],
+      "Klinikum West|50-64": [
+        266
+      ],
+      "Klinikum West|65+": [
+        512
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B061"
+}

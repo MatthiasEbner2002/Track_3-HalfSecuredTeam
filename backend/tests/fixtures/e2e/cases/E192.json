@@ -1,0 +1,42 @@
+{
+  "request": {
+    "id": "E192",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Nina Hofer",
+      "organisation": "Medical University of Vienna, biostatistics",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Survival analysis of time from diagnosis to first hospital admission; statistics are not enough because the model needs individual-level follow-up times.",
+    "question": "Provide pseudonymised medications and observations of adults with type 2 diabetes who have an active SGLT2 inhibitor.",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "SGLT2 inhibitor = ATC code starting with A10BK.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Cohort = adults with type 2 diabetes and an active SGLT2 inhibitor.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 304,
+      "record_types": [
+        "medications",
+        "observations"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B084"
+}

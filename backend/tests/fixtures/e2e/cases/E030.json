@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E030",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Sophie Lechner",
+      "organisation": "Alpenbräu AG, new products",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We are developing a sugar-free beer for people with this condition and want to size the target group per region.",
+    "question": "Provide pseudonymised conditions and medications of children with asthma.",
+    "definitions": [
+      "Child = aged under 18 on 31 December 2025.",
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "Cohort = children with asthma.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "54(d)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, access application",
+  "source": "B085"
+}

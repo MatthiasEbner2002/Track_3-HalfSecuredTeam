@@ -1,0 +1,40 @@
+{
+  "request": {
+    "id": "E175",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Laura Moser",
+      "organisation": "University hospital, clinical decision support group",
+      "country": "IT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We develop and validate a clinical decision-support algorithm. Summary tables are insufficient because the algorithm is evaluated per patient; only model parameters and evaluation metrics are exported.",
+    "question": "Provide pseudonymised conditions, medications and encounters of patients newly diagnosed with depression in 2025.",
+    "definitions": [
+      "New depression = any condition with an ICD-10 code starting with F32 and an onset_date in 2025.",
+      "Cohort = patients with new depression.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 78,
+      "record_types": [
+        "conditions",
+        "encounters",
+        "medications"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B088"
+}

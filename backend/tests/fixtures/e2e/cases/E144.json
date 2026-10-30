@@ -1,0 +1,60 @@
+{
+  "request": {
+    "id": "E144",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Felix Wagner",
+      "organisation": "Regional patient safety board",
+      "country": "CZ"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We want to improve the delivery of care by finding regions where guideline-recommended treatment is under-used.",
+    "question": "How many patients have both hypertension and type 2 diabetes, per region?",
+    "definitions": [
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Report per region: patients who have both hypertension and type 2 diabetes."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        16
+      ],
+      "Kärnten": [
+        31
+      ],
+      "Niederösterreich": [
+        120
+      ],
+      "Oberösterreich": [
+        67
+      ],
+      "Salzburg": [
+        35
+      ],
+      "Steiermark": [
+        75
+      ],
+      "Tirol": [
+        46
+      ],
+      "Vorarlberg": [
+        18
+      ],
+      "Wien": [
+        109
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B031"
+}

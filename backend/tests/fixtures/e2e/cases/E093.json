@@ -1,0 +1,34 @@
+{
+  "request": {
+    "id": "E093",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Institute for Occupational Health (university)",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We study chronic disease among working-age adults to recommend better prevention at the workplace to the ministry.",
+    "question": "Total number of patients with diabetes or obesity in the dataset.",
+    "definitions": [
+      "Metabolic disease = a diagnosis with an ICD-10 code starting with E11 or E66.",
+      "Report: patients with metabolic disease."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "all": [
+        3272
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B069"
+}

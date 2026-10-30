@@ -1,0 +1,39 @@
+{
+  "request": {
+    "id": "E188",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Petra Steiner",
+      "organisation": "University hospital, clinical decision support group",
+      "country": "FR"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We develop and validate a clinical decision-support algorithm. Summary tables are insufficient because the algorithm is evaluated per patient; only model parameters and evaluation metrics are exported.",
+    "question": "Provide pseudonymised encounters and medications of patients who had an inpatient stay with heart failure as main diagnosis in 2025.",
+    "definitions": [
+      "Heart failure stay = inpatient stay whose main diagnosis (primary_icd10) starts with I50 and whose start_date is in 2025.",
+      "Cohort = patients with at least one heart failure stay.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 103,
+      "record_types": [
+        "encounters",
+        "medications"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B083"
+}

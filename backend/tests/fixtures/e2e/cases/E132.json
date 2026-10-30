@@ -1,0 +1,69 @@
+{
+  "request": {
+    "id": "E132",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Nina Hofer",
+      "organisation": "INSERM Clinical Epidemiology Team",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Scientific research on regional differences in the quality of chronic disease care, published in a peer-reviewed journal.",
+    "question": "What is the mean systolic blood pressure of patients with hypertension in each region?",
+    "definitions": [
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Use the latest systolic blood pressure (LOINC 8480-6) per patient; patients without a value are left out.",
+      "Report per region: patients with hypertension who have a systolic value and their mean systolic blood pressure, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        62,
+        146.7
+      ],
+      "Kärnten": [
+        93,
+        146.4
+      ],
+      "Niederösterreich": [
+        332,
+        144.8
+      ],
+      "Oberösterreich": [
+        276,
+        144.3
+      ],
+      "Salzburg": [
+        121,
+        145.4
+      ],
+      "Steiermark": [
+        242,
+        145.7
+      ],
+      "Tirol": [
+        126,
+        146.9
+      ],
+      "Vorarlberg": [
+        67,
+        147.9
+      ],
+      "Wien": [
+        379,
+        143.7
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B022"
+}

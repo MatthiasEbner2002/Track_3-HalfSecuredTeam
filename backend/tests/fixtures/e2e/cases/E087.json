@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "E087",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Nina Hofer",
+      "organisation": "Federal Ministry of Health, planning department",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Policy-making: planning the number of specialist outpatient clinics per region for the next health plan.",
+    "question": "How many emergency visits were there in 2024 at each hospital?",
+    "definitions": [
+      "Emergency visit = encounter with type 'emergency'.",
+      "Count visits (not patients) whose start_date is in 2024.",
+      "Report per hospital: emergency visits."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(b)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        464
+      ],
+      "Klinikum Süd": [
+        410
+      ],
+      "Klinikum West": [
+        266
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B044"
+}

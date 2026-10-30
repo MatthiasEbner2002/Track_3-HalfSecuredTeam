@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E043",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Daniel Reiter",
+      "organisation": "Stadtwohnen GmbH, tenant management",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to know which age groups of tenants are affected so we can decline their applications for subsidised flats.",
+    "question": "How many adults have type 2 diabetes in each region and what is the prevalence?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Prevalence = adults with type 2 diabetes / all adults in the region × 100, one decimal.",
+      "Report per region: adults, adults with type 2 diabetes and the prevalence."
+    ]
+  },
+  "expected": {
+    "point": "54(a)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B001"
+}

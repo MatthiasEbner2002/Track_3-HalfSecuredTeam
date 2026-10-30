@@ -1,0 +1,45 @@
+{
+  "request": {
+    "id": "E148",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Daniel Reiter",
+      "organisation": "Medical faculty, public health curriculum",
+      "country": "FR"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Teaching material for a master's course in public health, showing real regional prevalence figures.",
+    "question": "What is the mean eGFR of patients with chronic kidney disease per hospital?",
+    "definitions": [
+      "Chronic kidney disease = any condition with an ICD-10 code starting with N18.",
+      "Use the latest eGFR (LOINC 62238-1) per patient; patients without an eGFR are left out.",
+      "Report per hospital: patients with chronic kidney disease who have an eGFR and their mean eGFR, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(d)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        162,
+        45.1
+      ],
+      "Klinikum Süd": [
+        151,
+        45.1
+      ],
+      "Klinikum West": [
+        101,
+        43.5
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B023"
+}

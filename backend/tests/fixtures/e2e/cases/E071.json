@@ -1,0 +1,69 @@
+{
+  "request": {
+    "id": "E071",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "DI Markus Pichler",
+      "organisation": "Hospital association quality programme",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We benchmark the quality of chronic disease care between hospitals to improve treatment for all patients.",
+    "question": "What is the mean BMI of men with COPD, by region?",
+    "definitions": [
+      "COPD = any condition with an ICD-10 code starting with J44.",
+      "Men = sex 'male'.",
+      "Use the latest BMI (LOINC 39156-5) per patient; patients without a BMI are left out.",
+      "Report per region: number of men with COPD who have a BMI and their mean BMI, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        "<10",
+        "suppressed"
+      ],
+      "Kärnten": [
+        "<10",
+        "suppressed"
+      ],
+      "Niederösterreich": [
+        28,
+        25.3
+      ],
+      "Oberösterreich": [
+        28,
+        27.2
+      ],
+      "Salzburg": [
+        "<10",
+        "suppressed"
+      ],
+      "Steiermark": [
+        14,
+        25.5
+      ],
+      "Tirol": [
+        12,
+        28.5
+      ],
+      "Vorarlberg": [
+        "<10",
+        "suppressed"
+      ],
+      "Wien": [
+        24,
+        27.2
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B026"
+}

@@ -1,0 +1,40 @@
+{
+  "request": {
+    "id": "E179",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Julia Brandstätter",
+      "organisation": "University of Applied Sciences, health informatics master",
+      "country": "PL"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Students train and validate prediction models on pseudonymised patient-level data inside the secure environment as part of their teaching course; nothing but metrics is exported.",
+    "question": "Provide pseudonymised conditions and medications of women with breast cancer.",
+    "definitions": [
+      "Breast cancer = any condition with an ICD-10 code starting with C50.",
+      "Women = sex 'female'.",
+      "Cohort = women with breast cancer.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(d)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 114,
+      "record_types": [
+        "conditions",
+        "medications"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B082"
+}

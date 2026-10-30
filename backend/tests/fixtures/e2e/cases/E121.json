@@ -1,0 +1,33 @@
+{
+  "request": {
+    "id": "E121",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Thomas Huber",
+      "organisation": "Cardiopharm Austria GmbH, drug safety (pharmacovigilance)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Post-authorisation safety study requested by the medicines agency: we monitor how the treated population is distributed by age and region.",
+    "question": "What is the mean cholesterol of patients with type 2 diabetes, by region?",
+    "definitions": [
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Use the latest total cholesterol per patient.",
+      "Report per region: patients with type 2 diabetes who have a cholesterol value and their mean cholesterol, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "error": true
+    }
+  },
+  "note": "allowed purpose, but the question cannot be interpreted from the definitions",
+  "source": "B094"
+}

@@ -1,0 +1,30 @@
+{
+  "request": {
+    "id": "E047",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Alpenland Versicherung AG, pricing department",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to align private health insurance premiums for customers with this condition with their actual risk.",
+    "question": "How many patients with chronic kidney disease are there per age band?",
+    "definitions": [
+      "Chronic kidney disease = any condition with an ICD-10 code starting with N18.",
+      "Age bands on 31 December 2025: 18-64, 65-79, 80+.",
+      "Report per age band: patients with chronic kidney disease."
+    ]
+  },
+  "expected": {
+    "point": "54(b)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B012"
+}

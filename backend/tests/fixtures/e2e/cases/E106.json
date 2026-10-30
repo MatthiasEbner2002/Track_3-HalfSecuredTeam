@@ -1,0 +1,59 @@
+{
+  "request": {
+    "id": "E106",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Thomas Huber",
+      "organisation": "Medical University of Warsaw, Cardiology Research Unit",
+      "country": "SI"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on medication use and treatment gaps in routine care.",
+    "question": "How many inpatient stays for appendicitis started in 2024, per region?",
+    "definitions": [
+      "Appendicitis stay = inpatient stay whose main diagnosis (primary_icd10) starts with K35.",
+      "Count stays (not patients) whose start_date is in 2024.",
+      "Report per region: appendicitis stays."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        "<10"
+      ],
+      "Kärnten": [
+        "<10"
+      ],
+      "Niederösterreich": [
+        17
+      ],
+      "Oberösterreich": [
+        14
+      ],
+      "Salzburg": [
+        "<10"
+      ],
+      "Steiermark": [
+        15
+      ],
+      "Tirol": [
+        "<10"
+      ],
+      "Vorarlberg": [
+        "<10"
+      ],
+      "Wien": [
+        14
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B053"
+}

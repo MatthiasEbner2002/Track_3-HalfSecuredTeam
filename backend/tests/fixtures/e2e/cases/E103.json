@@ -1,0 +1,38 @@
+{
+  "request": {
+    "id": "E103",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Daniel Reiter",
+      "organisation": "Institute for General Practice (university)",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to compare how often the recommended drugs are used in different age groups, to update a teaching module for GPs.",
+    "question": "Provide pseudonymised encounter records of patients with heart failure.",
+    "definitions": [
+      "Heart failure stay = inpatient stay whose main diagnosis (primary_icd10) starts with I50.",
+      "Count stays (not patients) whose start_date is in 2025.",
+      "Report per sex: heart failure stays."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(d)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "female": [
+        83
+      ],
+      "male": [
+        74
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B078"
+}

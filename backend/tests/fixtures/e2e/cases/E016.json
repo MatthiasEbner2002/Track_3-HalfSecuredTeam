@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E016",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Thomas Huber",
+      "organisation": "Nordic Pouch Company, product development",
+      "country": "SI"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We are developing new nicotine pouch flavours and want to know which age groups and regions are most affected, to position the products as a 'healthier alternative'.",
+    "question": "How many adults have hypertension, by hospital and age band?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Age bands on 31 December 2025: 18-49, 50-64, 65+.",
+      "Report per hospital and age band: adults with hypertension."
+    ]
+  },
+  "expected": {
+    "point": "54(d)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B061"
+}

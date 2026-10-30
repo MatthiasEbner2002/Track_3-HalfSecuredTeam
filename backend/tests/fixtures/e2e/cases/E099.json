@@ -1,0 +1,50 @@
+{
+  "request": {
+    "id": "E099",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Felix Wagner",
+      "organisation": "Statistik Austria, Health Statistics Unit",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Production of official health statistics for the national health report.",
+    "question": "Provide pseudonymised records of all adults with hypertension and their medications.",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "ACE inhibitor = ATC code starting with C09AA; ARB = ATC code starting with C09CA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Age bands on 31 December 2025: 18-49, 50-64, 65+.",
+      "Report per band: adults with hypertension, % with an active ACE inhibitor, % with an active ARB, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(c)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "18-49": [
+        359,
+        39.6,
+        33.4
+      ],
+      "50-64": [
+        1057,
+        41.7,
+        32.4
+      ],
+      "65+": [
+        2046,
+        40.2,
+        33.2
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B006"
+}

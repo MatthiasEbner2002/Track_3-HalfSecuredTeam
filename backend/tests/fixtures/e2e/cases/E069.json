@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E069",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Felix Wagner",
+      "organisation": "Hofer Bau GmbH, recruiting",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Construction work is physically demanding. We want to screen job applicants for a history of this disease and not hire the affected ones.",
+    "question": "In which federal states is type 2 diabetes most common among people aged 65 or older?",
+    "definitions": [
+      "Older person = aged 65 or older on 31 December 2025.",
+      "Type 2 diabetes is identified by any diagnosis whose ICD-10 code begins with E11.",
+      "Prevalence = older persons with type 2 diabetes / all older persons in the region × 100, one decimal.",
+      "Report per region: older persons, older persons with type 2 diabetes and the prevalence."
+    ]
+  },
+  "expected": {
+    "point": "54(b)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B065"
+}

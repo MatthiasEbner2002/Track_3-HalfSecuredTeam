@@ -1,0 +1,33 @@
+{
+  "request": {
+    "id": "E003",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Autoversicherung Direkt AG, actuarial",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to raise car insurance premiums in the age bands with the most patients, since the disease impairs driving.",
+    "question": "How many patients with heart failure and atrial fibrillation take both a beta blocker and an anticoagulant?",
+    "definitions": [
+      "Heart failure = any condition with an ICD-10 code starting with I50.",
+      "Atrial fibrillation = any condition with an ICD-10 code starting with I48.",
+      "Beta blocker = ATC code starting with C07AB.",
+      "Oral anticoagulant = ATC code starting with B01AA or B01AF.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report: patients with heart failure and atrial fibrillation, and how many of them have both an active beta blocker and an active oral anticoagulant."
+    ]
+  },
+  "expected": {
+    "point": "54(b)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B034"
+}

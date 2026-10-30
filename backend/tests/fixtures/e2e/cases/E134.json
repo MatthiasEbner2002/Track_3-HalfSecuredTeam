@@ -1,0 +1,86 @@
+{
+  "request": {
+    "id": "E134",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Julia Brandstätter",
+      "organisation": "University Medical Center Utrecht, Julius Center",
+      "country": "CZ"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Scientific research on treatment gaps in elderly patients to develop a clinical guideline update.",
+    "question": "How many patients have depression, by region and sex?",
+    "definitions": [
+      "Depression = any condition with an ICD-10 code starting with F32.",
+      "Report per region and sex: patients with depression."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Burgenland|female": [
+        12
+      ],
+      "Burgenland|male": [
+        20
+      ],
+      "Kärnten|female": [
+        33
+      ],
+      "Kärnten|male": [
+        41
+      ],
+      "Niederösterreich|female": [
+        114
+      ],
+      "Niederösterreich|male": [
+        87
+      ],
+      "Oberösterreich|female": [
+        101
+      ],
+      "Oberösterreich|male": [
+        94
+      ],
+      "Salzburg|female": [
+        37
+      ],
+      "Salzburg|male": [
+        33
+      ],
+      "Steiermark|female": [
+        67
+      ],
+      "Steiermark|male": [
+        58
+      ],
+      "Tirol|female": [
+        47
+      ],
+      "Tirol|male": [
+        43
+      ],
+      "Vorarlberg|female": [
+        31
+      ],
+      "Vorarlberg|male": [
+        22
+      ],
+      "Wien|female": [
+        110
+      ],
+      "Wien|male": [
+        129
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B060"
+}

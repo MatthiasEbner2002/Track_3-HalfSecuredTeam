@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E027",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Nina Hofer",
+      "organisation": "Cardiopharm Austria GmbH, sales",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Our field sales team should visit the GPs in the regions with the most affected patients to promote our product.",
+    "question": "Overall, how many adults take a statin?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Statin = ATC code starting with C10AA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report: adults, adults with an active statin and the share in %, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "54(c)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B019"
+}

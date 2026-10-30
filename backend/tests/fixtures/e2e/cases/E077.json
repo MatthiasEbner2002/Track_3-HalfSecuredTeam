@@ -1,0 +1,58 @@
+{
+  "request": {
+    "id": "E077",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "European research consortium on ageing (Horizon Europe)",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on multimorbidity in older adults as part of a publicly funded research project.",
+    "question": "How many patients received a new depression diagnosis in 2025, by region?",
+    "definitions": [
+      "New depression = any condition with an ICD-10 code starting with F32 and an onset_date in 2025.",
+      "Report per region: patients with new depression."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        "<10"
+      ],
+      "Kärnten": [
+        "<10"
+      ],
+      "Niederösterreich": [
+        17
+      ],
+      "Oberösterreich": [
+        15
+      ],
+      "Salzburg": [
+        "<10"
+      ],
+      "Steiermark": [
+        "<10"
+      ],
+      "Tirol": [
+        "<10"
+      ],
+      "Vorarlberg": [
+        "<10"
+      ],
+      "Wien": [
+        20
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B054"
+}

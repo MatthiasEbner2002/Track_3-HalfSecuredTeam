@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E058",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Daniel Reiter",
+      "organisation": "Wohnbau Kärnten Genossenschaft, tenant selection",
+      "country": "FR"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to exclude applicants with this diagnosis from our new housing project to keep the community healthy.",
+    "question": "Emergency department visits by men in 2025, per hospital.",
+    "definitions": [
+      "Men = sex 'male'.",
+      "Emergency visit = encounter with type 'emergency'.",
+      "Count visits (not patients) of men whose start_date is in 2025.",
+      "Report per hospital: emergency visits of men."
+    ]
+  },
+  "expected": {
+    "point": "54(a)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B073"
+}

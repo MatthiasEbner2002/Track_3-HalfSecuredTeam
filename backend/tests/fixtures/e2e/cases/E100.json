@@ -1,0 +1,50 @@
+{
+  "request": {
+    "id": "E100",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Laura Moser",
+      "organisation": "Medical faculty, public health curriculum",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Teaching material for a master's course in public health, showing real regional prevalence figures.",
+    "question": "How many inpatient stays started in 2025, by hospital and sex?",
+    "definitions": [
+      "Inpatient stay = encounter with type 'inpatient'.",
+      "Count stays (not patients) whose start_date is in 2025.",
+      "Report per hospital and sex: inpatient stays."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(d)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord|female": [
+        210
+      ],
+      "Klinikum Nord|male": [
+        211
+      ],
+      "Klinikum Süd|female": [
+        195
+      ],
+      "Klinikum Süd|male": [
+        187
+      ],
+      "Klinikum West|female": [
+        143
+      ],
+      "Klinikum West|male": [
+        133
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B051"
+}

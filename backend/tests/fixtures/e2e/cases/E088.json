@@ -1,0 +1,58 @@
+{
+  "request": {
+    "id": "E088",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Daniel Reiter",
+      "organisation": "Istituto Superiore di Sanità",
+      "country": "FR"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Public health surveillance of non-communicable diseases for the European health monitoring network.",
+    "question": "How many patients had an inpatient stay whose main diagnosis was diabetes in 2023 or later, by region?",
+    "definitions": [
+      "Diabetes stay = inpatient stay whose main diagnosis (primary_icd10) starts with E11.",
+      "Report per region: patients with at least one diabetes stay."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        "<10"
+      ],
+      "Kärnten": [
+        "<10"
+      ],
+      "Niederösterreich": [
+        35
+      ],
+      "Oberösterreich": [
+        24
+      ],
+      "Salzburg": [
+        16
+      ],
+      "Steiermark": [
+        23
+      ],
+      "Tirol": [
+        12
+      ],
+      "Vorarlberg": [
+        "<10"
+      ],
+      "Wien": [
+        34
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B074"
+}

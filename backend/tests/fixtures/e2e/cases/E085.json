@@ -1,0 +1,58 @@
+{
+  "request": {
+    "id": "E085",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Laura Moser",
+      "organisation": "INSERM Clinical Epidemiology Team",
+      "country": "IT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on regional differences in the quality of chronic disease care, published in a peer-reviewed journal.",
+    "question": "What is the mean systolic blood pressure of adults with hypertension, by sex and age band?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Age bands on 31 December 2025: 18-49, 50-64, 65+.",
+      "Use the latest systolic blood pressure (LOINC 8480-6) per patient; patients without a value are left out.",
+      "Report per sex and age band: adults with hypertension who have a systolic value and their mean systolic blood pressure, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "female|18-49": [
+        90,
+        143.7
+      ],
+      "female|50-64": [
+        286,
+        144.1
+      ],
+      "female|65+": [
+        510,
+        145.5
+      ],
+      "male|18-49": [
+        77,
+        145.7
+      ],
+      "male|50-64": [
+        234,
+        145.5
+      ],
+      "male|65+": [
+        501,
+        145.1
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B063"
+}

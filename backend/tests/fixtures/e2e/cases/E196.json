@@ -1,0 +1,40 @@
+{
+  "request": {
+    "id": "E196",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Thomas Huber",
+      "organisation": "Regional patient safety board",
+      "country": "SI"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "To improve care we validate an early-warning algorithm against each patient's course; aggregates are insufficient. Only performance metrics are exported.",
+    "question": "Provide pseudonymised conditions and medications of children with asthma.",
+    "definitions": [
+      "Child = aged under 18 on 31 December 2025.",
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "Cohort = children with asthma.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 209,
+      "record_types": [
+        "conditions",
+        "medications"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B085"
+}

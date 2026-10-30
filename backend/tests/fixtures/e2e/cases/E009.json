@@ -1,0 +1,33 @@
+{
+  "request": {
+    "id": "E009",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Felix Wagner",
+      "organisation": "Payday Kredit GmbH, risk",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We offer short-term loans and want to charge higher interest in regions where chronic illness is common, because of the higher default risk.",
+    "question": "Which share of men aged 50 to 69 with hypertension is treated with an ARB, per region?",
+    "definitions": [
+      "Men = sex 'male'.",
+      "Age 50 to 69 = aged 50 to 69 on 31 December 2025.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "ARB = ATC code starting with C09CA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per region: men aged 50 to 69 with hypertension and the share with an active ARB in %, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "54(b)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B068"
+}

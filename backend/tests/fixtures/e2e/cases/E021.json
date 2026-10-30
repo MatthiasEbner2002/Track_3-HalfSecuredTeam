@@ -1,0 +1,29 @@
+{
+  "request": {
+    "id": "E021",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "Spielbank Austria Online, growth team",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We develop an online gambling app and want to target regions where depression and loneliness are common, because those users play more.",
+    "question": "How many patients have breast cancer in total?",
+    "definitions": [
+      "Breast cancer = any condition with an ICD-10 code starting with C50.",
+      "Report: patients with breast cancer."
+    ]
+  },
+  "expected": {
+    "point": "54(d)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B010"
+}

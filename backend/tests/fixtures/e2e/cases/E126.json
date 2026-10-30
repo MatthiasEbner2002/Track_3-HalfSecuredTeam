@@ -1,0 +1,32 @@
+{
+  "request": {
+    "id": "E126",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "Medical faculty, public health curriculum",
+      "country": "SI"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Teaching material for a master's course in public health, showing real regional prevalence figures.",
+    "question": "What is the mean hypertension per region?",
+    "definitions": [
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Report per region: patients with hypertension and their mean hypertension, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(d)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "error": true
+    }
+  },
+  "note": "allowed purpose, but the question cannot be interpreted from the definitions",
+  "source": "B091"
+}

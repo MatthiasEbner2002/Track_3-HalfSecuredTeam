@@ -1,0 +1,50 @@
+{
+  "request": {
+    "id": "E096",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "Austrian social health insurance fund, disease management programmes",
+      "country": "SI"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We evaluate whether our prevention programme reduced hospital admissions, to decide whether to extend it to all regions.",
+    "question": "How many patients with hypertension have a systolic blood pressure of 140 or more, by age band?",
+    "definitions": [
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Use the latest systolic blood pressure (LOINC 8480-6) per patient.",
+      "Uncontrolled hypertension = latest systolic blood pressure of 140 or higher.",
+      "Age bands on 31 December 2025: 18-49, 50-64, 65-79, 80+.",
+      "Report per age band: patients with hypertension who have a systolic value, % with uncontrolled hypertension, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "18-49": [
+        167,
+        59.3
+      ],
+      "50-64": [
+        520,
+        64.4
+      ],
+      "65-79": [
+        658,
+        65.8
+      ],
+      "80+": [
+        353,
+        66.6
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B041"
+}

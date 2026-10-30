@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "E110",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Lukas Berger",
+      "organisation": "Austrian Public Health Institute (GÖG)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Public health monitoring of chronic disease burden for the regional health authorities.",
+    "question": "What share of adults with a BMI measurement has a BMI of 30 or more, by sex?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Use the latest BMI (LOINC 39156-5) per patient.",
+      "BMI 30 or more = latest BMI of 30 or higher.",
+      "Report per sex: adults with a BMI value and % with BMI 30 or more, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "female": [
+        4911,
+        21.0
+      ],
+      "male": [
+        4670,
+        21.5
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B043"
+}

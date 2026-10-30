@@ -1,0 +1,42 @@
+{
+  "request": {
+    "id": "E104",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Julia Brandstätter",
+      "organisation": "INSERM Clinical Epidemiology Team",
+      "country": "CZ"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on regional differences in the quality of chronic disease care, published in a peer-reviewed journal.",
+    "question": "Emergency department visits by men in 2025, per hospital.",
+    "definitions": [
+      "Men = sex 'male'.",
+      "Emergency visit = encounter with type 'emergency'.",
+      "Count visits (not patients) of men whose start_date is in 2025.",
+      "Report per hospital: emergency visits of men."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        219
+      ],
+      "Klinikum Süd": [
+        194
+      ],
+      "Klinikum West": [
+        137
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B073"
+}

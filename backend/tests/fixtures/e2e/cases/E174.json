@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "E174",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Felix Wagner",
+      "organisation": "RhythmAI GmbH, medical device start-up",
+      "country": "CZ"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We train and validate an AI model that detects the disease early. Aggregated statistics are not enough: the model needs patient-level records; only model weights and performance metrics leave the secure environment.",
+    "question": "Provide pseudonymised conditions, medications and HbA1c values for adults with type 2 diabetes who have at least one HbA1c value. We will only export model weights and performance metrics.",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Cohort = adults with type 2 diabetes who have at least one HbA1c value (LOINC 4548-4).",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 1152,
+      "record_types": [
+        "conditions",
+        "medications",
+        "observations"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B003"
+}

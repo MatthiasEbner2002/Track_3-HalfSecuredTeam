@@ -1,0 +1,33 @@
+{
+  "request": {
+    "id": "E130",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Laura Moser",
+      "organisation": "Charles University, Department of Epidemiology",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Epidemiological research on age and sex differences in chronic disease prevalence for a European comparison study.",
+    "question": "What share of patients with asthma uses a statin, per region?",
+    "definitions": [
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per region: patients with asthma and % with an active statin, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "error": true
+    }
+  },
+  "note": "allowed purpose, but the question cannot be interpreted from the definitions",
+  "source": "B092"
+}

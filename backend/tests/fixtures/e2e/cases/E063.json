@@ -1,0 +1,32 @@
+{
+  "request": {
+    "id": "E063",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Nordic Pouch Company, product development",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We are developing new nicotine pouch flavours and want to know which age groups and regions are most affected, to position the products as a 'healthier alternative'.",
+    "question": "What fraction of adults with asthma currently uses a fixed-dose inhaler combination, by sex?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "ICS/LABA inhaler = ATC code starting with R03AK.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per sex: adults with asthma and the percentage with an active ICS/LABA inhaler, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "54(d)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B072"
+}

@@ -1,0 +1,38 @@
+{
+  "request": {
+    "id": "E195",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Sophie Lechner",
+      "organisation": "National statistics office, methodology unit",
+      "country": "IT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We validate a small-area estimation model for official statistics; aggregated statistics are not sufficient as the model is fitted on record-level data.",
+    "question": "Provide pseudonymised encounters for patients with COPD aged 40 or older.",
+    "definitions": [
+      "COPD = any condition with an ICD-10 code starting with J44.",
+      "Cohort = patients with COPD aged 40 or older on 31 December 2025.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(c)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 339,
+      "record_types": [
+        "encounters"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B080"
+}

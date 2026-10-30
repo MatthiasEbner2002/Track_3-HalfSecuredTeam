@@ -1,0 +1,79 @@
+{
+  "request": {
+    "id": "E120",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Sophie Lechner",
+      "organisation": "Hospital association quality programme",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We benchmark the quality of chronic disease care between hospitals to improve treatment for all patients.",
+    "question": "How many adults with type 2 diabetes are not on metformin, by region?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Metformin = ATC code starting with A10BA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per region: adults with type 2 diabetes, how many of them have no active metformin and that share in %, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        33,
+        "<10",
+        "suppressed"
+      ],
+      "Kärnten": [
+        71,
+        17,
+        23.9
+      ],
+      "Niederösterreich": [
+        227,
+        53,
+        23.3
+      ],
+      "Oberösterreich": [
+        173,
+        43,
+        24.9
+      ],
+      "Salzburg": [
+        75,
+        17,
+        22.7
+      ],
+      "Steiermark": [
+        164,
+        42,
+        25.6
+      ],
+      "Tirol": [
+        110,
+        25,
+        22.7
+      ],
+      "Vorarlberg": [
+        36,
+        10,
+        27.8
+      ],
+      "Wien": [
+        263,
+        57,
+        21.7
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B029"
+}

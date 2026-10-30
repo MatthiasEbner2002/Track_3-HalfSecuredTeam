@@ -1,0 +1,42 @@
+{
+  "request": {
+    "id": "E083",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Petra Steiner",
+      "organisation": "Regional health planning authority Oberösterreich",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We plan hospital capacity and care pathways for the coming years and need the regional disease burden.",
+    "question": "How many women with breast cancer are there per age band?",
+    "definitions": [
+      "Breast cancer = any condition with an ICD-10 code starting with C50.",
+      "Women = sex 'female'.",
+      "Age bands on 31 December 2025: 18-49, 50-69, 70+.",
+      "Report per age band: women with breast cancer."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(b)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "18-49": [
+        14
+      ],
+      "50-69": [
+        52
+      ],
+      "70+": [
+        48
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B057"
+}

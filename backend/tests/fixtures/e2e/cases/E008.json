@@ -1,0 +1,32 @@
+{
+  "request": {
+    "id": "E008",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Petra Steiner",
+      "organisation": "CloudVape Ltd, product development",
+      "country": "FR"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We design new e-cigarette flavours and want to know in which age groups smoking-related disease is most common.",
+    "question": "Provide pseudonymised records of patients with COPD and their medications.",
+    "definitions": [
+      "COPD = any condition with an ICD-10 code starting with J44.",
+      "Tiotropium = ATC code starting with R03BB.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Age bands on 31 December 2025: 0-59, 60-74, 75+.",
+      "Report per band: patients with COPD, % with active tiotropium, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "54(d)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B076"
+}

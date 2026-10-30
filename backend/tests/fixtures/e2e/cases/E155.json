@@ -1,0 +1,49 @@
+{
+  "request": {
+    "id": "E155",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Lukas Berger",
+      "organisation": "Federal Ministry of Health, planning department",
+      "country": "IT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Policy-making: planning the number of specialist outpatient clinics per region for the next health plan.",
+    "question": "How many patients with heart failure have no active loop diuretic, per hospital?",
+    "definitions": [
+      "Heart failure = any condition with an ICD-10 code starting with I50.",
+      "Loop diuretic = ATC code starting with C03CA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per hospital: patients with heart failure, how many of them have no active loop diuretic and that share in %, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(b)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        114,
+        38,
+        33.3
+      ],
+      "Klinikum Süd": [
+        116,
+        45,
+        38.8
+      ],
+      "Klinikum West": [
+        64,
+        27,
+        42.2
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B028"
+}

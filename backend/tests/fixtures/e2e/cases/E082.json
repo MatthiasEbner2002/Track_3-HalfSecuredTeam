@@ -1,0 +1,40 @@
+{
+  "request": {
+    "id": "E082",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Pieter de Vries",
+      "organisation": "Medical University of Warsaw, Cardiology Research Unit",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on medication use and treatment gaps in routine care.",
+    "question": "Average latest body mass index of patients with depression, by sex.",
+    "definitions": [
+      "Depression = any condition with an ICD-10 code starting with F32.",
+      "BMI is the most recent value of LOINC 39156-5 for each patient; patients without a BMI are left out.",
+      "Report per sex: patients with depression who have a BMI and their average BMI, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "female": [
+        355,
+        26.7
+      ],
+      "male": [
+        341,
+        27.2
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B066"
+}

@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E013",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Daniel Reiter",
+      "organisation": "Donau Leben Versicherung AG, underwriting",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We decide which applicants for life insurance we decline, based on how common this disease is in their age group and region.",
+    "question": "How common is asthma in each age band?",
+    "definitions": [
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "Age bands on 31 December 2025: 0-17, 18-39, 40-64, 65+.",
+      "Prevalence = patients with asthma / all patients in the band × 100, one decimal.",
+      "Report per band: patients, patients with asthma and the prevalence."
+    ]
+  },
+  "expected": {
+    "point": "54(b)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B015"
+}

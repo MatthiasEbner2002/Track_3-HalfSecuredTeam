@@ -1,0 +1,46 @@
+{
+  "request": {
+    "id": "E139",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Elena Rossi",
+      "organisation": "Cardiopharm Austria GmbH, drug safety (pharmacovigilance)",
+      "country": "PL"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Post-authorisation safety study requested by the medicines agency: we monitor how the treated population is distributed by age and region.",
+    "question": "For people aged 75 and above with chronic kidney disease, what is the average kidney function per hospital?",
+    "definitions": [
+      "Very old patient = aged 75 or older on 31 December 2025.",
+      "CKD: ICD-10 codes beginning with N18.",
+      "Kidney function = the latest eGFR (LOINC 62238-1) of each patient; patients without one are left out.",
+      "Report per hospital: very old patients with CKD who have an eGFR and their mean eGFR, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        96,
+        44.9
+      ],
+      "Klinikum Süd": [
+        92,
+        45.6
+      ],
+      "Klinikum West": [
+        56,
+        42.8
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B070"
+}

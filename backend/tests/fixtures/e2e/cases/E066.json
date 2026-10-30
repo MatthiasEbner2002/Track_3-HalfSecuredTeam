@@ -1,0 +1,32 @@
+{
+  "request": {
+    "id": "E066",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "MediAds Online GmbH",
+      "country": "SI"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We sell targeted online advertising for private clinics and want to place ads where the prevalence is highest.",
+    "question": "How many patients have hypertension, type 2 diabetes and chronic kidney disease, by hospital?",
+    "definitions": [
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Chronic kidney disease = any condition with an ICD-10 code starting with N18.",
+      "Cardiorenal-metabolic patient = patient with hypertension and type 2 diabetes and chronic kidney disease.",
+      "Report per hospital: cardiorenal-metabolic patients."
+    ]
+  },
+  "expected": {
+    "point": "54(c)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B032"
+}
