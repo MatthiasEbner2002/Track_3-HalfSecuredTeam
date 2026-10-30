@@ -46,3 +46,8 @@ RETRIEVAL_TOP_K = 3  # candidate points per article shown to the LLM
 
 REFERENCE_DATE = "2025-12-31"  # date for ages and active medications
 SMALL_CELL_THRESHOLD = 10  # counts below this are shown as "<10"
+
+# Secure processing environments (Art. 73): one SQLite file per data permit, never served as a file.
+SPE_DIR = Path(os.environ.get("EHDS_SPE_DIR", REPO_ROOT / "backend" / "spe"))
+SPE_PAGE_ROWS = 50  # most rows one query shows on screen
+SPE_QUERY_STEPS = 2_000_000  # SQLite VM steps before a query is aborted

@@ -19,26 +19,28 @@ Done:
 - [x] SPE cohort: exact patient count (R05: 1,152) and the requested record types
 - [x] Staff UI at <http://localhost:8000/> (`backend/app/static/index.html`): pick one of the
   10 task requests or the 200 end-to-end cases (E001..E200), run it, compare with the expected answer
+- [x] SPE provisioning: one SQLite file per permit with only the cohort and the named tables,
+  patient IDs kept, opt-outs out; reachable only through `/api/spe/<id>` (see below)
+- [x] Download block: `/api/spe/<id>/download` answers `403` with Art. 73 and logs the attempt;
+  the file has no URL
+- [x] SPE page for applicant and staff: browse inside, blocked download, output airlock, audit log
 
 To do, in priority order:
 
-1. [ ] **SPE provisioning**: copy the selected patients' requested record types (with their
-   patient IDs) into a separate schema or folder per request, manifest with the exact count
-2. [ ] **Download block**: an endpoint that refuses patient-level downloads from the SPE
-   (Art. 73), shown in the demo
-3. [ ] **Applicant view, and staff details in the UI**: decision, reason, articles for the applicant; evidence,
-   grounding, flags (`needs_review`, `spe_quote_unverified`), SQL and code mapping for staff
-4. [ ] **`/api/submissions`**: return `pipeline.run` instead of placeholder results, or remove it
-5. [ ] **Step 1 hardening** (misses on the held-out set, below): deterministic Art. 54 floor for
+1. [ ] **Applicant and staff views for statistics**: decision, reason, articles for the applicant;
+   evidence, grounding, flags (`needs_review`, `spe_quote_unverified`), SQL and code mapping for
+   staff (the SPE page covers the SPE branch; the console at `/` is a test tool)
+2. [ ] **`/api/submissions`**: return `pipeline.run` instead of placeholder results, or remove it
+3. [ ] **Step 1 hardening** (misses on the held-out set, below): deterministic Art. 54 floor for
    unambiguous wording (nicotine, vape, e-liquid, tobacco, alcohol products, also German) and a
    tighter end-use prompt; tune on the `dev` split only
-6. [ ] **Data-extraction fallback without Bob**: `llm_mapping.py` still calls the `bob` CLI, which
+4. [ ] **Data-extraction fallback without Bob**: `llm_mapping.py` still calls the `bob` CLI, which
    is not installed, so a sentence the rules cannot read gives no numbers; fill the same
    `QuerySpec` with the OpenRouter LLM instead (same validation)
-7. [ ] **Cleanup**: delete or archive the unused `app/purpose/` and the stubs
+5. [ ] **Cleanup**: delete or archive the unused `app/purpose/` and the stubs
    `layers/statistics.py`, `layers/spe.py`, `small_cell.apply`
-8. [ ] **Persistence**: submissions and SPE environments survive a restart
-9. [ ] **Submission**: rerun all metrics, final architecture section, public repo, demo video
+6. [ ] **Persistence**: submissions survive a restart (SPE files already do, in `backend/spe/`)
+7. [ ] **Submission**: rerun all metrics, final architecture section, public repo, demo video
    (≤ 2 min: R02 reject, R01 statistics, R05 SPE with the blocked download)
 
 ## Quick start
@@ -108,6 +110,29 @@ receives request text and law text, never patient data.
 | Held-out decisions | `tests/data/heldout_requests.json`, `tests/fixtures/eval/requests.json` | Accept/reject and full decision on requests not used for development (`dev` / `test` split) |
 | Black-box extraction | `tests/fixtures/blackbox/` | 100 requests written separately, numbers computed independently of the parser |
 | End-to-end | `tests/fixtures/e2e/` | 200 cases through the whole pipeline (`run.py`, `--no-llm` for routing and data only) |
+
+### Secure processing environment (Art. 73)
+
+An `APPROVE_SPE` decision creates `backend/spe/<request_id>.db`: a SQLite file with a `cohort`
+table (the selected patient IDs, opted-out patients already excluded) and only the record types
+the request names, joined to that cohort. Nothing serves the file. The SPE is used through
+`/spe/<id>` (applicant view; `?role=staff` for staff), which talks to:
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/spe/<id>` | permit, cohort size, tables with row counts |
+| `POST /api/spe/<id>/query` | one read-only statement, at most 50 rows on screen; writes, `ATTACH`, `PRAGMA` and runaway queries are refused |
+| `GET /api/spe/<id>/download` | always `403`, Art. 73(1)(e), logged |
+| `POST /api/spe/<id>/outputs` | the airlock: a table has to pass the small-cell check (no patient IDs, no record-level columns, no count below 10), then waits for staff |
+| `POST /api/spe/<id>/outputs/<n>/review` | staff approve or reject; the applicant receives the content only when approved |
+| `GET /api/spe/<id>/audit` | every query, output and blocked download |
+
+What this prevents is bulk export: there is no endpoint that returns records as a file or
+beyond the page size, and every page view is logged with the name at the keyboard. It does not
+prevent reading the screen, which no SPE does. In production the same contract would be run by
+a trusted research environment (Findata Kapseli, an Azure TRE airlock, OpenSAFELY); the output
+check could use [ACRO](https://pypi.org/project/acro/). There is no login: `X-Role` / `X-Actor`
+headers stand in for it.
 
 ## Metrics
 

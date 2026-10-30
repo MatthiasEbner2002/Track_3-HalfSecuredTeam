@@ -6,7 +6,7 @@ Request -> decision -> (reject) | (accept -> route -> statistics/SPE spec
 
 import sqlite3
 
-from app import db
+from app import db, spe
 from app.layers import decision, mapping, query, routing
 from app.models import CodeMapping, DataRequest, PipelineResult, QueryPlan
 
@@ -41,6 +41,10 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
         plan = query.compile_spec(query_spec)
         rows = {q.name: db.execute(conn, q.sql, q.params) for q in plan.queries}
         data = query.answer(query_spec, plan, rows, conn)  # small-cell rule applied here
+        if route == "spe":  # copy the cohort's named records into the permit's own SPE (Art. 73)
+            spe_info = spe.create(request, conn, [r["patient_id"] for r in rows["cohort"]],
+                                  query_spec.record_types, articles, reason)
+            data["spe"] = {"id": request.id, "url": f"/spe/{request.id}", "tables": spe_info["tables"]}
     except mapping.InterpretError as e:
         flags.append(f"not_interpreted: {e}")
 

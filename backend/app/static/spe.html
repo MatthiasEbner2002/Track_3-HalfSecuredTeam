@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Secure processing environment</title>
+<style>
+  body { font: 14px/1.4 system-ui, sans-serif; margin: 0; background: #f4f5f7; color: #222; }
+  header { padding: 12px 20px; background: #1f3a5f; color: #fff; font-size: 18px; display: flex; align-items: center; gap: 16px; }
+  header a { color: #cfe0f5; font-size: 13px; }
+  header .spacer { flex: 1; }
+  header label { font-size: 13px; }
+  header select, header input { padding: 4px; font: inherit; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 16px 20px; }
+  section { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; min-width: 0; }
+  section.wide { grid-column: 1 / -1; }
+  h2 { margin: 0 0 8px; font-size: 15px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  button { padding: 6px 12px; border: 1px solid #1f3a5f; background: #1f3a5f; color: #fff; border-radius: 4px; cursor: pointer; }
+  button.secondary { background: #fff; color: #1f3a5f; }
+  button.danger { background: #fff; color: #c0392b; border-color: #c0392b; }
+  button.small { padding: 3px 8px; font-size: 12px; }
+  button.active { background: #e8a33d; border-color: #e8a33d; color: #fff; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  textarea, input[type=text] { font: 12px/1.4 ui-monospace, monospace; padding: 5px; box-sizing: border-box; }
+  textarea { width: 100%; height: 90px; }
+  table { border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+  td, th { border: 1px solid #ddd; padding: 3px 8px; text-align: left; vertical-align: top; white-space: nowrap; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-weight: 600; color: #fff; background: #2980b9; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; color: #fff; }
+  .pending { background: #e8a33d; } .approved { background: #27ae60; } .rejected, .refused { background: #c0392b; }
+  .muted { color: #777; font-size: 12px; }
+  .bad { color: #c0392b; font-weight: 600; }
+  .banner { border: 1px solid #c0392b; background: #fdecea; color: #7b1d14; padding: 10px 12px; border-radius: 4px; margin: 8px 0; display: none; }
+  .ok-banner { border: 1px solid #27ae60; background: #eafaf1; color: #145a32; padding: 10px 12px; border-radius: 4px; margin: 8px 0; }
+  #grid { position: relative; max-height: 420px; overflow: auto; user-select: none; }
+  #grid::after { content: attr(data-mark); position: sticky; bottom: 4px; left: 0; display: block; text-align: right; font-size: 11px; color: rgba(31,58,95,.45); pointer-events: none; }
+  .hidden { display: none; }
+  pre { background: #f7f7f7; border: 1px solid #e5e5e5; padding: 8px; overflow: auto; max-height: 240px; font-size: 12px; margin: 4px 0; white-space: pre-wrap; }
+  #auditWrap, #queueWrap { max-height: 420px; overflow: auto; }
+  td.wrap { white-space: normal; word-break: break-word; min-width: 240px; }
+</style>
+</head>
+<body>
+<header>
+  <span>Secure processing environment <b id="spid"></b></span>
+  <a href="/">← access body console</a>
+  <span class="spacer"></span>
+  <label>Viewing as
+    <select id="role"><option value="applicant">applicant</option><option value="staff">staff</option></select>
+  </label>
+  <label>Name <input id="actor" type="text" size="18" placeholder="who is at the keyboard"></label>
+</header>
+<main>
+  <section class="wide">
+    <h2>Data permit</h2>
+    <div id="permit"><span class="muted">loading…</span></div>
+  </section>
+
+  <section id="browse">
+    <h2>Work with the data — inside the SPE</h2>
+    <div class="row">
+      <span class="muted">Table:</span><span id="tables"></span>
+      <span class="spacer" style="flex:1"></span>
+      <button id="download" class="danger" title="There is no download from an SPE. Try it.">Download records</button>
+    </div>
+    <div id="blocked" class="banner"></div>
+    <textarea id="sql" spellcheck="false" placeholder="SELECT icd10, COUNT(*) AS n FROM conditions GROUP BY icd10 ORDER BY n DESC"></textarea>
+    <div class="row">
+      <button id="run">Run query</button>
+      <button id="prev" class="secondary small" disabled>‹ previous 50</button>
+      <button id="next" class="secondary small" disabled>next 50 ›</button>
+      <span id="qstatus" class="muted"></span>
+    </div>
+    <div id="qerror" class="bad"></div>
+    <div id="grid" data-mark=""></div>
+  </section>
+
+  <section id="outputs">
+    <h2>Outputs — the only way out</h2>
+    <p class="muted">An output is checked before it leaves: no patient IDs, no record-level columns, no count below 10. Then staff approve it (Art. 73(1)(e)).</p>
+    <div class="row">
+      <input id="oname" type="text" size="22" placeholder="name, e.g. counts_by_icd10">
+      <button id="exportTable" class="secondary" disabled>Submit last query result</button>
+    </div>
+    <textarea id="otext" spellcheck="false" placeholder='Or paste text / JSON, e.g. {"auc": 0.81, "n_train": 920}'></textarea>
+    <div class="row"><button id="exportText" class="secondary">Submit text</button><span id="ostatus" class="muted"></span></div>
+    <div id="olist"></div>
+  </section>
+
+  <section id="queue" class="hidden">
+    <h2>Output queue</h2>
+    <div id="queueWrap"></div>
+  </section>
+
+  <section id="audit" class="wide hidden">
+    <h2>Audit log</h2>
+    <div class="row"><button id="refreshAudit" class="secondary small">Refresh</button><span class="muted">Every query, every output, every blocked download.</span></div>
+    <div id="auditWrap"></div>
+  </section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const ID = decodeURIComponent(location.pathname.split("/").pop());
+const API = `/api/spe/${encodeURIComponent(ID)}`;
+let info = null, lastRows = null, page = {sql: null, offset: 0};
+$("spid").textContent = ID;
+
+const params = new URLSearchParams(location.search);
+$("role").value = params.get("role") === "staff" ? "staff" : "applicant";
+const esc = s => String(s ?? "").replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const headers = () => ({ "Content-Type": "application/json", "X-Role": $("role").value, ...($("actor").value ? { "X-Actor": $("actor").value } : {}) });
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, { ...opts, headers: headers() });
+  const json = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, json };
+}
+function grid(columns, rows) {
+  if (!columns.length) return `<p class="muted">no columns</p>`;
+  return `<table><tr>${columns.map(c => `<th>${esc(c)}</th>`).join("")}</tr>` +
+    rows.map(r => `<tr>${columns.map(c => `<td>${esc(r[c])}</td>`).join("")}</tr>`).join("") + `</table>`;
+}
+
+async function loadInfo() {
+  const r = await api("");
+  if (!r.ok) { $("permit").innerHTML = `<span class="bad">${esc(r.json.detail || r.status)}</span>`; return; }
+  info = r.json;
+  const tables = Object.entries(info.tables).map(([t, n]) => `${t} (${n.toLocaleString()} rows)`).join(", ");
+  $("permit").innerHTML =
+    `<p><span class="badge">APPROVE_SPE</span> &nbsp; Art. ${esc(info.articles.join(", "))} &nbsp; <span class="muted">created ${esc(info.created)}</span></p>` +
+    `<p>${esc(info.reason)}</p>` +
+    `<p><b>Applicant:</b> ${esc(info.applicant.name)}, ${esc(info.applicant.organisation)} (${esc(info.applicant.country)})<br>` +
+    `<b>Purpose:</b> ${esc(info.purpose)}</p>` +
+    `<p><b>Cohort:</b> ${info.cohort_size.toLocaleString()} patients (opted-out patients excluded, Art. 71). ` +
+    `<b>Records inside:</b> ${esc(tables)}. Patient IDs are pseudonyms and stay inside.</p>` +
+    `<p class="muted">What you see here is viewed inside the SPE and logged. Nothing can be downloaded; aggregates leave as reviewed outputs.</p>`;
+  $("tables").innerHTML = Object.keys(info.tables).map(t => `<button class="secondary small tbl" data-t="${esc(t)}">${esc(t)}</button>`).join(" ");
+  document.querySelectorAll(".tbl").forEach(b => b.onclick = () => { $("sql").value = `SELECT * FROM ${b.dataset.t}`; runQuery(0); });
+  $("grid").dataset.mark = `SPE ${ID} · ${info.applicant.name} · on-screen only`;
+}
+
+async function runQuery(offset) {
+  const base = $("sql").value.trim().replace(/;\s*$/, "");
+  if (!base) return;
+  const paged = /\blimit\b/i.test(base) ? base : `${base} LIMIT ${info.page_rows} OFFSET ${offset}`;
+  $("qerror").textContent = ""; $("qstatus").textContent = "running…";
+  const r = await api("/query", { method: "POST", body: JSON.stringify({ sql: paged }) });
+  if (!r.ok) { $("qerror").textContent = r.json.detail || `HTTP ${r.status}`; $("qstatus").textContent = ""; lastRows = null; $("exportTable").disabled = true; return; }
+  page = { sql: base, offset };
+  lastRows = r.json.rows;
+  $("grid").innerHTML = grid(r.json.columns, r.json.rows);
+  $("qstatus").textContent = `${r.json.rows.length} rows shown (rows ${offset + 1}–${offset + r.json.rows.length}) — ${r.json.notice}`;
+  $("prev").disabled = offset === 0;
+  $("next").disabled = r.json.rows.length < info.page_rows;
+  $("exportTable").disabled = !r.json.rows.length;
+  if ($("role").value === "staff") loadAudit();
+}
+$("run").onclick = () => runQuery(0);
+$("prev").onclick = () => runQuery(Math.max(0, page.offset - info.page_rows));
+$("next").onclick = () => runQuery(page.offset + info.page_rows);
+
+$("download").onclick = async () => {
+  const r = await api("/download/records");
+  const b = $("blocked");
+  b.style.display = "block";
+  b.innerHTML = `<b>HTTP ${r.status} — blocked.</b> ${esc(r.json.detail || "")}`;
+  if ($("role").value === "staff") loadAudit();
+};
+
+async function submitOutput(body) {
+  $("ostatus").textContent = "checking…";
+  const r = await api("/outputs", { method: "POST", body: JSON.stringify(body) });
+  if (!r.ok) { $("ostatus").textContent = r.json.detail || `HTTP ${r.status}`; return; }
+  $("ostatus").textContent = r.json.status === "refused" ? `refused: ${r.json.checks.join("; ")}` : "submitted, waiting for staff review";
+  loadOutputs();
+}
+$("exportTable").onclick = () => lastRows && submitOutput({ name: $("oname").value || "query_result", rows: lastRows });
+$("exportText").onclick = () => $("otext").value.trim() && submitOutput({ name: $("oname").value || "text", content: $("otext").value });
+
+function outputRow(o, staff) {
+  let html = `<tr><td>${o.id}</td><td>${esc(o.name)}</td><td>${esc(o.kind)}</td><td><span class="pill ${o.status}">${o.status}</span></td>` +
+    `<td class="wrap">${esc(o.checks.join("; ")) || "—"}</td><td>${esc(o.at)}</td><td>${esc(o.note || "")}</td>`;
+  if (staff) html += `<td>${o.status === "pending" ? `<button class="small review" data-id="${o.id}" data-s="approved">approve</button> <button class="small danger review" data-id="${o.id}" data-s="rejected">reject</button>` : ""}` +
+    ` <button class="small secondary peek" data-id="${o.id}">view</button></td>`;
+  else html += `<td>${o.status === "approved" ? `<button class="small secondary take" data-id="${o.id}">download output</button>` : ""}</td>`;
+  return html + `</tr><tr class="hidden peek-${o.id}"><td colspan="8"><pre id="peek-${o.id}"></pre></td></tr>`;
+}
+async function loadOutputs() {
+  const r = await api("/outputs");
+  const staff = $("role").value === "staff";
+  const html = r.json.length
+    ? `<table><tr><th>#</th><th>Name</th><th>Kind</th><th>Status</th><th>Checks</th><th>Submitted</th><th>Note</th><th></th></tr>${r.json.map(o => outputRow(o, staff)).join("")}</table>`
+    : `<p class="muted">no outputs yet</p>`;
+  (staff ? $("queueWrap") : $("olist")).innerHTML = html;
+  document.querySelectorAll(".review").forEach(b => b.onclick = async () => {
+    const note = prompt(`${b.dataset.s}: note for the applicant`, "") ?? "";
+    await api(`/outputs/${b.dataset.id}/review`, { method: "POST", body: JSON.stringify({ status: b.dataset.s, note }) });
+    loadOutputs(); loadAudit(); loadInfo();
+  });
+  document.querySelectorAll(".peek").forEach(b => b.onclick = async () => {
+    const o = (await api(`/outputs/${b.dataset.id}`)).json;
+    $(`peek-${o.id}`).textContent = typeof o.content === "string" ? o.content : JSON.stringify(o.content, null, 2);
+    document.querySelector(`.peek-${o.id}`).classList.toggle("hidden");
+  });
+  document.querySelectorAll(".take").forEach(b => b.onclick = async () => {
+    const o = (await api(`/outputs/${b.dataset.id}`)).json;  // approved: content is released
+    const text = typeof o.content === "string" ? o.content : JSON.stringify(o.content, null, 2);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+    a.download = `${ID}-output-${o.id}-${o.name}.json`; a.click();
+  });
+}
+
+async function loadAudit() {
+  const r = await api("/audit");
+  $("auditWrap").innerHTML = `<table><tr><th>#</th><th>When</th><th>Who</th><th>Action</th><th>Detail</th></tr>` +
+    r.json.map(a => `<tr><td>${a.id}</td><td>${esc(a.at)}</td><td>${esc(a.actor)}</td><td class="${a.action === "download_blocked" ? "bad" : ""}">${esc(a.action)}</td><td class="wrap">${esc(a.detail ? JSON.stringify(a.detail) : "")}</td></tr>`).join("") + `</table>`;
+}
+$("refreshAudit").onclick = loadAudit;
+
+function applyRole() {
+  const staff = $("role").value === "staff";
+  $("outputs").classList.toggle("hidden", staff);
+  $("queue").classList.toggle("hidden", !staff);
+  $("audit").classList.toggle("hidden", !staff);
+  history.replaceState(null, "", staff ? "?role=staff" : location.pathname);
+  loadOutputs();
+  if (staff) loadAudit();
+}
+$("role").onchange = applyRole;
+
+loadInfo().then(applyRole);
+</script>
+</body>
+</html>
