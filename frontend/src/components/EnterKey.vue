@@ -29,8 +29,8 @@ async function submit() {
     <v-card class="w-100" elevation="2">
       <v-card-title class="text-h6">Enter your data permit</v-card-title>
       <v-card-subtitle class="text-wrap">
-        An approved access application (Art. 68, 73 Regulation (EU) 2025/327) came with an access key. The
-        key opens the permit's secure processing environment only together with the applicant's name as
+        An approved access application (Art. 68, 73 Regulation (EU) 2025/327) came with an access key, valid for
+        one day. The key opens the permit's secure processing environment only together with the applicant's name as
         written on the application.
       </v-card-subtitle>
       <v-card-text>

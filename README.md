@@ -119,7 +119,7 @@ receives request text and law text, never patient data.
 An `APPROVE_SPE` decision creates `backend/spe/<request_id>.db` — a SQLite file with a `cohort`
 table (the selected patient IDs, opted-out patients already excluded) and only the record types
 the request names, joined to that cohort — and returns an **access key** in `data.spe.access_key`
-(shown once; only its SHA-256 is stored). Nothing serves the file.
+(shown once; only its SHA-256 is stored; valid for 24 hours, `EHDS_SPE_KEY_TTL_HOURS`). Nothing serves the file.
 
 The applicant opens the SPE in the separate frontend (`frontend/`, Vue 3 + Vuetify + Vite,
 <http://localhost:5173>) by entering the **key and their name as on the application**; both

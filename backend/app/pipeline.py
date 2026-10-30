@@ -46,7 +46,8 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
             spe_info, key = spe.create(request, conn, [r["patient_id"] for r in rows["cohort"]],
                                        query_spec.record_types, articles, reason)
             # the key is the applicant's only way in; it is not stored anywhere else
-            data["spe"] = {"id": request.id, "tables": spe_info["tables"], "access_key": key, "url": SPE_FRONTEND_URL}
+            data["spe"] = {"id": request.id, "tables": spe_info["tables"], "access_key": key,
+                           "key_expires": spe_info["key_expires"], "url": SPE_FRONTEND_URL}
     except mapping.InterpretError as e:
         flags.append(f"not_interpreted: {e}")
 

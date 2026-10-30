@@ -22,14 +22,14 @@ import secrets
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
 from app import config
-from app.config import SPE_PAGE_ROWS, SPE_QUERY_STEPS
+from app.config import SPE_KEY_TTL_HOURS, SPE_PAGE_ROWS, SPE_QUERY_STEPS
 from app.db import TABLES
 from app.models import DataRequest
 
@@ -80,6 +80,10 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+def _in(hours: int) -> str:
+    return (datetime.now(timezone.utc) + timedelta(hours=hours)).isoformat(timespec="seconds")
+
+
 def _audit(spe_id: str, action: str, detail: Any = None) -> None:
     with _db(spe_id) as conn:
         conn.execute("INSERT INTO audit_log (at, action, detail) VALUES (?, ?, ?)",
@@ -100,7 +104,8 @@ def create(request: DataRequest, conn: sqlite3.Connection, patient_ids: list[str
            articles: list[str], reason: str) -> tuple[dict[str, Any], str]:
     """Build (or rebuild) the SPE for a permit from the main database behind `conn`.
 
-    Returns (manifest, access key). The key is shown once; only its hash is stored.
+    Returns (manifest, access key). The key is shown once, only its hash is stored, and it opens the
+    SPE for SPE_KEY_TTL_HOURS from now; a re-run of the request mints a new one.
     """
     src_path = conn.execute("PRAGMA database_list").fetchone()[2]
     tables = [t for t in TABLES if t in record_types]
@@ -128,6 +133,7 @@ def create(request: DataRequest, conn: sqlite3.Connection, patient_ids: list[str
             "cohort_size": len(patient_ids),
             "record_types": tables,
             "created": _now(),
+            "key_expires": _in(SPE_KEY_TTL_HOURS),
             "key_hash": _hash(key),
         }
         spe.execute("CREATE TABLE manifest (json TEXT)")
@@ -164,6 +170,9 @@ def authenticate(key: str | None, applicant: str | None) -> str:
     if not (key_ok and name_ok):
         _audit(spe_id, "access_rejected", {"key_ok": key_ok, "name_ok": name_ok, "name_given": applicant.strip()[:80]})
         raise SpeError(401, "key and name do not open any secure processing environment")
+    if _now() > manifest["key_expires"]:
+        _audit(spe_id, "access_expired", {"key_expires": manifest["key_expires"]})
+        raise SpeError(401, f"this access key expired on {manifest['key_expires']}; the access body has to issue a new one")
     return spe_id
 
 

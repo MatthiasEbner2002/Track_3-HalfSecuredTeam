@@ -49,6 +49,7 @@ SMALL_CELL_THRESHOLD = 10  # counts below this are shown as "<10"
 
 # Secure processing environments (Art. 73): one SQLite file per data permit, never served as a file.
 SPE_DIR = Path(os.environ.get("EHDS_SPE_DIR", REPO_ROOT / "backend" / "spe"))
+SPE_KEY_TTL_HOURS = int(os.environ.get("EHDS_SPE_KEY_TTL_HOURS", "24"))  # how long an access key opens its SPE
 SPE_PAGE_ROWS = 50  # most rows one query shows on screen (as an image)
 CORS_ORIGINS = [o for o in os.environ.get("EHDS_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if o]
 SPE_FRONTEND_URL = os.environ.get("EHDS_SPE_FRONTEND_URL", "http://localhost:5173")  # where the applicant enters the key

@@ -2,7 +2,9 @@
 
 import base64
 import io
+import json
 import sqlite3
+from datetime import datetime, timedelta, timezone
 
 from urllib.parse import quote
 
@@ -79,6 +81,25 @@ def test_rebuild_rotates_the_key(r05, conn):
     assert again.data["spe"]["tables"] == r05.data["spe"]["tables"]
     assert again.data["spe"]["access_key"] != old
     assert client.post("/api/spe/access", headers={"Authorization": f"Bearer {old}", "X-Applicant": NAME}).status_code == 401
+
+
+def test_key_expires_after_one_day(r05, auth, spe_dir):
+    info = client.post("/api/spe/access", headers=auth).json()
+    issued, expires = datetime.fromisoformat(info["created"]), datetime.fromisoformat(info["key_expires"])
+    assert expires - issued == timedelta(hours=config.SPE_KEY_TTL_HOURS) == timedelta(days=1)
+    assert r05.data["spe"]["key_expires"] == info["key_expires"]
+    # same key, many uses: not one-time
+    for _ in range(3):
+        assert client.post("/api/spe/access", headers=auth).status_code == 200
+    # move the expiry into the past
+    s = sqlite3.connect(spe_dir / "R05.db")
+    manifest = json.loads(s.execute("SELECT json FROM manifest").fetchone()[0])
+    manifest["key_expires"] = (datetime.now(timezone.utc) - timedelta(minutes=1)).isoformat(timespec="seconds")
+    s.execute("UPDATE manifest SET json = ?", (json.dumps(manifest),)); s.commit(); s.close()
+    res = client.post("/api/spe/access", headers=auth)
+    assert res.status_code == 401 and "expired" in res.json()["detail"]
+    assert client.post("/api/spe/query", json={"sql": "SELECT 1"}, headers=auth).status_code == 401
+    assert [a["action"] for a in spe.audit_log("R05")].count("access_expired") == 2
 
 
 def test_key_and_name_are_both_required(r05, auth):

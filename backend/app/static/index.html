@@ -214,7 +214,7 @@ function render(r) {
   if (r.data?.spe) {
     const t = Object.entries(r.data.spe.tables).map(([k, v]) => `${k}: ${v}`).join(", ");
     html += `<p><b>SPE created</b> — ${r.data.cohort_size} patients, records: ${esc(t)}.<br>`
-          + `Access key for the applicant (shown once): <code>${esc(r.data.spe.access_key)}</code><br>`
+          + `Access key for the applicant (shown once, valid until ${esc(r.data.spe.key_expires)}): <code>${esc(r.data.spe.access_key)}</code><br>`
           + `<a href="${esc(r.data.spe.url)}" target="_blank">Open the SPE frontend</a> and enter the key.</p>`;
   } else if (r.data && Object.keys(r.data).length) html += `<details open><summary>Data</summary>${dataTable(r.data)}</details>`;
   if (expected?.answer && r.decision !== "REJECT") html += `<details><summary>Expected answer</summary><pre>${esc(JSON.stringify(expected.answer, null, 2))}</pre></details>`;

@@ -36,6 +36,7 @@ Rebuild the committed databases only after changing their sources:
 | `EHDS_OLLAMA_URL` | `http://localhost:11434` | Ollama for the embeddings |
 | `EHDS_LLM` | `on` | `off` disables the LLM fallback in data extraction |
 | `EHDS_SPE_DIR` | `backend/spe` | where the per-permit SPE files are written (gitignored) |
+| `EHDS_SPE_KEY_TTL_HOURS` | `24` | how long an SPE access key stays valid |
 | `EHDS_SPE_FRONTEND_URL` | `http://localhost:5173` | link returned with the access key |
 | `EHDS_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | origins allowed to call the API |
 

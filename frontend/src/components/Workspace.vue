@@ -57,7 +57,7 @@ async function tryDownload() {
           <v-card-title class="d-flex align-center ga-3 flex-wrap">
             <v-chip color="secondary" variant="flat" label>APPROVE_SPE</v-chip>
             <span>Art. {{ permit.articles.join(", ") }}</span>
-            <span class="text-caption text-medium-emphasis">created {{ permit.created }}</span>
+            <span class="text-caption text-medium-emphasis">created {{ permit.created }} · key valid until {{ permit.key_expires }}</span>
           </v-card-title>
           <v-card-text>
             <p class="mb-2">{{ permit.reason }}</p>
