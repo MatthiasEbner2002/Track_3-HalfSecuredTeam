@@ -179,7 +179,8 @@ function compare(exp, r) {
   }
   const d = r.data || {};
   if (exp.decision === "APPROVE_SPE") {
-    if (d.cohort_size !== ans.cohort_size || sa(d.record_types || []) !== sa(ans.record_types)) problems.push("answer wrong-values");
+    if (d.cohort_size !== ans.cohort_size) problems.push(`cohort_size ${d.cohort_size} (expected ${ans.cohort_size})`);
+    if (ans.record_types && sa(d.record_types || []) !== sa(ans.record_types)) problems.push("record_types differ");
     return problems;
   }
   // R-samples store {group: {name: value}}; E-cases store {group: [values]}
