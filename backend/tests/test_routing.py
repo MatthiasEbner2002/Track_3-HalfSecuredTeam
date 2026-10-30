@@ -59,12 +59,12 @@ def test_unjustified_access_application_gets_statistics():
     assert not choice.needs_review
 
 
-def test_choose_with_defaults_is_cached(monkeypatch):
+def test_choose_calls_the_model_every_time(monkeypatch):
     llm = FakeLLM()
     monkeypatch.setattr(decision, "_default_llm", lambda: llm)
     routing.choose(load_request("R05"))
     routing.choose(load_request("R05"))
-    assert spe_calls(llm) == 1
+    assert spe_calls(llm) == 2  # no answer caching
 
 
 def test_pipeline_approves_spe_when_justified(conn, monkeypatch):

@@ -1,19 +1,17 @@
 """OpenRouter chat client (stdlib only) for JSON-schema-constrained answers.
 
 Only request text is sent to OpenRouter; patient data never leaves the app.
-Answers are cached on disk keyed by (model, prompts, schema), so an identical
-request gives the identical decision across restarts and costs nothing twice.
+No local caching: every call goes to the model afresh. temperature and seed are
+not sent: with require_parameters they exclude the endpoints we may use.
 """
 
 import copy
-import hashlib
 import json
 import os
 import re
 import time
 import urllib.error
 import urllib.request
-from pathlib import Path
 from typing import Any
 
 from app.config import (
@@ -21,11 +19,8 @@ from app.config import (
     LLM_TIMEOUT_S,
     OPENROUTER_API_KEY,
     OPENROUTER_URL,
-    REPO_ROOT,
 )
 from app.rag.errors import ServiceUnavailable
-
-CACHE_DIR = REPO_ROOT / "backend" / ".cache" / "openrouter"
 
 
 class OpenRouterUnavailable(ServiceUnavailable):
@@ -75,15 +70,9 @@ def _parse_answer(content: str, schema: dict) -> dict:
 
 
 class OpenRouterLLM:
-    def __init__(
-        self,
-        model: str = LLM_MODEL,
-        api_key: str | None = None,
-        cache_dir: Path | None = CACHE_DIR,
-    ):
+    def __init__(self, model: str = LLM_MODEL, api_key: str | None = None):
         self.model = model
         self.api_key = api_key
-        self.cache_dir = cache_dir
 
     def _key(self) -> str:
         key = self.api_key or os.environ.get("OPENROUTER_API_KEY") or OPENROUTER_API_KEY
@@ -153,23 +142,4 @@ class OpenRouterLLM:
     def complete_json(self, system: str, user: str, schema: dict) -> dict:
         """Return the model's answer parsed as JSON matching schema."""
         key = self._key()
-        strict = _strict_schema(schema)
-        cache_key = hashlib.sha256(
-            json.dumps(
-                {"model": self.model, "system": system, "user": user, "schema": strict},
-                sort_keys=True,
-            ).encode()
-        ).hexdigest()
-        if self.cache_dir is not None:
-            cached = self.cache_dir / f"{cache_key}.json"
-            if cached.exists():
-                return json.loads(cached.read_text(encoding="utf-8"))
-
-        answer = self._call(key, system, user, strict)
-
-        if self.cache_dir is not None:
-            self.cache_dir.mkdir(parents=True, exist_ok=True)
-            (self.cache_dir / f"{cache_key}.json").write_text(
-                json.dumps(answer), encoding="utf-8"
-            )
-        return answer
+        return self._call(key, system, user, _strict_schema(schema))

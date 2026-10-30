@@ -14,7 +14,6 @@ and flags the result for staff review — statistics never leak records.
 """
 
 from dataclasses import dataclass
-from functools import lru_cache
 
 from app.layers import decision
 from app.layers.decision import LLM
@@ -132,28 +131,12 @@ def _choose_uncached(request: DataRequest, retriever: Retriever, llm: LLM) -> Ro
     return choice
 
 
-@lru_cache(maxsize=512)
-def _choose(request_json: str) -> RouteChoice:
-    return _choose_uncached(
-        DataRequest.model_validate_json(request_json),
-        decision._default_retriever(),
-        decision._default_llm(),
-    )
-
-
 def choose(
     request: DataRequest, retriever: Retriever | None = None, llm: LLM | None = None
 ) -> RouteChoice:
-    """Route an accepted request. With default backends the result is cached per request
-    content; pass a retriever or llm explicitly (tests, eval) to bypass the cache."""
-    if retriever is None and llm is None:
-        return _choose(request.model_dump_json())
+    """Route an accepted request; calls the model afresh every time (no caching)."""
     return _choose_uncached(
         request,
         retriever or decision._default_retriever(),
         llm or decision._default_llm(),
     )
-
-
-def clear_cache() -> None:
-    _choose.cache_clear()

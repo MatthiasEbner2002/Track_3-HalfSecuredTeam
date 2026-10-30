@@ -33,8 +33,8 @@ DECISIONS = {"statistics": "APPROVE_STATISTICAL", "spe": "APPROVE_SPE"}
 
 
 def run(request: DataRequest) -> tuple[str, list[str], list[str]]:
-    """One uncached decision: explicit backends bypass the caches in decide() and choose()."""
-    retriever, llm = decision._default_retriever(), OpenRouterLLM(cache_dir=None)
+    """One fresh decision: every call goes to the model (nothing is cached anywhere)."""
+    retriever, llm = decision._default_retriever(), OpenRouterLLM()
     verdict = decision.decide(request, retriever, llm)
     if not verdict.accepted:
         return "REJECT", verdict.articles, verdict.flags

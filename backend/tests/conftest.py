@@ -49,8 +49,6 @@ def fake_decision_backend(request, monkeypatch, tmp_path_factory):
     retriever = Retriever.from_chunks(CHUNKS, FakeEmbedder(), tmp_path_factory.mktemp("law") / "law.db")
     monkeypatch.setattr(decision, "_default_retriever", lambda: retriever)
     monkeypatch.setattr(decision, "_default_llm", lambda: FakeLLM())
-    decision.clear_cache()
-    routing.clear_cache()
 
 
 @pytest.fixture(scope="session")

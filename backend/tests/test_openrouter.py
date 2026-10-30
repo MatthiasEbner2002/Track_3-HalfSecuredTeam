@@ -1,4 +1,4 @@
-"""OpenRouter client on a fake urlopen: request shape, errors, retries, disk cache."""
+"""OpenRouter client on a fake urlopen: request shape, errors, retries, no caching."""
 
 import io
 import json
@@ -65,7 +65,7 @@ def body_of(request) -> dict:
 def test_request_shape_and_strict_schema(api_key, http):
     schema = json.loads(json.dumps(SCHEMA))
     http.queue = [_payload(ANSWER)]
-    result = OpenRouterLLM(cache_dir=None).complete_json("sys", "user", schema)
+    result = OpenRouterLLM().complete_json("sys", "user", schema)
 
     assert result == ANSWER
     (request,) = http.requests
@@ -86,14 +86,14 @@ def test_request_shape_and_strict_schema(api_key, http):
 def test_json_fence_is_stripped(api_key, http):
     fenced = {"choices": [{"message": {"content": "```json\n" + json.dumps(ANSWER) + "\n```"}}]}
     http.queue = [io.BytesIO(json.dumps(fenced).encode())]
-    assert OpenRouterLLM(cache_dir=None).complete_json("s", "u", SCHEMA) == ANSWER
+    assert OpenRouterLLM().complete_json("s", "u", SCHEMA) == ANSWER
 
 
 def test_missing_key(monkeypatch, http):
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     monkeypatch.setattr(openrouter, "OPENROUTER_API_KEY", "")
     with pytest.raises(OpenRouterUnavailable) as exc:
-        OpenRouterLLM(cache_dir=None).complete_json("s", "u", SCHEMA)
+        OpenRouterLLM().complete_json("s", "u", SCHEMA)
     assert "OPENROUTER_API_KEY" in str(exc.value) and "sk-test-secret" not in str(exc.value)
     assert http.requests == []
 
@@ -101,13 +101,13 @@ def test_missing_key(monkeypatch, http):
 def test_401_rejected_key(api_key, http):
     http.queue = [_http_error(401)]
     with pytest.raises(OpenRouterUnavailable, match="rejected the API key"):
-        OpenRouterLLM(cache_dir=None).complete_json("s", "u", SCHEMA)
+        OpenRouterLLM().complete_json("s", "u", SCHEMA)
 
 
 def test_429_retries_once(api_key, http, monkeypatch):
     monkeypatch.setattr(openrouter.time, "sleep", lambda s: None)
     http.queue = [_http_error(429, "rate limited"), _payload(ANSWER)]
-    assert OpenRouterLLM(cache_dir=None).complete_json("s", "u", SCHEMA) == ANSWER
+    assert OpenRouterLLM().complete_json("s", "u", SCHEMA) == ANSWER
     assert len(http.requests) == 2
 
 
@@ -115,21 +115,12 @@ def test_invalid_json_twice_raises_value_error(api_key, http):
     bad = io.BytesIO(json.dumps({"choices": [{"message": {"content": "not json"}}]}).encode())
     http.queue = [bad, io.BytesIO(json.dumps({"choices": [{"message": {"content": "{}"}}]}).encode())]
     with pytest.raises(ValueError):
-        OpenRouterLLM(cache_dir=None).complete_json("s", "u", SCHEMA)
+        OpenRouterLLM().complete_json("s", "u", SCHEMA)
     assert len(http.requests) == 2
 
 
-def test_disk_cache_avoids_second_call(api_key, http, tmp_path):
-    llm = OpenRouterLLM(cache_dir=tmp_path)
-    http.queue = [_payload(ANSWER)]
-    llm.complete_json("s", "u", SCHEMA)
-    assert list(tmp_path.glob("*.json"))
-    assert llm.complete_json("s", "u", SCHEMA) == ANSWER  # no second HTTP call
-    assert len(http.requests) == 1
-
-
-def test_no_cache_calls_twice(api_key, http):
-    llm = OpenRouterLLM(cache_dir=None)
+def test_identical_calls_hit_the_network_twice(api_key, http):
+    llm = OpenRouterLLM()
     http.queue = [_payload(ANSWER), _payload(ANSWER)]
     llm.complete_json("s", "u", SCHEMA)
     llm.complete_json("s", "u", SCHEMA)

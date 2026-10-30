@@ -12,7 +12,7 @@ Done:
   (no IBM Bob, no NLI model): Art. 54 / 53 point picked by the LLM from retrieved law text and
   quoted; SPE vs. downgrade judged against Art. 66(2)/66(3) with a quote that must appear verbatim
   in the request (otherwise downgrade + staff flag); route articles (69, 66, 68, 73) grounded in
-  the law text; answers cached; `503` with a fix-it message when Ollama or OpenRouter fails
+  the law text; `503` with a fix-it message when Ollama or OpenRouter fails
 - [x] Data extraction from the definitions: 6/6 numbers, black-box 100/100 with the rules alone
   (hospital grouping, main diagnosis `primary_icd10`, stays vs. patients covered)
 - [x] Small-cell rule and opt-outs in every statistical answer
@@ -90,7 +90,7 @@ receives request text and law text, never patient data.
 | Law corpus | `app/rag/corpus.py`, `app/rag/store.py`, `data/law.db` | `eulex.html` (Regulation (EU) 2025/327) parsed into 406 chunks: each paragraph and each lettered point of Chapter IV (Art. 50–81) on its own, plus the recitals. Embedded once with `nomic-embed-text` (local Ollama) and committed; retrieval is cosine similarity over the chunks |
 | Decision, steps 1–2 | `app/layers/decision.py` | Three small steps instead of one big question. **Extract** (LLM): actor, analysis and *end use* of the results, from organisation and purpose only. **Retrieve**: the end use is the query for the 3 closest points of Art. 53(1) and of Art. 54. **Match** (LLM): one of those 6 points by id (enum in the schema, so no invented articles), plus the words of the point that cover the use. **Code decides**: Art. 54 point → `REJECT`, Art. 53 point → accept; the reason quotes the point verbatim from `law.db`; words not found in the point → `needs_review` |
 | Routing, steps 3–4 | `app/layers/routing.py` | Health data request → statistics (Art. 69(1)). Access application → Art. 66(2)/66(3) fetched by id, the LLM judges whether the application shows that anonymised statistics are not enough and quotes the sentence. Quote found verbatim in the request → `APPROVE_SPE` (66, 68, 73); otherwise downgrade to `APPROVE_STATISTICAL` (66, 69), flagged `spe_quote_unverified` when a justification was claimed but could not be quoted. Route articles come with their law text as grounding |
-| LLM client | `app/rag/openrouter.py` | `anthropic/claude-haiku-5.5` via OpenRouter, strict JSON schema, routed only to endpoints that enforce it. Answers cached on disk by (model, prompt, schema), plus an in-memory cache per request, so the same request always gets the same decision |
+| LLM client | `app/rag/openrouter.py` | `anthropic/claude-haiku-5.5` via OpenRouter, strict JSON schema, routed only to endpoints that enforce it. No local cache: every request calls the model afresh; consistency comes from the strict JSON schema, the enum of retrieved points and the verbatim-quote checks |
 | Data extraction | `app/layers/mapping.py`, `app/models.py` | Each definition sentence must fully match an ordered regex rule; named concepts (diagnosis → ICD-10 prefix, drug → ATC prefix and "active on 31.12.2025", measurement → LOINC with "latest value", age, sex, region, hospital, inpatient stay / main diagnosis, composites with AND/OR/NOT) become a `QuerySpec` (pydantic, the contract). Plain-English names are bound to the codes the definitions give; measurements also resolve from a built-in name → LOINC table. The "Report per …" line is read by finding the defined names and the operation (count, %, mean, negation). Any sentence not understood raises an error instead of being skipped; codes that match nothing in the data are rejected. Nothing is written per request |
 | Fallback interpretation | `app/layers/llm_mapping.py` | Where the rules give up, an LLM may fill the same `QuerySpec` under the same validation. Currently wired to IBM Bob, which is not installed, so it is inactive (todo 6) |
 | SQL compiler | `app/layers/query.py` | `QuerySpec` → SQLite SQL: a base view without opted-out patients, age on 31.12.2025, one patient-ID CTE per concept, one 0/1 flag per patient, grouping by region / hospital / sex / age band (or two of them), patients or stays as the unit |
@@ -137,7 +137,7 @@ headers stand in for it.
 ## Metrics
 
 On the 10 requests, through `pipeline.run` (what the API returns), `anthropic/claude-haiku-5.5`
-via OpenRouter, caches cleared:
+via OpenRouter (no cache; every run calls the model):
 
 | Metric | Target | Now |
 |---|---|---|

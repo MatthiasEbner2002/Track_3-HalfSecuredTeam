@@ -25,7 +25,7 @@ ones that depend on the request type and route (66, 68, 69, 73).
 
 import re
 from dataclasses import dataclass
-from functools import cache, lru_cache
+from functools import cache
 from typing import Protocol
 
 from app.config import RETRIEVAL_TOP_K
@@ -170,20 +170,8 @@ def decide_rag(
     )
 
 
-@lru_cache(maxsize=512)
-def _decide(request_json: str) -> Decision:
-    return decide_rag(DataRequest.model_validate_json(request_json))
-
-
 def decide(
     request: DataRequest, retriever: Retriever | None = None, llm: LLM | None = None
 ) -> Decision:
-    """Decide a request. With default backends the result is cached per request content;
-    pass a retriever or llm explicitly (tests, eval) to bypass the cache."""
-    if retriever is None and llm is None:
-        return _decide(request.model_dump_json())
+    """Decide a request; calls the model afresh every time (no caching of answers)."""
     return decide_rag(request, retriever, llm)
-
-
-def clear_cache() -> None:
-    _decide.cache_clear()

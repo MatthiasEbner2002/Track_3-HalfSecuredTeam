@@ -49,10 +49,9 @@ Rebuild the committed databases only after changing their sources:
   the request → SPE (66, 68, 73); otherwise downgrade (66, 69), flagged `spe_quote_unverified`
   when a justification was claimed but could not be quoted.
 - Claude Haiku 5.5 via OpenRouter (strict JSON schema, routed only to endpoints that enforce it); only request text leaves the
-  app, never patient data. Answers are cached on disk in `.cache/openrouter/`, so the same request
-  gets the same decision after a restart. Embeddings: local `nomic-embed-text` via Ollama.
-  Decisions and routes are cached per request content; passing a retriever/LLM explicitly
-  (tests, eval) bypasses the cache.
+  app, never patient data. No local cache: every request calls the model afresh; consistency
+  comes from the strict JSON schema, the enum of retrieved points and the verbatim-quote checks.
+  Embeddings: local `nomic-embed-text` via Ollama.
 - `app/purpose/` (IBM Bob / NLI / rules purpose check) is no longer used by the pipeline.
 - Evaluation set: `tests/fixtures/eval/requests.json` (100 requests, tune on `dev`, report `test`).
 

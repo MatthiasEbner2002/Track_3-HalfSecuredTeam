@@ -39,7 +39,7 @@ def test_consistent_across_three_runs(request_, accept, point):
 def test_decision_and_articles(expected, request_id):
     """decide_rag + routing.choose reproduce the expected decision and articles."""
     request_ = load_request(request_id)
-    retriever, llm = decision._default_retriever(), OpenRouterLLM(cache_dir=None)
+    retriever, llm = decision._default_retriever(), OpenRouterLLM()
     verdict = decision.decide_rag(request_, retriever, llm)
     if not verdict.accepted:
         final, articles = "REJECT", verdict.articles
