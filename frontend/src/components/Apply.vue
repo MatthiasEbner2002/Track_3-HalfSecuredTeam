@@ -11,6 +11,8 @@ const result = ref(null);
 const copied = ref(false);
 const loaded = ref(null); // which of the 10 task requests is in the form
 const tab = ref("answer"); // answer | json
+const suggesting = ref(false);
+const suggestion = ref(null); // last answer of /suggest-definitions
 
 function blank() {
   return {
@@ -62,6 +64,27 @@ const body = computed(() => ({
   question: form.value.question,
   definitions: form.value.definitions.split("\n").map((d) => d.trim()).filter(Boolean),
 }));
+
+const canSuggest = computed(() => form.value.purpose.trim() && form.value.question.trim());
+
+async function suggestDefinitions() {
+  suggesting.value = true;
+  suggestion.value = null;
+  try {
+    const res = await fetch("/api/requests/suggest-definitions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body.value) });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      suggestion.value = { decision: "error", reason: typeof json.detail === "string" ? json.detail : JSON.stringify(json.detail ?? json) };
+      return;
+    }
+    suggestion.value = json;
+    if (json.decision === "ok" && json.definitions.length) form.value.definitions = json.definitions.join("\n");
+  } catch (e) {
+    suggestion.value = { decision: "error", reason: "Request failed: " + e.message };
+  } finally {
+    suggesting.value = false;
+  }
+}
 
 async function submit() {
   error.value = "";
@@ -140,6 +163,26 @@ onMounted(loadSamples);
               </v-btn-toggle>
               <v-textarea v-model="form.purpose" label="Purpose — what you will do with the data and why" rows="3" auto-grow variant="outlined" density="compact" />
               <v-textarea v-model="form.question" label="Question — what you want to receive" rows="2" auto-grow variant="outlined" density="compact" />
+              <div class="d-flex align-center ga-3 mb-3">
+                <v-btn variant="tonal" color="secondary" size="small" prepend-icon="mdi-creation" :loading="suggesting" :disabled="!canSuggest" @click="suggestDefinitions">
+                  Suggest definitions with AI
+                </v-btn>
+                <span class="text-caption text-medium-emphasis">Checks the purpose against Art. 54 / 53 first, then drafts the definitions below.</span>
+              </div>
+              <v-expand-transition>
+                <div v-if="suggestion">
+                  <v-alert v-if="suggestion.decision === 'REJECT'" type="error" variant="tonal" density="compact" class="mb-3" title="This purpose would be rejected">
+                    Art. {{ suggestion.articles.join(", ") }} — {{ suggestion.reason }} No definitions were drafted.
+                  </v-alert>
+                  <v-alert v-else-if="suggestion.decision === 'error'" type="error" variant="tonal" density="compact" class="mb-3">{{ suggestion.reason }}</v-alert>
+                  <v-alert v-else :type="suggestion.computable ? 'success' : 'warning'" variant="tonal" density="compact" class="mb-3" closable @click:close="suggestion = null">
+                    <div>Purpose allowed (Art. {{ suggestion.articles.join(", ") }}). Definitions drafted below — edit them as you like.
+                      <span v-if="suggestion.computable">The access body can compute this automatically.</span>
+                      <span v-else>Staff would have to interpret this request by hand.</span></div>
+                    <div v-if="suggestion.note" class="text-caption mt-1">{{ suggestion.note }}</div>
+                  </v-alert>
+                </div>
+              </v-expand-transition>
               <v-textarea v-model="form.definitions" label="Definitions — one per line, in plain English" rows="4" auto-grow variant="outlined" density="compact" class="font-mono"
                           hint="e.g. Adult = aged 18 or older on 31 December 2025." persistent-hint />
               <v-text-field v-model="form.id" label="Your reference (optional)" variant="outlined" density="compact" class="mt-3" />

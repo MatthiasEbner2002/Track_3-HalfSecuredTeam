@@ -26,8 +26,8 @@ async function submit() {
 </script>
 
 <template>
-  <v-container class="fill-height justify-center">
-    <div class="login">
+  <div class="login-page d-flex justify-center pa-4">
+    <div class="login mx-auto">
       <div class="text-center mb-6">
         <v-avatar color="primary" size="64" class="mb-3 elevation-2"><v-icon icon="mdi-shield-lock-outline" size="34" /></v-avatar>
         <h1 class="text-h5 font-weight-medium mb-1">Enter your data permit</h1>
@@ -67,16 +67,19 @@ async function submit() {
           </v-form>
         </v-card-text>
       </v-card>
-      <div class="d-flex justify-center flex-wrap ga-6 mt-6 text-caption text-medium-emphasis text-no-wrap">
+      <div class="hints d-flex justify-center flex-wrap ga-6 mt-6 text-caption text-medium-emphasis text-no-wrap">
         <span><v-icon icon="mdi-image-outline" size="16" class="mr-1" />records shown as images</span>
         <span><v-icon icon="mdi-download-off-outline" size="16" class="mr-1" />no download</span>
         <span><v-icon icon="mdi-clipboard-text-clock-outline" size="16" class="mr-1" />every access logged</span>
       </div>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <style scoped>
+.login-page { width: 100%; min-height: 100%; padding-top: 32px !important; }
 .login { width: 100%; max-width: 520px; }
+/* May be wider than the card so the three hints share one line; stays centred when they wrap. */
+.hints { width: max-content; max-width: calc(100vw - 32px); position: relative; left: 50%; transform: translateX(-50%); }
 .font-mono :deep(input) { font-family: ui-monospace, monospace; letter-spacing: 0.02em; }
 </style>

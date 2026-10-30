@@ -66,7 +66,7 @@ function blank() {
 
 async function post(body) {
   const t0 = performance.now();
-  const res = await fetch("/api/requests", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const res = await fetch("/api/requests?debug=1", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const text = await res.text();
   let json;
   try { json = JSON.parse(text); } catch { json = text; }

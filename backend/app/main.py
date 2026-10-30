@@ -10,7 +10,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 
-from app import db, pipeline, spe, spe_api, submissions
+from app import db, pipeline, spe, spe_api, submissions, suggest
 from app.config import CORS_ORIGINS, REQUESTS_DIR, SPE_FRONTEND_URL
 from app.models import DataRequest, PipelineResult
 from app.rag.errors import ServiceUnavailable
@@ -82,6 +82,16 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.post("/api/requests", response_model=PipelineResult)
-def submit_request(request: DataRequest, conn: sqlite3.Connection = Depends(get_conn)) -> PipelineResult:
-    return pipeline.run(request, conn)
+@app.post("/api/requests/suggest-definitions", response_model=suggest.Suggestion)
+def suggest_definitions(request: DataRequest, conn: sqlite3.Connection = Depends(get_conn)) -> suggest.Suggestion:
+    """Draft the definitions for a purpose + question. Runs the law check first; a prohibited purpose gets no draft."""
+    return suggest.suggest(request, conn)
+
+
+@app.post("/api/requests", response_model=PipelineResult, response_model_exclude_none=True)
+def submit_request(request: DataRequest, debug: bool = False, conn: sqlite3.Connection = Depends(get_conn)) -> PipelineResult:
+    """The decision and the answer. The generated SQL and code mapping are internals: only with ?debug=1 (test console)."""
+    result = pipeline.run(request, conn)
+    if not debug:
+        result.queries, result.mapping = [], None
+    return result
