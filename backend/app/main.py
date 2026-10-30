@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 
 from app import db, pipeline, submissions
 from app.models import DataRequest, PipelineResult
-from app.rag.ollama import OllamaUnavailable
+from app.rag.errors import ServiceUnavailable
 
 app = FastAPI(title="EHDS Health Data Access Body", version="0.1.0")
 app.include_router(submissions.router)
@@ -22,8 +22,8 @@ def get_conn() -> Iterator[sqlite3.Connection]:
         conn.close()
 
 
-@app.exception_handler(OllamaUnavailable)
-def ollama_unavailable(request: Request, exc: OllamaUnavailable) -> JSONResponse:
+@app.exception_handler(ServiceUnavailable)
+def service_unavailable(request: Request, exc: ServiceUnavailable) -> JSONResponse:
     return JSONResponse(status_code=503, content={"detail": str(exc)})
 
 

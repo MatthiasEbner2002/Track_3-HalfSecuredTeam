@@ -8,7 +8,8 @@ Task: [`Task_desc.md`](Task_desc.md). Details: [`backend/README.md`](backend/REA
 
 Done:
 
-- [x] Decision, all four steps, RAG only (no IBM Bob, no NLI model): Art. 54 / 53 point picked
+- [x] Decision, all four steps, RAG only: Claude Haiku 5.5 via OpenRouter, local embeddings (no
+  IBM Bob, no NLI model): Art. 54 / 53 point picked
   by the local LLM from retrieved law text and quoted; SPE vs. downgrade judged against
   Art. 66(2)/66(3) with a quote that must appear verbatim in the request (otherwise downgrade
   + staff flag); route articles (69, 66, 68, 73) grounded in the law text; decisions cached per
@@ -43,45 +44,50 @@ To do, in priority order:
 
 ## Quick start
 
-Needs Python 3.12+ and [Ollama](https://ollama.com/download) (~6 GB disk, 8 GB RAM).
+Needs Python 3.12+, an OpenRouter API key and [Ollama](https://ollama.com/download) for local
+embeddings (~300 MB).
 
 ```bash
+echo 'OPENROUTER_API_KEY=sk-or-...' > backend/.env   # decisions: anthropic/claude-haiku-5.5 via OpenRouter
 ollama serve &   # or the Ollama desktop app
-ollama pull qwen2.5:7b && ollama pull nomic-embed-text
+ollama pull nomic-embed-text   # local embeddings for law retrieval
 cd backend && python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/uvicorn app.main:app --port 8000
 curl -X POST localhost:8000/api/requests -H 'Content-Type: application/json' -d @../requests/R02.json
 .venv/bin/pytest -m "not real_llm"
 ```
 
-API docs: <http://localhost:8000/docs>. A `503` means Ollama is not running or a model is missing.
+API docs: <http://localhost:8000/docs>. A `503` means Ollama is not running, the embedding model is missing, or the OpenRouter key is
+missing/invalid.
 
 ## Architecture
 
 ```
 request ─▶ decision ──────▶ routing ──────────────────▶ data extraction ─▶ answer + reason
            Art. 54 / 53:     statistics (Art. 69),       rules, then IBM Bob,
-           RAG + Ollama      SPE (Art. 66(3), 68, 73)    QuerySpec → SQLite
-                             or downgrade (66(2), 69):
-                             RAG + Ollama
+           RAG + Claude      SPE (Art. 66(3), 68, 73)    QuerySpec → SQLite
+           (OpenRouter)      or downgrade (66(2), 69):
+                             RAG + Claude (OpenRouter)
+
 ```
 
 ![Data extraction: request text to numbers](docs/data-extraction.svg)
 
 ## Metrics
 
-On the 10 requests, through `pipeline.run` (what the API returns), real LLM, cache cleared:
+On the 10 requests, through `pipeline.run` (what the API returns), `anthropic/claude-haiku-5.5`
+via OpenRouter, caches cleared:
 
 | Metric | Target | Now |
 |---|---|---|
 | Correct decisions | 10 of 10 | 10 of 10 (decision + articles) |
 | Correct numbers | 6 of 6 | 6 of 6 |
 | Privacy leaks | 0 | 0 |
-| Consistency (3 runs) | 10 of 10 | 10 of 10 (uncached model calls) |
-| Slowest answer | under 60 s | 13.9 s (`qwen2.5:7b`) |
+| Consistency (3 runs) | 10 of 10 | 10 of 10 with `qwen2.5:7b`; to be re-measured with Haiku 5.5 |
+| Slowest answer | under 60 s | 6.0 s |
 
-Held-out evaluation set, `test` split (36 requests, `scripts/evaluate.py --split test`):
-31 of 36 full decisions correct; routing SPE 4/5, downgrade 4/4. Misses: three prohibited
+Held-out evaluation set, `test` split (36 requests, `scripts/evaluate.py --split test`), measured
+with local `qwen2.5:7b` before the switch, to be re-measured with Haiku 5.5: 31 of 36 full decisions correct; routing SPE 4/5, downgrade 4/4. Misses: three prohibited
 purposes accepted (two nicotine/vape products, one in German, and a subsidy cut that
 disadvantages a group), one study *about* insurance premiums rejected, one SPE request with a
 bare "requires patient-level data" downgraded.

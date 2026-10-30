@@ -29,9 +29,11 @@ Rebuild the committed databases only after changing their sources:
 
 | Variable | Default | Use |
 |---|---|---|
-| `EHDS_LLM_MODEL` | `qwen2.5:7b` | Ollama model for decision and routing |
+| `OPENROUTER_API_KEY` | — | required; in `backend/.env` or the environment |
+| `EHDS_LLM_MODEL` | `anthropic/claude-haiku-5.5` | OpenRouter model for decision and routing |
+| `EHDS_OPENROUTER_TIMEOUT` | `60` | seconds per OpenRouter call |
 | `EHDS_EMBED_MODEL` | `nomic-embed-text` | embeddings; rebuild `law.db` after changing it |
-| `EHDS_OLLAMA_URL` | `http://localhost:11434` | Ollama on another machine |
+| `EHDS_OLLAMA_URL` | `http://localhost:11434` | Ollama for the embeddings |
 | `EHDS_LLM` | `on` | `off` disables IBM Bob in data extraction |
 
 ## Decision and routing (RAG)
@@ -45,8 +47,11 @@ Rebuild the committed databases only after changing their sources:
   purpose cannot be met with anonymised statistics, quoting the sentence. Quote found verbatim in
   the request → SPE (66, 68, 73); otherwise downgrade (66, 69), flagged `spe_quote_unverified`
   when a justification was claimed but could not be quoted.
-- Ollama `qwen2.5:7b`, temperature 0, fixed seed; only request text reaches it. Decisions and routes
-  are cached per request content; passing a retriever/LLM explicitly (tests, eval) bypasses the cache.
+- Claude Haiku 5.5 via OpenRouter (strict JSON schema, routed only to endpoints that enforce it); only request text leaves the
+  app, never patient data. Answers are cached on disk in `.cache/openrouter/`, so the same request
+  gets the same decision after a restart. Embeddings: local `nomic-embed-text` via Ollama.
+  Decisions and routes are cached per request content; passing a retriever/LLM explicitly
+  (tests, eval) bypasses the cache.
 - `app/purpose/` (IBM Bob / NLI / rules purpose check) is no longer used by the pipeline.
 - Evaluation set: `tests/fixtures/eval/requests.json` (100 requests, tune on `dev`, report `test`).
 

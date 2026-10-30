@@ -6,6 +6,7 @@ from app import pipeline
 from app.layers import decision, routing
 from app.main import app
 from app.rag.ollama import OllamaUnavailable
+from app.rag.openrouter import OpenRouterUnavailable
 
 from conftest import load_request
 from fakes import FakeLLM
@@ -87,3 +88,13 @@ def test_api_returns_503_when_ollama_is_down(monkeypatch):
     response = TestClient(app).post("/api/requests", json=load_request("R01").model_dump())
     assert response.status_code == 503
     assert "not reachable" in response.json()["detail"]
+
+
+def test_api_returns_503_when_openrouter_is_down(monkeypatch):
+    def boom():
+        raise OpenRouterUnavailable("OpenRouter rejected the API key (HTTP 401)")
+
+    monkeypatch.setattr(decision, "_default_llm", boom)
+    response = TestClient(app).post("/api/requests", json=load_request("R01").model_dump())
+    assert response.status_code == 503
+    assert "rejected the API key" in response.json()["detail"]

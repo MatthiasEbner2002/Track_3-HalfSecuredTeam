@@ -30,7 +30,8 @@ from typing import Protocol
 
 from app.config import RETRIEVAL_TOP_K
 from app.models import DataRequest, Decision, LawParagraph
-from app.rag.ollama import OllamaEmbedder, OllamaLLM
+from app.rag.ollama import OllamaEmbedder
+from app.rag.openrouter import OpenRouterLLM
 from app.rag.store import Retriever
 
 PERMITTED = "Art. 53(1)"
@@ -78,7 +79,7 @@ def _default_retriever() -> Retriever:
 
 @cache
 def _default_llm() -> LLM:
-    return OllamaLLM()
+    return OpenRouterLLM()
 
 
 def normalise(text: str) -> str:

@@ -10,7 +10,7 @@ from app import db
 from app.config import LAW_DB_PATH, REQUESTS_DIR
 from app.layers import decision, routing
 from app.models import DataRequest
-from app.rag import ollama
+from app.rag import ollama, openrouter
 from app.rag.store import Retriever
 from fakes import CHUNKS, FakeEmbedder, FakeLLM
 
@@ -26,9 +26,11 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(config, items):
-    if LAW_DB_PATH.exists() and ollama.is_available():
+    if LAW_DB_PATH.exists() and ollama.is_available() and openrouter.is_configured():
         return
-    skip = pytest.mark.skip(reason="needs Ollama running and data/law.db (python -m app.rag.corpus)")
+    skip = pytest.mark.skip(
+        reason="needs Ollama (embeddings), data/law.db and OPENROUTER_API_KEY"
+    )
     for item in items:
         if "real_llm" in item.keywords:
             item.add_marker(skip)

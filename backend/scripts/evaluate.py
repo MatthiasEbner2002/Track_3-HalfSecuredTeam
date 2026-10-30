@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.config import REQUESTS_DIR  # noqa: E402
 from app.layers import decision, routing  # noqa: E402
 from app.models import DataRequest  # noqa: E402
+from app.rag.openrouter import OpenRouterLLM  # noqa: E402
 
 EVAL = Path(__file__).resolve().parent.parent / "tests" / "fixtures" / "eval" / "requests.json"
 OPTIONAL = {"67", "71"}
@@ -33,7 +34,7 @@ DECISIONS = {"statistics": "APPROVE_STATISTICAL", "spe": "APPROVE_SPE"}
 
 def run(request: DataRequest) -> tuple[str, list[str], list[str]]:
     """One uncached decision: explicit backends bypass the caches in decide() and choose()."""
-    retriever, llm = decision._default_retriever(), decision._default_llm()
+    retriever, llm = decision._default_retriever(), OpenRouterLLM(cache_dir=None)
     verdict = decision.decide(request, retriever, llm)
     if not verdict.accepted:
         return "REJECT", verdict.articles, verdict.flags

@@ -1,15 +1,16 @@
-"""Minimal Ollama client (stdlib only) for embeddings and JSON-constrained chat."""
+"""Minimal Ollama client (stdlib only) for local embeddings (nomic-embed-text)."""
 
 import json
 import urllib.error
 import urllib.request
 from typing import Any
 
-from app.config import EMBED_MODEL, LLM_MODEL, LLM_SEED, OLLAMA_URL
+from app.config import EMBED_MODEL, OLLAMA_URL
+from app.rag.errors import ServiceUnavailable
 
 
-class OllamaUnavailable(RuntimeError):
-    """Ollama is down, unreachable, or the model is not pulled."""
+class OllamaUnavailable(ServiceUnavailable):
+    """Ollama is down, unreachable, or the embedding model is not pulled."""
 
 
 def _post(path: str, body: dict[str, Any], timeout: float = 120) -> dict[str, Any]:
@@ -21,7 +22,7 @@ def _post(path: str, body: dict[str, Any], timeout: float = 120) -> dict[str, An
             return json.load(response)
     except urllib.error.HTTPError as e:
         if e.code == 404:
-            model = body.get("model", LLM_MODEL)
+            model = body.get("model", EMBED_MODEL)
             raise OllamaUnavailable(
                 f"model {model!r} is not available in Ollama at {OLLAMA_URL} "
                 f"(pull it with `ollama pull {model}`)"
@@ -35,7 +36,7 @@ def _post(path: str, body: dict[str, Any], timeout: float = 120) -> dict[str, An
 
 def is_available() -> bool:
     try:
-        _post("/api/show", {"model": LLM_MODEL}, timeout=2)
+        _post("/api/show", {"model": EMBED_MODEL}, timeout=2)
         return True
     except (OSError, OllamaUnavailable):
         return False
@@ -55,25 +56,3 @@ class OllamaEmbedder:
 
     def _embed(self, texts: list[str]) -> list[list[float]]:
         return _post("/api/embed", {"model": self.model, "input": texts})["embeddings"]
-
-
-class OllamaLLM:
-    def __init__(self, model: str = LLM_MODEL):
-        self.model = model
-
-    def complete_json(self, system: str, user: str, schema: dict[str, Any]) -> dict[str, Any]:
-        """Return the model's answer parsed as JSON matching schema."""
-        response = _post(
-            "/api/chat",
-            {
-                "model": self.model,
-                "stream": False,
-                "format": schema,
-                "options": {"temperature": 0, "seed": LLM_SEED},
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-            },
-        )
-        return json.loads(response["message"]["content"])
