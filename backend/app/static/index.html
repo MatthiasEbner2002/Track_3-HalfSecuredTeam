@@ -212,8 +212,9 @@ function render(r) {
   }
   if (r.data?.spe) {
     const t = Object.entries(r.data.spe.tables).map(([k, v]) => `${k}: ${v}`).join(", ");
-    html += `<p><b>SPE created</b> — ${r.data.cohort_size} patients, records: ${esc(t)}. `
-          + `<a href="${esc(r.data.spe.url)}" target="_blank">Open as applicant</a> · <a href="${esc(r.data.spe.url)}?role=staff" target="_blank">as staff</a></p>`;
+    html += `<p><b>SPE created</b> — ${r.data.cohort_size} patients, records: ${esc(t)}.<br>`
+          + `Access key for the applicant (shown once): <code>${esc(r.data.spe.access_key)}</code><br>`
+          + `<a href="${esc(r.data.spe.url)}" target="_blank">Open the SPE frontend</a> and enter the key.</p>`;
   } else if (r.data && Object.keys(r.data).length) html += `<details open><summary>Data</summary>${dataTable(r.data)}</details>`;
   if (expected?.answer && r.decision !== "REJECT") html += `<details><summary>Expected answer</summary><pre>${esc(JSON.stringify(expected.answer, null, 2))}</pre></details>`;
   if (r.queries?.length) html += `<details><summary>SQL (${r.queries.length})</summary><pre>${esc(r.queries.map(q => `-- ${q.name}\n${q.sql}\n-- params: ${JSON.stringify(q.params)}`).join("\n\n"))}</pre></details>`;

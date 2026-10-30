@@ -7,10 +7,14 @@ dependencies = [
     "fastapi",
     "uvicorn[standard]",
     "pydantic>=2",
+    "pillow>=12,<13",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest", "httpx"]
+
+[tool.setuptools.packages.find]
+include = ["app*"]  # backend/spe/ holds runtime data, not a package
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

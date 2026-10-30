@@ -1,21 +1,21 @@
 """HTTP side of the secure processing environment: the only way to reach an SPE.
 
-Who is calling comes from the X-Actor header (a name, default "applicant") and
-X-Role ("applicant" or "staff"). There is no login in this prototype; the
-headers exist so the audit log and the staff/applicant split are visible.
+Every route needs `Authorization: Bearer <key>` (the key the APPROVE_SPE
+decision returned) and `X-Applicant: <name>` (the applicant named on the
+permit, percent-encoded because header values are ASCII). The key fixes which SPE is opened, so there is no SPE id in the URL
+and a key cannot be pointed at another permit's data.
+The pages themselves live in frontend/ (Vue + Vuetify), not here.
 """
 
-from pathlib import Path
 from typing import Any
+from urllib.parse import unquote
 
-from fastapi import APIRouter, Header, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, Header
 from pydantic import BaseModel
 
 from app import spe
 
-router = APIRouter(tags=["spe"])
-STATIC_DIR = Path(__file__).parent / "static"
+router = APIRouter(prefix="/api/spe", tags=["spe"])
 
 
 class QueryBody(BaseModel):
@@ -24,62 +24,47 @@ class QueryBody(BaseModel):
 
 class OutputBody(BaseModel):
     name: str
-    rows: list[dict[str, Any]] | None = None  # a table, small-cell checked
-    content: str | None = None  # anything else (metrics, model card), staff checks
+    sql: str | None = None  # a table: the server runs it and checks the result
+    content: str | None = None  # anything else (metrics, model card), checked for IDs
 
 
-class ReviewBody(BaseModel):
-    status: str  # approved | rejected
-    note: str = ""
+def current_spe(authorization: str | None = Header(None), x_applicant: str | None = Header(None)) -> str:
+    scheme, _, key = (authorization or "").partition(" ")
+    return spe.authenticate(key if scheme.lower() == "bearer" else None, unquote(x_applicant or ""))
 
 
-def _actor(actor: str | None, role: str | None) -> str:
-    return actor or ("staff" if role == "staff" else "applicant")
-
-
-@router.get("/spe/{spe_id}", include_in_schema=False)
-def spe_page(spe_id: str) -> FileResponse:
-    if not spe.exists(spe_id):
-        raise HTTPException(404, f"no secure processing environment {spe_id!r}")
-    return FileResponse(STATIC_DIR / "spe.html")
-
-
-@router.get("/api/spe/{spe_id}")
-def spe_info(spe_id: str) -> dict[str, Any]:
+@router.post("/access")
+def access(spe_id: str = Depends(current_spe)) -> dict[str, Any]:
+    """Exchange key + name for the permit: what the frontend calls first."""
     return spe.info(spe_id)
 
 
-@router.post("/api/spe/{spe_id}/query")
-def spe_query(spe_id: str, body: QueryBody, x_actor: str | None = Header(None), x_role: str | None = Header(None)) -> dict[str, Any]:
-    return spe.query(spe_id, body.sql, actor=_actor(x_actor, x_role))
+@router.get("")
+def spe_info(spe_id: str = Depends(current_spe)) -> dict[str, Any]:
+    return spe.info(spe_id)
 
 
-@router.get("/api/spe/{spe_id}/download")
-@router.get("/api/spe/{spe_id}/download/{what:path}")
-def spe_download(spe_id: str, what: str = "", x_actor: str | None = Header(None), x_role: str | None = Header(None)) -> None:
-    spe.download(spe_id, actor=_actor(x_actor, x_role), what=what)
+@router.post("/query")
+def spe_query(body: QueryBody, spe_id: str = Depends(current_spe)) -> dict[str, Any]:
+    return spe.query(spe_id, body.sql)
 
 
-@router.get("/api/spe/{spe_id}/outputs")
-def spe_outputs(spe_id: str) -> list[dict[str, Any]]:
+@router.get("/download")
+@router.get("/download/{what:path}")
+def spe_download(what: str = "", spe_id: str = Depends(current_spe)) -> None:
+    spe.download(spe_id, what=what)
+
+
+@router.get("/outputs")
+def spe_outputs(spe_id: str = Depends(current_spe)) -> list[dict[str, Any]]:
     return spe.list_outputs(spe_id)
 
 
-@router.post("/api/spe/{spe_id}/outputs")
-def spe_export(spe_id: str, body: OutputBody, x_actor: str | None = Header(None), x_role: str | None = Header(None)) -> dict[str, Any]:
-    return spe.export(spe_id, body.name, rows=body.rows, content=body.content, actor=_actor(x_actor, x_role))
+@router.post("/outputs")
+def spe_export(body: OutputBody, spe_id: str = Depends(current_spe)) -> dict[str, Any]:
+    return spe.export(spe_id, body.name, sql=body.sql, content=body.content)
 
 
-@router.get("/api/spe/{spe_id}/outputs/{output_id}")
-def spe_output(spe_id: str, output_id: int, x_role: str | None = Header(None)) -> dict[str, Any]:
-    return spe.get_output(spe_id, output_id, role=x_role or "applicant")
-
-
-@router.post("/api/spe/{spe_id}/outputs/{output_id}/review")
-def spe_review(spe_id: str, output_id: int, body: ReviewBody, x_actor: str | None = Header(None)) -> dict[str, Any]:
-    return spe.review(spe_id, output_id, body.status, body.note, actor=x_actor or "staff")
-
-
-@router.get("/api/spe/{spe_id}/audit")
-def spe_audit(spe_id: str) -> list[dict[str, Any]]:
-    return spe.audit_log(spe_id)
+@router.get("/outputs/{output_id}")
+def spe_output(output_id: int, spe_id: str = Depends(current_spe)) -> dict[str, Any]:
+    return spe.get_output(spe_id, output_id)
