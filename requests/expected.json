@@ -214,5 +214,43 @@
     ],
     "reason": "Developing or marketing nicotine products is prohibited (Art. 54).",
     "answer": null
+  },
+  "R11": {
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "reason": "Planning a public-health programme is an allowed purpose (Art. 53). Statistics answer the question (Art. 69). Submitted in German; judged on its English translation.",
+    "answer": {
+      "female": {
+        "ckd_adults": 219,
+        "egfr_below_45": 106,
+        "share_pct": 48.4
+      },
+      "male": {
+        "ckd_adults": 195,
+        "egfr_below_45": 95,
+        "share_pct": 48.7
+      }
+    }
+  },
+  "R12": {
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "reason": "Scientific research including the development of algorithms is an allowed purpose (Art. 53). The model needs the order of events within each patient, so pseudonymised data is justified (Art. 66). Access only under a data permit inside a secure processing environment, no download (Art. 68, 73).",
+    "answer": {
+      "cohort_size": 123,
+      "record_types": [
+        "conditions",
+        "encounters",
+        "medications"
+      ]
+    }
   }
 }

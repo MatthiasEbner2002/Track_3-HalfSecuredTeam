@@ -3,13 +3,15 @@ import { computed, onMounted, ref } from "vue";
 
 // What an applicant sees: the request form and the access body's answer. No test scaffolding.
 
+const emit = defineEmits(["open-spe"]); // ({ key, applicant }) when the applicant follows the link to the SPE
+
 const form = ref(blank());
 const samples = ref([]);
 const sending = ref(false);
 const error = ref("");
 const result = ref(null);
 const copied = ref(false);
-const loaded = ref(null); // which of the 10 task requests is in the form
+const loaded = ref(null); // which of the sample requests is in the form
 const tab = ref("answer"); // answer | json
 const suggesting = ref(false);
 const suggestion = ref(null); // last answer of /suggest-definitions
@@ -125,10 +127,19 @@ const table = computed(() => {
 
 const pending = computed(() => (result.value?.flags || []).some((f) => f.startsWith("not_interpreted")));
 
+const LANGUAGES = { bg: "Bulgarian", cs: "Czech", da: "Danish", de: "German", el: "Greek", en: "English", es: "Spanish", et: "Estonian", fi: "Finnish", fr: "French", ga: "Irish", hr: "Croatian", hu: "Hungarian", it: "Italian", lt: "Lithuanian", lv: "Latvian", mt: "Maltese", nl: "Dutch", pl: "Polish", pt: "Portuguese", ro: "Romanian", sk: "Slovak", sl: "Slovenian", sv: "Swedish" };
+const translatedFrom = computed(() => (result.value?.translated ? LANGUAGES[result.value.language] || result.value.language : null));
+const showTranslation = ref(false);
+
 async function copy(text) {
   await navigator.clipboard.writeText(text);
   copied.value = true;
   setTimeout(() => (copied.value = false), 1500);
+}
+
+function openSpe() {
+  emit("open-spe", { key: result.value.data.spe.access_key, applicant: form.value.applicant.name });
+  location.hash = "#/spe";
 }
 
 onMounted(loadSamples);
@@ -145,11 +156,12 @@ onMounted(loadSamples);
             <v-btn size="small" variant="text" prepend-icon="mdi-eraser" @click="clear">Clear</v-btn>
           </v-card-title>
           <v-card-text>
-            <div class="text-caption text-medium-emphasis mb-1">Prefill with one of the 10 task requests</div>
+            <div class="text-caption text-medium-emphasis mb-1">Prefill with one of the sample requests (R11 is German, R12 a pseudonymised-records application)</div>
             <div class="d-flex flex-wrap ga-1 mb-4">
               <v-btn v-for="s in samples" :key="s.id" size="small" :variant="loaded === s.id ? 'flat' : 'tonal'" :color="loaded === s.id ? 'warning' : 'primary'" :title="s.decision" @click="prefill(s.id)">{{ s.id }}</v-btn>
             </div>
             <v-form @submit.prevent="submit">
+              <p class="text-caption text-medium-emphasis mb-2">You can write in any official EU language; the access body judges an English translation and shows it to you with the answer.</p>
               <p class="text-overline mb-1">Applicant</p>
               <v-row dense>
                 <v-col cols="12" sm="7"><v-text-field v-model="form.applicant.name" label="Name" variant="outlined" density="compact" /></v-col>
@@ -183,7 +195,7 @@ onMounted(loadSamples);
                   </v-alert>
                 </div>
               </v-expand-transition>
-              <v-textarea v-model="form.definitions" label="Definitions — one per line, in plain English" rows="4" auto-grow variant="outlined" density="compact" class="font-mono"
+              <v-textarea v-model="form.definitions" label="Definitions — one per line, in plain words" rows="4" auto-grow variant="outlined" density="compact" class="font-mono"
                           hint="e.g. Adult = aged 18 or older on 31 December 2025." persistent-hint />
               <v-text-field v-model="form.id" label="Your reference (optional)" variant="outlined" density="compact" class="mt-3" />
               <v-btn type="submit" color="primary" size="large" block :loading="sending" prepend-icon="mdi-send-outline">Submit request</v-btn>
@@ -230,6 +242,22 @@ onMounted(loadSamples);
             <v-alert v-if="pending && result.decision !== 'REJECT'" type="info" variant="tonal" density="compact" class="mb-3">
               Your definitions could not be turned into a query automatically; staff will prepare the answer.
             </v-alert>
+            <v-alert v-if="translatedFrom" type="info" variant="tonal" density="compact" class="mb-3" icon="mdi-translate">
+              <div class="d-flex align-center">
+                <span>Your request was translated from {{ translatedFrom }}; the decision rests on the English text.</span>
+                <v-spacer />
+                <v-btn size="x-small" variant="text" @click="showTranslation = !showTranslation">{{ showTranslation ? "Hide" : "Show" }}</v-btn>
+              </div>
+              <v-expand-transition>
+                <div v-if="showTranslation" class="text-body-2 mt-2">
+                  <div><strong>Organisation:</strong> {{ result.translated.organisation }}</div>
+                  <div><strong>Purpose:</strong> {{ result.translated.purpose }}</div>
+                  <div><strong>Question:</strong> {{ result.translated.question }}</div>
+                  <div><strong>Definitions:</strong></div>
+                  <ul class="pl-5"><li v-for="(d, i) in result.translated.definitions" :key="i">{{ d }}</li></ul>
+                </div>
+              </v-expand-transition>
+            </v-alert>
 
             <template v-if="table">
               <p class="text-overline mb-1">Your statistics</p>
@@ -254,7 +282,7 @@ onMounted(loadSamples);
                   <v-btn size="small" variant="tonal" :icon="copied ? 'mdi-check' : 'mdi-content-copy'" title="copy" @click="copy(result.data.spe.access_key)" />
                 </div>
               </v-sheet>
-              <v-btn color="secondary" href="#/spe" prepend-icon="mdi-shield-lock-outline">Open the environment</v-btn>
+              <v-btn color="secondary" prepend-icon="mdi-shield-lock-outline" @click="openSpe">Open the environment</v-btn>
             </template>
           </v-card-text>
         </v-card>

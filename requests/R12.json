@@ -1,0 +1,20 @@
+{
+  "id": "R12",
+  "submitted": "2026-10-30T09:40:00+01:00",
+  "applicant": {
+    "name": "Dr. Elena Marchetti",
+    "organisation": "Vienna Heart Failure Registry Group, university hospital research unit",
+    "country": "AT"
+  },
+  "requested_as": "health data access application",
+  "requested_format": "pseudonymised records",
+  "purpose": "We study the sequence of hospital admissions and medication changes in patients with heart failure to build a time-to-readmission model that helps cardiology units plan follow-up care. The analysis needs the order of events within each patient; aggregated statistics cannot answer this.",
+  "question": "Provide pseudonymised encounters, medications and conditions for adults with heart failure who had at least one inpatient stay in 2025. We will only export model coefficients and performance metrics.",
+  "definitions": [
+    "Adult = aged 18 or older on 31 December 2025.",
+    "Heart failure = any condition with an ICD-10 code starting with I50.",
+    "Inpatient stay = encounter with type 'inpatient' starting in 2025.",
+    "Cohort = adults with heart failure who have at least one inpatient stay.",
+    "Report the size of the cohort you would make available."
+  ]
+}

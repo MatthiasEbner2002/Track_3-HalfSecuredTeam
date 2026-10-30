@@ -238,7 +238,7 @@ onMounted(() => loadSamples().catch((e) => (error.value = "could not load sample
           <v-card-title>Batch run</v-card-title>
           <v-card-text>
             <div class="d-flex align-center flex-wrap ga-2 mb-2">
-              <v-text-field v-model="range" label="Cases" title="ids or ranges, e.g. E001-E020 E150 R01-R10" density="compact" variant="outlined" hide-details style="max-width: 260px" />
+              <v-text-field v-model="range" label="Cases" title="ids or ranges, e.g. E001-E020 E150 R01-R12" density="compact" variant="outlined" hide-details style="max-width: 260px" />
               <v-btn color="primary" :disabled="batchRunning" @click="runBatch(parseRange(range, ids))">Run</v-btn>
               <v-btn variant="tonal" color="primary" :disabled="batchRunning || !batch.some((r) => r.state === 'FAIL')" @click="runBatch(batch.filter((r) => r.state === 'FAIL').map((r) => r.id))">Re-run failed</v-btn>
               <v-btn variant="tonal" :disabled="!batchRunning" @click="stopFlag = true">Stop</v-btn>

@@ -1,0 +1,19 @@
+{
+  "id": "R11",
+  "submitted": "2026-10-30T09:10:00+01:00",
+  "applicant": {
+    "name": "Dr. Katharina Pichler",
+    "organisation": "Klinische Abteilung für Nephrologie, Medizinische Universität Graz (universitäre Forschungsgruppe)",
+    "country": "AT"
+  },
+  "requested_as": "health data request",
+  "requested_format": "anonymised statistics",
+  "purpose": "Wir untersuchen, wie häufig eine fortgeschrittene Einschränkung der Nierenfunktion bei Erwachsenen mit chronischer Nierenerkrankung ist, getrennt nach Geschlecht, um ein Früherkennungsprogramm der Krankenkassen zu planen.",
+  "question": "Wie viele Erwachsene mit chronischer Nierenerkrankung haben einen letzten eGFR-Wert unter 45, nach Geschlecht?",
+  "definitions": [
+    "Erwachsen = 18 Jahre oder älter am 31. Dezember 2025.",
+    "Chronische Nierenerkrankung = jede Diagnose mit einem ICD-10-Code, der mit N18 beginnt.",
+    "Eingeschränkte Nierenfunktion = letzter eGFR-Wert (LOINC 62238-1) unter 45.",
+    "Bericht pro Geschlecht: Erwachsene mit chronischer Nierenerkrankung, wie viele davon eine eingeschränkte Nierenfunktion haben und deren Anteil in %, eine Dezimalstelle."
+  ]
+}

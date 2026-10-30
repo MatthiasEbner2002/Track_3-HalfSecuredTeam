@@ -2,6 +2,7 @@
 
 | Layer | File | What it does |
 |---|---|---|
+| Language | `app/layers/language.py` | any EU language → English in one LLM call; English passes through; codes/numbers checked |
 | Decision | `app/layers/decision.py` | RAG engine: Art. 54 rejects, Art. 53 accepts, see below |
 | Routing | `app/layers/routing.py` | statistics, SPE or downgrade (RAG check of Art. 66); adds Art. 66/68/69/73 |
 | Mapping | `app/layers/mapping.py`, `llm_mapping.py` | definitions → `QuerySpec` (rules, then the OpenRouter LLM) |
@@ -21,6 +22,7 @@ python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/python -m app.eval_decisions                      # accept/reject: 10 samples + 16 held-out
 .venv/bin/python scripts/evaluate.py --set tasks --runs 3   # full decision + articles on R01-R10
 .venv/bin/python scripts/evaluate.py --split test --failures  # full decision, 36 held-out requests
+.venv/bin/python scripts/evaluate.py --lang de                 # only the German held-out requests
 .venv/bin/python tests/fixtures/blackbox/run.py             # data extraction: 100 black-box requests
 ```
 
@@ -49,6 +51,17 @@ Note that uvicorn's own `--proxy-headers` (on by default) already rewrites the c
 run it with `--no-proxy-headers`, otherwise a local client can dodge the limit by changing that header.
 `scripts/flood.py` sends a burst from one address and checks the 429 / `Retry-After` behaviour
 (`--spoof` tries the header trick, `--wait` checks the unblock).
+
+## Languages
+
+`language.localise` runs before anything else in `pipeline.run` and `suggest.suggest`. One
+OpenRouter call returns the ISO 639-1 code (enum of the 24 official EU languages) and the
+English text of organisation, purpose, question and definitions; name, country, `requested_as`
+and `requested_format` are never touched. `en` → the original request object is returned
+unchanged. Otherwise the translation must keep every ICD-10/ATC/LOINC code, number and date
+(numeric dates compare by day and year) and the number of definitions; one retry with the
+problems, then the translation is used with `translation_unverified` and `needs_review`. The
+result carries `language`, `translated` (the English text) and the flag `translated_from:<code>`.
 
 ## Decision and routing (RAG)
 

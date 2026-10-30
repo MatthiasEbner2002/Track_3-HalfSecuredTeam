@@ -4,8 +4,9 @@ Technical companion to the [README](../README.md). Configuration and environment
 [`backend/README.md`](../backend/README.md).
 
 ```
+request JSON ─▶ language: any EU language ─▶ English (English passes through)
                  ┌──────────────── decision (steps 1–4) ────────────────┐
-request JSON ─▶  │ 1. Art. 54 / 53   RAG: retrieve points, LLM picks one │ ─▶ REJECT (Art. 54) ─▶ reason
+                 │ 1. Art. 54 / 53   RAG: retrieve points, LLM picks one │ ─▶ REJECT (Art. 54) ─▶ reason
                  │ 2–4. route        health data request → statistics   │
                  │                   access application → LLM checks    │
                  │                   Art. 66(3) justification → SPE     │
@@ -33,6 +34,7 @@ local Ollama.
 | Component | Where | Approach |
 |---|---|---|
 | Law corpus | `app/rag/corpus.py`, `app/rag/store.py`, `data/law.db` | `eulex.html` (Regulation (EU) 2025/327) parsed into 406 chunks: each paragraph and each lettered point of Chapter IV (Art. 50–81) on its own, plus the recitals. Embedded once with `nomic-embed-text` (local Ollama) and committed; retrieval is cosine similarity over the chunks |
+| Language | `app/layers/language.py` | One LLM call (strict JSON schema) detects the language (enum of the 24 EU codes) and translates organisation, purpose, question and definitions into English, in the wording of the task requests. English is passed through verbatim, so English requests behave exactly as before. ICD-10/ATC/LOINC codes, numbers and dates must appear unchanged in the translation (checked in code; one retry, then `translation_unverified` + `needs_review`). The result carries `language` and the English `translated` text; every layer below reads English only. Also in front of the suggest endpoint |
 | Decision, steps 1–2 | `app/layers/decision.py` | Three small steps instead of one big question. **Extract** (LLM): actor, analysis and *end use* of the results, from organisation and purpose only. **Retrieve**: the end use is the query for the 3 closest points of Art. 53(1) and of Art. 54. **Match** (LLM): one of those 6 points by id (enum in the schema, so no invented articles), plus the words of the point that cover the use. **Code decides**: Art. 54 point → `REJECT`, Art. 53 point → accept; the reason quotes the point verbatim from `law.db`; words not found in the point → `needs_review` |
 | Routing, steps 3–4 | `app/layers/routing.py` | Health data request → statistics (Art. 69(1)). Access application → deterministic floor (a sentence that says statistics/aggregates are not enough) and, failing that, the LLM judges against Art. 66(2)/66(3) and quotes the sentence. Quote found verbatim in the request → `APPROVE_SPE` (66, 68, 73); otherwise downgrade to `APPROVE_STATISTICAL` (66, 69), flagged `spe_quote_unverified` when a justification was claimed but could not be quoted. Route articles come with their law text as grounding |
 | LLM client | `app/rag/openrouter.py` | `anthropic/claude-haiku-5.5` via OpenRouter, strict JSON schema, routed only to endpoints that enforce it. No local cache: every request calls the model afresh; consistency comes from the strict JSON schema, the enum of retrieved points and the verbatim-quote checks |
@@ -44,7 +46,7 @@ local Ollama.
 | Suggest definitions | `app/suggest.py` | `POST /api/requests/suggest-definitions`: the Art. 54/53 check first, then the LLM drafts definitions in the task's wording and the parser confirms they are computable |
 | Rate limit | `app/ratelimit.py` | Per client IP on `/api/*`: more than 20 calls in 10 s → blocked 60 s, `429` + `Retry-After` ([details below](#rate-limit)) |
 | API | `app/main.py` | `POST /api/requests` runs the whole pipeline and returns decision, articles, reason, grounding, evidence, flags and the answer (generated SQL and code mapping only with `?debug=1`); `/api/samples` serves the sample requests; `/api/submissions` keeps submissions in memory (placeholder results, not wired to the pipeline) |
-| Request page | `frontend/` (`#/apply`) | Form (prefill with R01–R10), "Suggest definitions with AI", the decision with reason and articles, statistics table or SPE access key; raw JSON tab |
+| Request page | `frontend/` (`#/apply`) | Form (prefill with R01–R12; any EU language), "Suggest definitions with AI", the decision with reason and articles, statistics table or SPE access key; raw JSON tab |
 | SPE frontend | `frontend/` (`#/spe`) | Key + name entry, tables, SQL, blocked download |
 | Test console | `frontend/` (`#/console`) | Pick a task request or an end-to-end case, run it, see decision, reason, evidence, flags and SQL next to the expected answer, or run a batch |
 
@@ -57,8 +59,8 @@ local Ollama.
 | Set | Where | Checks |
 |---|---|---|
 | Unit tests | `backend/tests/` | Layers on fakes (no network); `-m real_llm` runs against OpenRouter and Ollama |
-| Task requests | `requests/R01–R10`, `expected.json` | Decision, articles and numbers |
-| Held-out decisions | `tests/data/heldout_requests.json`, `tests/fixtures/eval/requests.json` | Accept/reject and full decision on requests not used for development (`dev` / `test` split) |
+| Sample requests | `requests/R01–R12`, `expected.json` | The 10 task requests plus R11 (German, statistics) and R12 (English SPE application): decision, articles and numbers |
+| Held-out decisions | `tests/data/heldout_requests.json`, `tests/fixtures/eval/requests.json` | Accept/reject and full decision on requests not used for development (`dev` / `test` split); `scripts/evaluate.py --lang de` runs only the German ones |
 | Black-box extraction | `tests/fixtures/blackbox/` | 100 requests written separately, numbers computed independently of the parser |
 | End-to-end | `tests/fixtures/e2e/` | 200 cases through the whole pipeline (`run.py`, `--no-llm` for routing and data only) |
 | Rate limit | `tests/test_ratelimit.py`, `scripts/flood.py` | Limiter unit tests; a live burst against a running API |
@@ -98,9 +100,10 @@ because a client can set that header itself; without a reverse proxy start uvico
 State is per process and in memory; a multi-worker deployment would move it to the proxy or Redis.
 
 `backend/scripts/flood.py` sends a burst from one address and checks the behaviour; below the
-uvicorn log (top) and the script (bottom) for 30 requests:
+uvicorn log and the script for 30 requests:
 
-![Rate limit: 20 allowed, then 429 with Retry-After](rate-limit.png)
+![Server log: 200 OK, then 429 Too Many Requests](rate-limit-server.png)
+![Attacker: 20 allowed, 10 blocked, Retry-After 60 s](rate-limit-attacker.png)
 
 ## What the LLM sees
 

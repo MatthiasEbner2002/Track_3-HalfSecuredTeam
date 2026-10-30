@@ -47,13 +47,17 @@ class FakeLLM:
     """Answers the extract call with fixed facts and the match call with a fixed rule."""
 
     def __init__(self, rule_id: str = "Art. 53(1)(e)", words: str = "scientific research",
-                 spe_quote: str | None = None):
+                 spe_quote: str | None = None, translation: dict | None = None):
         self.match_answer = {"rule_id": rule_id, "matching_words": words}
         self.spe_quote = spe_quote
+        self.translation = translation  # answer to the language step; default: "already English"
         self.calls: list[tuple[str, str, dict]] = []
 
     def complete_json(self, system: str, user: str, schema: dict) -> dict:
         self.calls.append((system, user, schema))
+        if "language" in schema["properties"]:
+            return self.translation or {"language": "en", "organisation": "", "purpose": "", "question": "",
+                                        "definitions": []}
         if "justified" in schema["properties"]:
             return {"quote": self.spe_quote or "", "justified": self.spe_quote is not None}
         if "end_use" in schema["properties"]:

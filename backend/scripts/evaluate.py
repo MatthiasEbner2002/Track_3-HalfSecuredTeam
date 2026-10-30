@@ -23,7 +23,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.config import REQUESTS_DIR  # noqa: E402
-from app.layers import decision, routing  # noqa: E402
+from app.layers import decision, language, routing  # noqa: E402
 from app.models import DataRequest  # noqa: E402
 from app.rag.openrouter import OpenRouterLLM  # noqa: E402
 
@@ -35,11 +35,12 @@ DECISIONS = {"statistics": "APPROVE_STATISTICAL", "spe": "APPROVE_SPE"}
 def run(request: DataRequest) -> tuple[str, list[str], list[str]]:
     """One fresh decision: every call goes to the model (nothing is cached anywhere)."""
     retriever, llm = decision._default_retriever(), OpenRouterLLM()
+    request, lang = language.localise(request, llm=llm)  # same first step as the pipeline
     verdict = decision.decide(request, retriever, llm)
     if not verdict.accepted:
-        return "REJECT", verdict.articles, verdict.flags
+        return "REJECT", verdict.articles, lang.flags + verdict.flags
     choice = routing.choose(request, retriever, llm)
-    return DECISIONS[choice.route], list(dict.fromkeys(verdict.articles + choice.articles)), verdict.flags + choice.flags
+    return DECISIONS[choice.route], list(dict.fromkeys(verdict.articles + choice.articles)), lang.flags + verdict.flags + choice.flags
 
 
 def category(expected: dict) -> str:
@@ -68,9 +69,10 @@ def main() -> None:
     parser.add_argument("--split", choices=["dev", "test", "all"], default="all", help="eval set only")
     parser.add_argument("--runs", type=int, default=1)
     parser.add_argument("--failures", action="store_true")
+    parser.add_argument("--lang", help="eval set only: just the requests written in this language, e.g. de")
     args = parser.parse_args()
 
-    items = load(args.which, args.split)
+    items = [i for i in load(args.which, args.split) if not args.lang or i["language"] == args.lang]
     tally: dict[str, list[int]] = defaultdict(lambda: [0, 0])
     failures, slowest, review, inconsistent = [], 0.0, 0, 0
     for item in items:

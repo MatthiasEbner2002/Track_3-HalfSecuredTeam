@@ -12,7 +12,7 @@ import json
 import time
 
 from app.config import REPO_ROOT, REQUESTS_DIR
-from app.layers import decision
+from app.layers import decision, language
 from app.models import DataRequest
 
 HELDOUT = REPO_ROOT / "backend" / "tests" / "data" / "heldout_requests.json"
@@ -42,7 +42,7 @@ def main() -> None:
         results = []
         for _ in range(args.runs):
             start = time.time()
-            results.append(decision.decide(request))
+            results.append(decision.decide(language.localise(request)[0]))
             slowest = max(slowest, time.time() - start)
         d = results[0]
         inconsistent += len({r.model_dump_json() for r in results}) > 1

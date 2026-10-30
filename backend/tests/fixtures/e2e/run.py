@@ -71,7 +71,7 @@ def main() -> int:
 
     from app import pipeline
     from app.db import connect
-    from app.layers import decision
+    from app.layers import decision, language
     from app.models import DataRequest, Decision
 
     files = select(args.ids)
@@ -85,6 +85,7 @@ def main() -> int:
         case = json.loads(f.read_text(encoding="utf-8"))
         exp = case["expected"]
         if args.no_llm:
+            language.localise = lambda req, conn=None, llm=None: (req, language.Translation())  # type: ignore[assignment]
             accepted = exp["decision"] != "REJECT"
             decision.decide = lambda req, _a=accepted: Decision(  # type: ignore[assignment]
                 accepted=_a, articles=["53"] if _a else ["54"], reason="(decision given by the test)"

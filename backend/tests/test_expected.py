@@ -8,7 +8,7 @@ The purpose engine has its own scoreboard in test_expected_purpose.py.
 import pytest
 
 from app.eval_decisions import cases
-from app.layers import decision, routing
+from app.layers import decision, language, routing
 from app.rag.openrouter import OpenRouterLLM
 
 from conftest import REQUEST_IDS, load_request
@@ -25,21 +25,22 @@ IDS = [request.id for request, _, _ in CASES]
 
 @pytest.mark.parametrize(("request_", "accept", "point"), CASES, ids=IDS)
 def test_accept_or_reject(request_, accept, point):
-    result = decision.decide_rag(request_)
+    result = decision.decide_rag(language.localise(request_)[0])
     assert result.accepted == accept
     assert result.articles[0] == ("53" if accept else "54")
 
 
 @pytest.mark.parametrize(("request_", "accept", "point"), CASES[:10], ids=IDS[:10])
 def test_consistent_across_three_runs(request_, accept, point):
-    assert len({decision.decide_rag(request_).model_dump_json() for _ in range(3)}) == 1
+    assert len({decision.decide_rag(language.localise(request_)[0]).model_dump_json() for _ in range(3)}) == 1
 
 
 @pytest.mark.parametrize("request_id", REQUEST_IDS)
 def test_decision_and_articles(expected, request_id):
-    """decide_rag + routing.choose reproduce the expected decision and articles."""
-    request_ = load_request(request_id)
+    """localise + decide_rag + routing.choose reproduce the expected decision and articles."""
     retriever, llm = decision._default_retriever(), OpenRouterLLM()
+    request_, lang = language.localise(load_request(request_id), llm=llm)
+    assert lang.language == ("de" if request_id == "R11" else "en") and lang.verified
     verdict = decision.decide_rag(request_, retriever, llm)
     if not verdict.accepted:
         final, articles = "REJECT", verdict.articles

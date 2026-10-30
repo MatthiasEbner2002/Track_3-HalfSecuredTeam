@@ -17,7 +17,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from app.config import REQUESTS_DIR
-from app.layers import decision, mapping, query
+from app.layers import decision, language, mapping, query
 from app.layers.mapping import KNOWN_MEASUREMENTS
 from app.models import DataRequest
 from app.rag.openrouter import OpenRouterLLM
@@ -68,6 +68,7 @@ class Suggestion(BaseModel):
     definitions: list[str] = []
     note: str = ""
     computable: bool | None = None  # the parser could turn the draft into a query (None when not tried)
+    language: str = "en"  # language the applicant wrote in; the draft is in English
 
 
 @cache
@@ -88,9 +89,10 @@ def _vocab(conn: sqlite3.Connection) -> dict[str, str]:
 
 
 def suggest(request: DataRequest, conn: sqlite3.Connection, llm: Any | None = None) -> Suggestion:
+    request, lang = language.localise(request, conn)  # any EU language in, English draft out
     verdict = decision.decide(request)  # the same law check as a submitted request
     if not verdict.accepted:
-        return Suggestion(decision="REJECT", articles=verdict.articles, reason=verdict.reason)
+        return Suggestion(decision="REJECT", articles=verdict.articles, reason=verdict.reason, language=lang.language)
     llm = llm or OpenRouterLLM()
     system = INSTRUCTIONS.format(examples=_examples(), **_vocab(conn))
     user = json.dumps({
@@ -111,4 +113,5 @@ def suggest(request: DataRequest, conn: sqlite3.Connection, llm: Any | None = No
     except (mapping.InterpretError, ValueError):
         computable = False
     return Suggestion(decision="ok", articles=verdict.articles, reason=verdict.reason,
-                      definitions=definitions, note=answer.get("note", ""), computable=computable)
+                      definitions=definitions, note=answer.get("note", ""), computable=computable,
+                      language=lang.language)

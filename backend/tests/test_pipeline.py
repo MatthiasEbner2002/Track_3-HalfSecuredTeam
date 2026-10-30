@@ -7,8 +7,8 @@ from app.models import Decision
 from conftest import REQUEST_IDS, load_request
 
 
-def test_all_ten_requests_present():
-    assert REQUEST_IDS == [f"R{i:02d}" for i in range(1, 11)]
+def test_all_twelve_requests_present():
+    assert REQUEST_IDS == [f"R{i:02d}" for i in range(1, 13)]
 
 
 @pytest.mark.parametrize("request_id", REQUEST_IDS)

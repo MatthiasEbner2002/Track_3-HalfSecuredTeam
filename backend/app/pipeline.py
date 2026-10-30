@@ -1,20 +1,26 @@
 """Wires the layers together in the order of the architecture diagram:
 
-Request -> decision -> (reject) | (accept -> route -> statistics/SPE spec
--> mapping -> query -> execute -> small-cell rule) -> result
+Request -> language (any EU language -> English) -> decision -> (reject)
+| (accept -> route -> statistics/SPE spec -> mapping -> query -> execute
+-> small-cell rule) -> result
 """
 
 import sqlite3
 
 from app import db, spe
 from app.config import SPE_FRONTEND_URL
-from app.layers import decision, mapping, query, routing
+from app.layers import decision, language, mapping, query, routing
 from app.models import CodeMapping, DataRequest, PipelineResult, QueryPlan
 
 _DECISIONS = {"statistics": "APPROVE_STATISTICAL", "spe": "APPROVE_SPE"}
 
 
 def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
+    request, lang = language.localise(request, conn)
+    # every layer below reads the English text; the result shows it next to what the applicant wrote
+    translated = {"organisation": request.applicant.organisation, "purpose": request.purpose,
+                  "question": request.question, "definitions": request.definitions} if lang.translated else None
+
     verdict = decision.decide(request)
     if not verdict.accepted:
         return PipelineResult(
@@ -23,16 +29,18 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
             articles=verdict.articles,
             reason=verdict.reason,
             grounding=verdict.grounding,
-            needs_review=verdict.needs_review,
+            needs_review=verdict.needs_review or not lang.verified,
             evidence=verdict.evidence,
-            flags=verdict.flags,
+            flags=lang.flags + verdict.flags,
+            language=lang.language,
+            translated=translated,
         )
 
     choice = routing.choose(request)
     route = choice.route
     articles = list(dict.fromkeys(verdict.articles + choice.articles))
     reason = f"{verdict.reason} {choice.reason}".strip()
-    flags = verdict.flags + choice.flags
+    flags = lang.flags + verdict.flags + choice.flags
     codes, plan, data = CodeMapping(), QueryPlan(), {}
     try:
         query_spec, source = query.interpret(request, route, conn)
@@ -57,11 +65,13 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
         articles=articles,
         reason=reason,
         grounding=verdict.grounding + choice.grounding,
-        needs_review=verdict.needs_review or choice.needs_review,
+        needs_review=verdict.needs_review or choice.needs_review or not lang.verified,
         evidence=verdict.evidence + choice.evidence,
         flags=flags,
         route=route,
         mapping=codes,
         queries=plan.queries,
         data=data,
+        language=lang.language,
+        translated=translated,
     )

@@ -33,7 +33,7 @@ def index() -> RedirectResponse:
 
 
 def _load_sample(sample_id: str) -> dict[str, Any] | None:
-    """The 10 task requests (R01..R10, answer in expected.json) or an end-to-end case (E001..E200)."""
+    """The 12 sample requests (R01..R12, answer in expected.json) or an end-to-end case (E001..E200)."""
     if sample_id.startswith("R") and (path := REQUESTS_DIR / f"{sample_id}.json").is_file():
         expected_path = REQUESTS_DIR / "expected.json"
         expected = json.loads(expected_path.read_text()).get(sample_id) if expected_path.is_file() else None
