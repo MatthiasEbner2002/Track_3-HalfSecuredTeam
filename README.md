@@ -78,7 +78,7 @@ request JSON ─▶  │ 1. Art. 54 / 53   RAG: retrieve points, LLM picks one �
                      statistics: aggregates ─▶ small-cell rule ─▶ answer ◀────┤
                      SPE: cohort patient IDs ─▶ backend/spe/<id>.db (cohort + named ◀──┘
                           tables) + access key ─▶ SPE frontend: queries as images,
-                          download 403, output airlock
+                          download 403
 ```
 
 The backend is one FastAPI app (`backend/app/main.py`) on one central SQLite database built
@@ -97,9 +97,9 @@ receives request text and law text, never patient data.
 | Fallback interpretation | `app/layers/llm_mapping.py` | Where the rules give up, the OpenRouter LLM fills the same `QuerySpec` under the same validation (request text only, codes must come from the request, flagged `llm_interpreted`, no local cache) |
 | SQL compiler | `app/layers/query.py` | `QuerySpec` → SQLite SQL: a base view without opted-out patients, age on 31.12.2025, one patient-ID CTE per concept, one 0/1 flag per patient, grouping by region / hospital / sex / age band (or two of them), patients or stays as the unit |
 | Small-cell rule | `app/layers/query.py`, `app/layers/small_cell.py` | Every requested group listed, also empty ones; counts below 10 → `<10`; percentages with numerator or denominator below 10 and means over fewer than 10 patients → `suppressed`; rounding in Python with `Decimal`, one decimal, half up. Answers name each value by its metric |
-| SPE | `app/spe.py`, `app/spe_api.py` | The cohort query gives the exact patient count; the cohort and only the named record types are copied into one SQLite file per permit, opened with an access key + applicant name; read-only queries returned as watermarked images, download always `403`, output airlock with the small-cell check, audit log ([details below](#secure-processing-environment-art-73)) |
+| SPE | `app/spe.py`, `app/spe_api.py` | The cohort query gives the exact patient count; the cohort and only the named record types are copied into one SQLite file per permit, opened with an access key + applicant name; read-only queries returned as watermarked images, download always `403`, audit log ([details below](#secure-processing-environment-art-73)) |
 | API | `app/main.py` | `POST /api/requests` runs the whole pipeline and returns decision, articles, reason, grounding, evidence, flags, generated SQL and the answer; `/api/samples` serves the sample requests to the UI; `/api/submissions` keeps submissions in memory (placeholder results) |
-| SPE frontend | `frontend/` (Vue 3 + Vuetify + Vite) | The applicant's workspace inside the SPE: key + name entry, tables, SQL, blocked download, outputs |
+| SPE frontend | `frontend/` (Vue 3 + Vuetify + Vite) | The applicant's workspace inside the SPE: key + name entry, tables, SQL, blocked download |
 | Staff UI | `app/static/index.html` | Single page served at `/`: pick a task request or an end-to-end case, run it, see decision, reason, evidence, flags and SQL next to the expected answer, or run a batch |
 
 ![Data extraction: request text to numbers](docs/data-extraction.svg)
