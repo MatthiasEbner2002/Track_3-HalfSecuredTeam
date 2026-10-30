@@ -28,6 +28,15 @@ automatically — nothing is written by hand per request. Small groups are hidde
 
 ![Approved statistics](docs/ui-statistics.png)
 
+#### Help with the hard part: the definitions
+
+Most applicants know their purpose and their question, but not how to pin down "adult" or
+"type 2 diabetes" so that a computer can count it. One click runs the same law check first — a
+prohibited purpose gets no help — and then drafts the definitions in the wording the access body
+can compute. The applicant can edit every line before submitting.
+
+<img src="docs/ui-suggest.png" alt="Suggest definitions with AI: purpose allowed, definitions drafted" width="620">
+
 ### 3. Records only in a secure room — and the door is locked
 
 An application that explains why statistics are not enough gets pseudonymised records inside a
