@@ -10,7 +10,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 
-from app import db, pipeline, spe, spe_api, submissions, suggest
+from app import db, pipeline, ratelimit, spe, spe_api, submissions, suggest
 from app.config import CORS_ORIGINS, REQUESTS_DIR, SPE_FRONTEND_URL
 from app.models import DataRequest, PipelineResult
 from app.rag.errors import ServiceUnavailable
@@ -20,6 +20,8 @@ app.include_router(submissions.router)
 app.include_router(spe_api.router)
 # the SPE frontend (frontend/, Vite) runs on its own origin
 app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_methods=["*"], allow_headers=["*"])
+# added last so it runs first: a flooding address is turned away before CORS or any route sees it
+app.middleware("http")(ratelimit.middleware)
 
 E2E_DIR = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "e2e" / "cases"
 

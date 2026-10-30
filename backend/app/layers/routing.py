@@ -23,13 +23,16 @@ from app.layers.decision import LLM
 from app.models import DataRequest, Evidence, LawParagraph, Route
 from app.rag.store import Retriever
 
-SPE_PROMPT = """You review a health data access application under the European Health Data Space \
-Regulation (EU) 2025/327. The applicant asks for pseudonymised patient-level records. The law below \
-says when that is allowed. Decide whether the application itself demonstrates that its purpose cannot \
-be achieved with anonymised statistics, i.e. it explains why aggregated numbers are not enough (for \
-example, a model must be trained on individual patient histories). Merely asking for records, or a \
-purpose that aggregated tables per group could answer, is not a justification. If it is justified, \
-copy word for word the sentence of the application that explains it; otherwise leave the quote empty."""
+SPE_PROMPT = """You review a health data access application under the European Health Data Space Regulation (EU) 2025/327. The applicant asks for pseudonymised patient-level records. The law below (Art. 66(2) and 66(3)) says when that is allowed: only if the purpose cannot be achieved with anonymised, aggregated statistics.
+
+Decide whether the application itself states such a reason. It is justified when the application says, in its own words, that
+- a model or algorithm is trained, fitted, validated or evaluated on individual records or per patient, or
+- the analysis needs the order, sequence, timing or follow-up of events within a patient (longitudinal, trajectories, survival, time-to-event), or
+- records have to be linked or analysed at record level, or
+- aggregated statistics / summary tables / counts are not enough, insufficient or cannot answer the question.
+It is NOT justified when the application only asks for records, or when its purpose is a count, prevalence, share, mean, benchmark, capacity plan, surveillance or teaching material that aggregated tables per group could deliver.
+
+Judge only what the text says; do not infer a justification that is not written. If justified, copy word for word the one sentence of the application that states the reason (exactly as written, no paraphrase); otherwise set justified to false and leave the quote empty."""
 
 SPE_SCHEMA = {
     "type": "object",

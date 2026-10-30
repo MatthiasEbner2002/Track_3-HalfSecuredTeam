@@ -39,6 +39,16 @@ Rebuild the committed databases only after changing their sources:
 | `EHDS_SPE_KEY_TTL_HOURS` | `24` | how long an SPE access key stays valid |
 | `EHDS_SPE_FRONTEND_URL` | `http://localhost:5173` | link returned with the access key |
 | `EHDS_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | origins allowed to call the API |
+| `EHDS_RATE_LIMIT_REQUESTS` | `20` | `/api/` calls one IP may make per window before it is blocked (429 + `Retry-After`) |
+| `EHDS_RATE_LIMIT_WINDOW_S` | `10` | length of that window in seconds |
+| `EHDS_RATE_LIMIT_BLOCK_S` | `60` | how long a flooding IP stays blocked |
+| `EHDS_TRUST_PROXY` | `0` | `1` takes the client IP from `X-Forwarded-For` (only behind your own reverse proxy) |
+
+Note that uvicorn's own `--proxy-headers` (on by default) already rewrites the client address from
+`X-Forwarded-For` for peers in `--forwarded-allow-ips` (default `127.0.0.1`). Without a reverse proxy
+run it with `--no-proxy-headers`, otherwise a local client can dodge the limit by changing that header.
+`scripts/flood.py` sends a burst from one address and checks the 429 / `Retry-After` behaviour
+(`--spoof` tries the header trick, `--wait` checks the unblock).
 
 ## Decision and routing (RAG)
 

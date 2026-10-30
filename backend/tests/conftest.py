@@ -6,7 +6,7 @@ import pytest
 # Unit tests never call the extraction LLM (costs money, needs the network); test_llm_mapping fakes it.
 os.environ.setdefault("EHDS_LLM", "off")
 
-from app import db
+from app import db, ratelimit
 from app.config import LAW_DB_PATH, REQUESTS_DIR
 from app.layers import decision, routing
 from app.models import DataRequest
@@ -49,6 +49,12 @@ def fake_decision_backend(request, monkeypatch, tmp_path_factory):
     retriever = Retriever.from_chunks(CHUNKS, FakeEmbedder(), tmp_path_factory.mktemp("law") / "law.db")
     monkeypatch.setattr(decision, "_default_retriever", lambda: retriever)
     monkeypatch.setattr(decision, "_default_llm", lambda: FakeLLM())
+
+
+@pytest.fixture(autouse=True)
+def fresh_rate_limiter(monkeypatch):
+    """Every TestClient call comes from one address; a fresh, generous limiter keeps tests from blocking each other."""
+    monkeypatch.setattr(ratelimit, "limiter", ratelimit.RateLimiter(limit=10_000))
 
 
 @pytest.fixture(scope="session")
