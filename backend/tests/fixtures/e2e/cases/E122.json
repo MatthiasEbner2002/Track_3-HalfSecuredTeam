@@ -1,0 +1,33 @@
+{
+  "request": {
+    "id": "E122",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "University of Applied Sciences, nursing programme",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Our nursing students learn descriptive statistics on real-world patterns of chronic disease in a teaching module.",
+    "question": "How many patients with chronic pain take paracetamol, by hospital?",
+    "definitions": [
+      "Paracetamol = ATC code starting with N02BE.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per hospital: patients with an active paracetamol."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(d)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "error": true
+    }
+  },
+  "note": "allowed purpose, but the question cannot be interpreted from the definitions",
+  "source": "B096"
+}

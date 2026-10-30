@@ -1,0 +1,170 @@
+{
+  "request": {
+    "id": "E150",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Sophie Lechner",
+      "organisation": "Charles University, Department of Epidemiology",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Epidemiological research on age and sex differences in chronic disease prevalence for a European comparison study.",
+    "question": "What is the prevalence of obesity among adults, by region and age band?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Obesity = any condition with an ICD-10 code starting with E66.",
+      "Age bands on 31 December 2025: 18-44, 45-64, 65+.",
+      "Prevalence = adults with obesity / all adults in the group × 100, one decimal.",
+      "Report per region and age band: adults, adults with obesity and the prevalence."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Burgenland|18-44": [
+        222,
+        33,
+        14.9
+      ],
+      "Burgenland|45-64": [
+        188,
+        36,
+        19.1
+      ],
+      "Burgenland|65+": [
+        122,
+        23,
+        18.9
+      ],
+      "Kärnten|18-44": [
+        371,
+        59,
+        15.9
+      ],
+      "Kärnten|45-64": [
+        294,
+        39,
+        13.3
+      ],
+      "Kärnten|65+": [
+        220,
+        28,
+        12.7
+      ],
+      "Niederösterreich|18-44": [
+        1199,
+        195,
+        16.3
+      ],
+      "Niederösterreich|45-64": [
+        857,
+        133,
+        15.5
+      ],
+      "Niederösterreich|65+": [
+        684,
+        119,
+        17.4
+      ],
+      "Oberösterreich|18-44": [
+        1110,
+        170,
+        15.3
+      ],
+      "Oberösterreich|45-64": [
+        792,
+        145,
+        18.3
+      ],
+      "Oberösterreich|65+": [
+        571,
+        85,
+        14.9
+      ],
+      "Salzburg|18-44": [
+        410,
+        71,
+        17.3
+      ],
+      "Salzburg|45-64": [
+        274,
+        48,
+        17.5
+      ],
+      "Salzburg|65+": [
+        224,
+        32,
+        14.3
+      ],
+      "Steiermark|18-44": [
+        918,
+        151,
+        16.4
+      ],
+      "Steiermark|45-64": [
+        611,
+        109,
+        17.8
+      ],
+      "Steiermark|65+": [
+        523,
+        69,
+        13.2
+      ],
+      "Tirol|18-44": [
+        568,
+        80,
+        14.1
+      ],
+      "Tirol|45-64": [
+        361,
+        57,
+        15.8
+      ],
+      "Tirol|65+": [
+        311,
+        63,
+        20.3
+      ],
+      "Vorarlberg|18-44": [
+        285,
+        55,
+        19.3
+      ],
+      "Vorarlberg|45-64": [
+        211,
+        33,
+        15.6
+      ],
+      "Vorarlberg|65+": [
+        143,
+        27,
+        18.9
+      ],
+      "Wien|18-44": [
+        1423,
+        238,
+        16.7
+      ],
+      "Wien|45-64": [
+        1048,
+        190,
+        18.1
+      ],
+      "Wien|65+": [
+        776,
+        148,
+        19.1
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B062"
+}

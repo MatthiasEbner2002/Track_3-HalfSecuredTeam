@@ -8,9 +8,11 @@ from app.models import DataRequest
 
 
 def ask(conn, *definitions, mode="statistics", question="q"):
+    """The answer with the metric values as a list per group: wordings differ, so the metric keys do too."""
     req = DataRequest(id="T", applicant={"name": "x", "organisation": "y", "country": "AT"},
                       requested_as="r", purpose="research", question=question, definitions=list(definitions))
-    return extract(req, mode, conn)
+    data = extract(req, mode, conn)
+    return {k: list(v.values()) for k, v in data.items()} if mode == "statistics" else data
 
 
 def test_definition_built_from_other_definitions(conn):

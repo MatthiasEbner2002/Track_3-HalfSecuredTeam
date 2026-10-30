@@ -1,0 +1,45 @@
+{
+  "request": {
+    "id": "E072",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Nina Hofer",
+      "organisation": "Health technology assessment agency (AIHTA)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Health technology assessment: we estimate the number of patients eligible for a new treatment to inform reimbursement policy.",
+    "question": "For people aged 75 and above with chronic kidney disease, what is the average kidney function per hospital?",
+    "definitions": [
+      "Very old patient = aged 75 or older on 31 December 2025.",
+      "CKD: ICD-10 codes beginning with N18.",
+      "Kidney function = the latest eGFR (LOINC 62238-1) of each patient; patients without one are left out.",
+      "Report per hospital: very old patients with CKD who have an eGFR and their mean eGFR, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(b)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        96,
+        44.9
+      ],
+      "Klinikum Süd": [
+        92,
+        45.6
+      ],
+      "Klinikum West": [
+        56,
+        42.8
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B070"
+}

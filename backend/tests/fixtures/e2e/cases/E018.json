@@ -1,0 +1,30 @@
+{
+  "request": {
+    "id": "E018",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Alpenland Versicherung AG, pricing department",
+      "country": "FR"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to align private health insurance premiums for customers with this condition with their actual risk.",
+    "question": "How many inpatient stays for appendicitis started in 2024, per region?",
+    "definitions": [
+      "Appendicitis stay = inpatient stay whose main diagnosis (primary_icd10) starts with K35.",
+      "Count stays (not patients) whose start_date is in 2024.",
+      "Report per region: appendicitis stays."
+    ]
+  },
+  "expected": {
+    "point": "54(b)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B053"
+}

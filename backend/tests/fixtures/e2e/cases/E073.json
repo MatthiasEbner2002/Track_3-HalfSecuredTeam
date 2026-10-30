@@ -1,0 +1,35 @@
+{
+  "request": {
+    "id": "E073",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Daniel Reiter",
+      "organisation": "Statistik Austria, Health Statistics Unit",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Production of official health statistics for the national health report.",
+    "question": "How many inpatient stays in total had a main diagnosis of urinary tract infection?",
+    "definitions": [
+      "UTI stay = inpatient stay whose main diagnosis (primary_icd10) starts with N39.",
+      "Count stays (not patients).",
+      "Report: UTI stays."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(c)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "all": [
+        237
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B052"
+}

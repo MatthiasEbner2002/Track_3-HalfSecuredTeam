@@ -1,0 +1,40 @@
+{
+  "request": {
+    "id": "E161",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "DI Markus Pichler",
+      "organisation": "RhythmAI GmbH, medical device start-up",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We train and validate an AI model that detects the disease early. Aggregated statistics are not enough: the model needs patient-level records; only model weights and performance metrics leave the secure environment.",
+    "question": "Provide pseudonymised conditions and medications of children with asthma.",
+    "definitions": [
+      "Child = aged under 18 on 31 December 2025.",
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "Cohort = children with asthma.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 209,
+      "record_types": [
+        "conditions",
+        "medications"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B085"
+}

@@ -1,0 +1,32 @@
+{
+  "request": {
+    "id": "E129",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Felix Wagner",
+      "organisation": "Regional nursing care planning office",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We plan community nursing capacity and need the number of patients with chronic conditions per region.",
+    "question": "How many patients have depression in each district?",
+    "definitions": [
+      "Depression = any condition with an ICD-10 code starting with F32.",
+      "Report per district: patients with depression."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(b)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "error": true
+    }
+  },
+  "note": "allowed purpose, but the question cannot be interpreted from the definitions",
+  "source": "B090"
+}

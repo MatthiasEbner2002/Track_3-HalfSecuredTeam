@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "E173",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Petra Steiner",
+      "organisation": "Medical University of Vienna, biostatistics",
+      "country": "DE"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Survival analysis of time from diagnosis to first hospital admission; statistics are not enough because the model needs individual-level follow-up times.",
+    "question": "Provide pseudonymised observations and medications of adults with obesity whose latest BMI is 35 or higher.",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Obesity = any condition with an ICD-10 code starting with E66.",
+      "Use the latest BMI (LOINC 39156-5) per patient.",
+      "Cohort = adults with obesity whose latest BMI is 35 or higher.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 467,
+      "record_types": [
+        "medications",
+        "observations"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B087"
+}

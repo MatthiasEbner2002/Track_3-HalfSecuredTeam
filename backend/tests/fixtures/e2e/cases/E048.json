@@ -1,0 +1,33 @@
+{
+  "request": {
+    "id": "E048",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Autoversicherung Direkt AG, actuarial",
+      "country": "FR"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to raise car insurance premiums in the age bands with the most patients, since the disease impairs driving.",
+    "question": "How many adults with hypertension do not take any ACE inhibitor or ARB, per age band?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "RAS blocker = ATC code starting with C09AA or C09CA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Age bands on 31 December 2025: 18-49, 50-64, 65+.",
+      "Report per band: adults with hypertension, how many of them have no active RAS blocker and that share in %, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "54(b)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B030"
+}

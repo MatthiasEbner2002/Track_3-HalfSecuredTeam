@@ -1,0 +1,79 @@
+{
+  "request": {
+    "id": "E147",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Nina Hofer",
+      "organisation": "Regional nursing care planning office",
+      "country": "NL"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We plan community nursing capacity and need the number of patients with chronic conditions per region.",
+    "question": "What share of women has depression in each region?",
+    "definitions": [
+      "Women = sex 'female'.",
+      "Depression = any condition with an ICD-10 code starting with F32.",
+      "Share = women with depression / all women in the region × 100, one decimal.",
+      "Report per region: women, women with depression and the share."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(b)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        342,
+        12,
+        3.5
+      ],
+      "Kärnten": [
+        564,
+        33,
+        5.9
+      ],
+      "Niederösterreich": [
+        1881,
+        114,
+        6.1
+      ],
+      "Oberösterreich": [
+        1661,
+        101,
+        6.1
+      ],
+      "Salzburg": [
+        550,
+        37,
+        6.7
+      ],
+      "Steiermark": [
+        1368,
+        67,
+        4.9
+      ],
+      "Tirol": [
+        810,
+        47,
+        5.8
+      ],
+      "Vorarlberg": [
+        431,
+        31,
+        7.2
+      ],
+      "Wien": [
+        2151,
+        110,
+        5.1
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B018"
+}

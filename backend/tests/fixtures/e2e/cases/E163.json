@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "E163",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Daniel Reiter",
+      "organisation": "Danube Institute for Diabetes Research (university research group)",
+      "country": "DE"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Scientific research on treatment pathways that requires patient-level longitudinal records; only aggregated results leave the secure processing environment.",
+    "question": "Provide pseudonymised conditions, medications, observations and encounters for patients with chronic kidney disease who have at least one eGFR value.",
+    "definitions": [
+      "Chronic kidney disease = any condition with an ICD-10 code starting with N18.",
+      "Cohort = patients with chronic kidney disease who have at least one eGFR value (LOINC 62238-1).",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 414,
+      "record_types": [
+        "conditions",
+        "encounters",
+        "medications",
+        "observations"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B081"
+}

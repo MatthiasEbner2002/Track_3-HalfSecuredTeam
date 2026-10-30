@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E033",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Brightline Health Marketing GmbH",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Our client launches a new drug for this condition. We want to focus our physician advertising campaign on the regions where it is most common.",
+    "question": "What share of adults with a BMI measurement has a BMI of 30 or more, by sex?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Use the latest BMI (LOINC 39156-5) per patient.",
+      "BMI 30 or more = latest BMI of 30 or higher.",
+      "Report per sex: adults with a BMI value and % with BMI 30 or more, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "54(c)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B043"
+}

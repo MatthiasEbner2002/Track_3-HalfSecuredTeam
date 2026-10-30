@@ -1,0 +1,43 @@
+{
+  "request": {
+    "id": "E117",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Nina Hofer",
+      "organisation": "European research consortium on ageing (Horizon Europe)",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on multimorbidity in older adults as part of a publicly funded research project.",
+    "question": "How many patients have hypertension, type 2 diabetes and chronic kidney disease, by hospital?",
+    "definitions": [
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Chronic kidney disease = any condition with an ICD-10 code starting with N18.",
+      "Cardiorenal-metabolic patient = patient with hypertension and type 2 diabetes and chronic kidney disease.",
+      "Report per hospital: cardiorenal-metabolic patients."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        29
+      ],
+      "Klinikum Süd": [
+        26
+      ],
+      "Klinikum West": [
+        15
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B032"
+}

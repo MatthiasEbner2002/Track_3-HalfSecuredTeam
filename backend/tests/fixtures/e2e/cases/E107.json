@@ -1,0 +1,68 @@
+{
+  "request": {
+    "id": "E107",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Cardiopharm Austria GmbH, drug safety (pharmacovigilance)",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Post-authorisation safety study requested by the medicines agency: we monitor how the treated population is distributed by age and region.",
+    "question": "What is the mean eGFR of patients with chronic kidney disease, by region?",
+    "definitions": [
+      "Chronic kidney disease = any condition with an ICD-10 code starting with N18.",
+      "Use the latest eGFR (LOINC 62238-1) per patient; patients without an eGFR are left out.",
+      "Report per region: patients with chronic kidney disease who have an eGFR and their mean eGFR, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        15,
+        42.9
+      ],
+      "Kärnten": [
+        15,
+        44.1
+      ],
+      "Niederösterreich": [
+        86,
+        45.7
+      ],
+      "Oberösterreich": [
+        61,
+        45.2
+      ],
+      "Salzburg": [
+        18,
+        45.2
+      ],
+      "Steiermark": [
+        66,
+        42.8
+      ],
+      "Tirol": [
+        40,
+        43.5
+      ],
+      "Vorarlberg": [
+        17,
+        43.8
+      ],
+      "Wien": [
+        96,
+        45.8
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B027"
+}

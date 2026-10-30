@@ -1,0 +1,48 @@
+{
+  "request": {
+    "id": "E119",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Julia Brandstätter",
+      "organisation": "European research consortium on ageing (Horizon Europe)",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on multimorbidity in older adults as part of a publicly funded research project.",
+    "question": "What share of inpatient stays in 2024 had pneumonia as main diagnosis, per hospital?",
+    "definitions": [
+      "Inpatient stay = encounter with type 'inpatient'.",
+      "Pneumonia stay = inpatient stay whose main diagnosis (primary_icd10) starts with J18.",
+      "Count stays (not patients) whose start_date is in 2024.",
+      "Report per hospital: inpatient stays, pneumonia stays and the share of pneumonia stays in %, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        434,
+        25,
+        5.8
+      ],
+      "Klinikum Süd": [
+        343,
+        20,
+        5.8
+      ],
+      "Klinikum West": [
+        292,
+        16,
+        5.5
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B048"
+}

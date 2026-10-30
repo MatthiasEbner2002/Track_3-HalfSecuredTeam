@@ -1,0 +1,33 @@
+{
+  "request": {
+    "id": "E067",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Pieter de Vries",
+      "organisation": "Privatklinik Sonnenhof, patient acquisition",
+      "country": "NL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to send advertising letters for our private treatment programme to the regions with the most patients.",
+    "question": "How many adults with type 2 diabetes receive neither an SGLT2 inhibitor nor a GLP-1 agonist, by hospital?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "SGLT2 inhibitor = ATC code starting with A10BK.",
+      "GLP-1 agonist = ATC code starting with A10BJ.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per hospital: adults with type 2 diabetes, how many of them have neither an active SGLT2 inhibitor nor an active GLP-1 agonist, and that share in %, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "54(c)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B035"
+}

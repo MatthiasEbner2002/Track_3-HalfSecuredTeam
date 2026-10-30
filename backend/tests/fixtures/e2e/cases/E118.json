@@ -1,0 +1,38 @@
+{
+  "request": {
+    "id": "E118",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Daniel Reiter",
+      "organisation": "Regional government, health department",
+      "country": "FR"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We evaluate the regional screening programme and need prevalence figures by region and age band.",
+    "question": "How many patients living in Wien have depression, by sex?",
+    "definitions": [
+      "Viennese patient = patient whose region is 'Wien'.",
+      "Depression = any condition with an ICD-10 code starting with F32.",
+      "Report per sex: Viennese patients with depression."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "female": [
+        110
+      ],
+      "male": [
+        129
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B059"
+}

@@ -1,0 +1,29 @@
+{
+  "request": {
+    "id": "E019",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Elena Rossi",
+      "organisation": "Zucker & Co Süsswaren GmbH, marketing",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We launch an energy drink for teenagers and want to advertise it in the regions with the most young patients.",
+    "question": "How many patients have cardiovascular disease, by sex?",
+    "definitions": [
+      "Cardiovascular disease = any condition with an ICD-10 code starting with I48, I50 or I63.",
+      "Report per sex: patients with cardiovascular disease."
+    ]
+  },
+  "expected": {
+    "point": "54(c)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B038"
+}

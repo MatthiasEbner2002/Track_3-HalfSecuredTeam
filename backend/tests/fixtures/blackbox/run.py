@@ -41,6 +41,11 @@ def same_value(exp, act) -> bool:
     return _r1(act) == _r1(exp)
 
 
+def _values(v):
+    """The engine answers {metric_key: value} per group; the cases store the values positionally."""
+    return list(v.values()) if isinstance(v, dict) else v
+
+
 def compare(case, actual) -> str | None:
     """None if equal, else the failure category."""
     exp = case["expected"]
@@ -54,7 +59,7 @@ def compare(case, actual) -> str | None:
     if set(map(str, actual)) != set(exp):
         return "wrong-groups"
     for k, ev in exp.items():
-        av = actual[k] if k in actual else actual.get(str(k))
+        av = _values(actual[k] if k in actual else actual.get(str(k)))
         if not isinstance(av, (list, tuple)) or len(av) != len(ev):
             return "wrong-values"
         if not all(same_value(e, a) for e, a in zip(ev, av)):
@@ -128,7 +133,7 @@ def main() -> int:
             else:
                 print("--- diff (group: expected | actual)")
                 for k in sorted(set(exp) | set(map(str, actual))):
-                    ev, av = exp.get(k, "<missing>"), actual.get(k, "<missing>")
+                    ev, av = exp.get(k, "<missing>"), _values(actual.get(k, "<missing>"))
                     same = (
                         isinstance(ev, list) and isinstance(av, (list, tuple)) and len(ev) == len(av)
                         and all(same_value(e, a) for e, a in zip(ev, av))

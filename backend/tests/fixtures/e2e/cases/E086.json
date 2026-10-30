@@ -1,0 +1,46 @@
+{
+  "request": {
+    "id": "E086",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "DI Markus Pichler",
+      "organisation": "Institute for General Practice (university)",
+      "country": "SI"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to compare how often the recommended drugs are used in different age groups, to update a teaching module for GPs.",
+    "question": "What share of adults with hypertension has an active statin, per hospital?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Statin = ATC code starting with C10AA.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per hospital: adults with hypertension, % with an active statin, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(d)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        1372,
+        40.4
+      ],
+      "Klinikum Süd": [
+        1211,
+        43.6
+      ],
+      "Klinikum West": [
+        879,
+        40.7
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B014"
+}

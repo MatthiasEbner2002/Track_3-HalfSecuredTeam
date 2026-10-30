@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E062",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Tabakwaren Handels GmbH, product strategy",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We develop a new cigarette brand with lower tar and want to know where the lung-disease burden is highest to launch it there first.",
+    "question": "What share of women has depression in each region?",
+    "definitions": [
+      "Women = sex 'female'.",
+      "Depression = any condition with an ICD-10 code starting with F32.",
+      "Share = women with depression / all women in the region × 100, one decimal.",
+      "Report per region: women, women with depression and the share."
+    ]
+  },
+  "expected": {
+    "point": "54(d)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B018"
+}

@@ -1,0 +1,40 @@
+{
+  "request": {
+    "id": "E186",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "INSERM Clinical Epidemiology Team",
+      "country": "SI"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Scientific research on treatment sequences: we need patient-level medication histories, since aggregated statistics cannot show the order of prescriptions.",
+    "question": "Provide pseudonymised conditions and medications of women with breast cancer.",
+    "definitions": [
+      "Breast cancer = any condition with an ICD-10 code starting with C50.",
+      "Women = sex 'female'.",
+      "Cohort = women with breast cancer.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 114,
+      "record_types": [
+        "conditions",
+        "medications"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B082"
+}

@@ -1,0 +1,40 @@
+{
+  "request": {
+    "id": "E182",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "University of Applied Sciences, health informatics master",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Students train and validate prediction models on pseudonymised patient-level data inside the secure environment as part of their teaching course; nothing but metrics is exported.",
+    "question": "Provide pseudonymised diagnoses and medications for adults with heart failure. Only model performance metrics will be exported.",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Heart failure = any condition with an ICD-10 code starting with I50.",
+      "Cohort = adults with heart failure.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(d)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 294,
+      "record_types": [
+        "conditions",
+        "medications"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B079"
+}

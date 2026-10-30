@@ -1,0 +1,41 @@
+{
+  "request": {
+    "id": "E169",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Elena Rossi",
+      "organisation": "Regional patient safety board",
+      "country": "PL"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "To improve care we validate an early-warning algorithm against each patient's course; aggregates are insufficient. Only performance metrics are exported.",
+    "question": "Provide pseudonymised conditions and encounters of men aged 50 to 69 with hypertension and type 2 diabetes.",
+    "definitions": [
+      "Men = sex 'male'.",
+      "Hypertension = any condition with an ICD-10 code starting with I10.",
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Cohort = men aged 50 to 69 on 31 December 2025 with hypertension and type 2 diabetes.",
+      "Report the size of the cohort you would make available."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_SPE",
+    "articles": [
+      "53",
+      "66",
+      "68",
+      "73"
+    ],
+    "answer": {
+      "cohort_size": 85,
+      "record_types": [
+        "conditions",
+        "encounters"
+      ]
+    }
+  },
+  "note": "allowed purpose, patient-level data justified",
+  "source": "B089"
+}

@@ -1,0 +1,38 @@
+{
+  "request": {
+    "id": "E143",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Mag. Petra Steiner",
+      "organisation": "Hospital association quality programme",
+      "country": "DE"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We benchmark the quality of chronic disease care between hospitals to improve treatment for all patients.",
+    "question": "How many patients were newly diagnosed with type 2 diabetes in 2024, by sex?",
+    "definitions": [
+      "New type 2 diabetes = any condition with an ICD-10 code starting with E11 and an onset_date in 2024.",
+      "Report per sex: patients with new type 2 diabetes."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "female": [
+        14
+      ],
+      "male": [
+        21
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B055"
+}

@@ -1,0 +1,60 @@
+{
+  "request": {
+    "id": "E101",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "DI Markus Pichler",
+      "organisation": "Hospital association quality programme",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We benchmark the quality of chronic disease care between hospitals to improve treatment for all patients.",
+    "question": "How many patients with type 2 diabetes have an eGFR below 45, by region?",
+    "definitions": [
+      "Type 2 diabetes = any condition with an ICD-10 code starting with E11.",
+      "Use the latest eGFR (LOINC 62238-1) per patient.",
+      "Reduced kidney function = latest eGFR below 45.",
+      "Report per region: patients with type 2 diabetes and reduced kidney function."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        "<10"
+      ],
+      "Kärnten": [
+        "<10"
+      ],
+      "Niederösterreich": [
+        17
+      ],
+      "Oberösterreich": [
+        "<10"
+      ],
+      "Salzburg": [
+        "<10"
+      ],
+      "Steiermark": [
+        18
+      ],
+      "Tirol": [
+        "<10"
+      ],
+      "Vorarlberg": [
+        "<10"
+      ],
+      "Wien": [
+        13
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B042"
+}

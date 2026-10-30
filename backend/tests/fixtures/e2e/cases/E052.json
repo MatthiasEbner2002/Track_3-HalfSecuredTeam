@@ -1,0 +1,32 @@
+{
+  "request": {
+    "id": "E052",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Pieter de Vries",
+      "organisation": "Alpenland Versicherung AG, pricing department",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We want to align private health insurance premiums for customers with this condition with their actual risk.",
+    "question": "What share of older patients with heart failure has an active beta blocker, per hospital?",
+    "definitions": [
+      "Older patient = aged 65 or older on 31 December 2025.",
+      "Heart failure = any condition with an ICD-10 code starting with I50.",
+      "Beta blocker = ATC code starting with C07AB.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per hospital: older patients with heart failure and % with an active beta blocker, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "54(b)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B058"
+}

@@ -1,0 +1,32 @@
+{
+  "request": {
+    "id": "E123",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Austrian Public Health Institute (GÖG)",
+      "country": "DE"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Public health monitoring of chronic disease burden for the regional health authorities.",
+    "question": "How many patients have gout, by region?",
+    "definitions": [
+      "Gout = any condition with an ICD-10 code starting with M10.",
+      "Report per region: patients with gout."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "error": true
+    }
+  },
+  "note": "allowed purpose, but the question cannot be interpreted from the definitions",
+  "source": "B093"
+}

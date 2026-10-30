@@ -1,0 +1,59 @@
+{
+  "request": {
+    "id": "E089",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Julia Brandstätter",
+      "organisation": "Medical faculty, public health curriculum",
+      "country": "PL"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Teaching material for a master's course in public health, showing real regional prevalence figures.",
+    "question": "How many inpatient stays started in 2025, by the patient's region?",
+    "definitions": [
+      "Inpatient stay = encounter with type 'inpatient'.",
+      "Count stays (not patients) whose start_date is in 2025.",
+      "Report per region: inpatient stays."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(d)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        28
+      ],
+      "Kärnten": [
+        69
+      ],
+      "Niederösterreich": [
+        187
+      ],
+      "Oberösterreich": [
+        194
+      ],
+      "Salzburg": [
+        69
+      ],
+      "Steiermark": [
+        140
+      ],
+      "Tirol": [
+        86
+      ],
+      "Vorarlberg": [
+        61
+      ],
+      "Wien": [
+        245
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B004"
+}

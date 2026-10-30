@@ -1,0 +1,31 @@
+{
+  "request": {
+    "id": "E064",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Elena Rossi",
+      "organisation": "CloudVape Ltd, product development",
+      "country": "CZ"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We design new e-cigarette flavours and want to know in which age groups smoking-related disease is most common.",
+    "question": "Count every outpatient encounter that started during 2025, by age group.",
+    "definitions": [
+      "Outpatient encounter = encounter with type 'outpatient'.",
+      "Count encounters (not patients) whose start_date falls in 2025.",
+      "Age bands on 31 December 2025: 0-17, 18-64, 65+.",
+      "Report per age band: outpatient encounters."
+    ]
+  },
+  "expected": {
+    "point": "54(d)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B067"
+}

@@ -1,0 +1,59 @@
+{
+  "request": {
+    "id": "E078",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Prof. Jan Novak",
+      "organisation": "Regional nursing care planning office",
+      "country": "FR"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We plan community nursing capacity and need the number of patients with chronic conditions per region.",
+    "question": "How many patients have an active SGLT2 inhibitor prescription, by region?",
+    "definitions": [
+      "SGLT2 inhibitor = ATC code starting with A10BK.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per region: patients with an active SGLT2 inhibitor."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(b)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        "<10"
+      ],
+      "Kärnten": [
+        22
+      ],
+      "Niederösterreich": [
+        61
+      ],
+      "Oberösterreich": [
+        44
+      ],
+      "Salzburg": [
+        22
+      ],
+      "Steiermark": [
+        46
+      ],
+      "Tirol": [
+        33
+      ],
+      "Vorarlberg": [
+        "<10"
+      ],
+      "Wien": [
+        63
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B020"
+}

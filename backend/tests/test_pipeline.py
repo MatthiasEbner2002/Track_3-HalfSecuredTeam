@@ -24,7 +24,9 @@ def test_r01_returns_one_row_per_region(conn, r01):
     result = pipeline.run(r01, conn)
     (regions,) = conn.execute("SELECT COUNT(DISTINCT region) FROM patients").fetchone()
     assert len(result.data) == regions
-    assert result.data["Burgenland"] == [532, 33, 6.2]  # small-cell rule and rounding applied
+    assert result.data["Burgenland"] == {  # small-cell rule and rounding applied, keys from "Report per"
+        "adults": 532, "adults_with_type_2_diabetes": 33, "prevalence": 6.2,
+    }
 
 
 def test_reject_branch_stops_before_data(conn, r01, monkeypatch):

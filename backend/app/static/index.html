@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EHDS Health Data Access Body — test console</title>
+<style>
+  body { font: 14px/1.4 system-ui, sans-serif; margin: 0; background: #f4f5f7; color: #222; }
+  header { padding: 12px 20px; background: #1f3a5f; color: #fff; font-size: 18px; }
+  main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 20px; }
+  section { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; }
+  section.wide { grid-column: 1 / -1; }
+  h2 { margin: 0 0 8px; font-size: 15px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  button { padding: 6px 12px; border: 1px solid #1f3a5f; background: #1f3a5f; color: #fff; border-radius: 4px; cursor: pointer; }
+  button.secondary { background: #fff; color: #1f3a5f; }
+  button:disabled { opacity: .5; cursor: wait; }
+  button.sample { padding: 4px 8px; }
+  button.sample.active { background: #e8a33d; border-color: #e8a33d; }
+  select, input[type=text] { padding: 5px; font: inherit; }
+  textarea { width: 100%; box-sizing: border-box; height: 420px; font: 12px/1.4 ui-monospace, monospace; }
+  pre { background: #f7f7f7; border: 1px solid #e5e5e5; padding: 8px; overflow: auto; max-height: 420px; font-size: 12px; margin: 0; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-weight: 600; color: #fff; }
+  .REJECT { background: #c0392b; } .APPROVE_STATISTICAL { background: #27ae60; } .APPROVE_SPE { background: #2980b9; }
+  .ok { color: #27ae60; font-weight: 600; } .bad { color: #c0392b; font-weight: 600; }
+  .muted { color: #777; font-size: 12px; }
+  table { border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+  td, th { border: 1px solid #ddd; padding: 3px 8px; text-align: left; vertical-align: top; }
+  details { margin-top: 8px; }
+  #error { color: #c0392b; white-space: pre-wrap; }
+  #batchTable { width: 100%; }
+  #batchWrap { max-height: 360px; overflow: auto; }
+  tr.PASS td:first-child { border-left: 4px solid #27ae60; } tr.FAIL td:first-child { border-left: 4px solid #c0392b; }
+  tr.RUN td:first-child { border-left: 4px solid #e8a33d; }
+</style>
+</head>
+<body>
+<header>EHDS Health Data Access Body — test console</header>
+<main>
+  <section>
+    <h2>Request</h2>
+    <div class="row" id="samples"><span class="muted">loading samples…</span></div>
+    <div class="row">
+      <label>Black-box case <select id="e2e"><option value="">— pick E001…E200 —</option></select></label>
+      <button id="prev" class="secondary" title="previous case">‹</button>
+      <button id="next" class="secondary" title="next case">›</button>
+    </div>
+    <div class="row">
+      <button id="send">Send request</button>
+      <button id="clear" class="secondary">Blank template</button>
+      <span id="status" class="muted"></span>
+    </div>
+    <textarea id="input" spellcheck="false"></textarea>
+    <div id="expected" class="muted"></div>
+  </section>
+  <section>
+    <h2>Result</h2>
+    <div id="error"></div>
+    <div id="summary"><span class="muted">Pick a sample or write your own request, then send.</span></div>
+    <details><summary>Full JSON response</summary><pre id="raw"></pre></details>
+  </section>
+  <section class="wide">
+    <h2>Batch run</h2>
+    <div class="row">
+      <label>Cases <input id="range" type="text" value="E001-E010" size="22" title="ids or ranges, e.g. E001-E020 E150 R01-R10"></label>
+      <button id="runBatch">Run</button>
+      <button id="runFailed" class="secondary" title="re-run the failed rows of the last batch">Re-run failed</button>
+      <button id="stopBatch" class="secondary" disabled>Stop</button>
+      <span id="tally" class="muted">Each request costs one LLM call (~5 s with a GPU, minutes on CPU). Rows are clickable.</span>
+    </div>
+    <div id="batchWrap"><table id="batchTable"></table></div>
+  </section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const TEMPLATE = {
+  id: "MY01",
+  submitted: new Date().toISOString(),
+  applicant: { name: "", organisation: "", country: "AT" },
+  requested_as: "health data request",
+  requested_format: "anonymised statistics",
+  purpose: "",
+  question: "",
+  definitions: [""]
+};
+let expected = null, samples = [], current = null, stopFlag = false, lastResults = {};
+
+async function loadSamples() {
+  samples = await (await fetch("/api/samples")).json();
+  $("samples").innerHTML = "";
+  for (const s of samples.filter(s => s.id.startsWith("R"))) {
+    const b = document.createElement("button");
+    b.className = "sample secondary"; b.textContent = s.id; b.title = s.decision || "";
+    b.onclick = () => loadSample(s.id);
+    $("samples").appendChild(b);
+  }
+  for (const s of samples.filter(s => s.id.startsWith("E"))) {
+    const o = document.createElement("option");
+    o.value = s.id; o.textContent = `${s.id}  ${s.decision}  — ${s.note || ""}`;
+    $("e2e").appendChild(o);
+  }
+}
+
+async function loadSample(id) {
+  current = id;
+  document.querySelectorAll("button.sample").forEach(b => b.classList.toggle("active", b.textContent === id));
+  $("e2e").value = id.startsWith("E") ? id : "";
+  const s = await (await fetch(`/api/samples/${id}`)).json();
+  $("input").value = JSON.stringify(s.request, null, 2);
+  expected = s.expected;
+  $("expected").textContent = expected
+    ? `Expected: ${expected.decision} — Art. ${expected.articles.join(", ")}` + (expected.point ? ` (${expected.point})` : "") + (s.note ? ` — ${s.note}` : "")
+    : "";
+  $("summary").innerHTML = '<span class="muted">Ready to send.</span>'; $("raw").textContent = ""; $("error").textContent = "";
+  if (lastResults[id]) render(lastResults[id]);
+}
+
+$("e2e").onchange = () => $("e2e").value && loadSample($("e2e").value);
+$("prev").onclick = () => step(-1);
+$("next").onclick = () => step(1);
+function step(d) {
+  const ids = samples.map(s => s.id);
+  const i = ids.indexOf(current);
+  const j = i < 0 ? 0 : Math.min(ids.length - 1, Math.max(0, i + d));
+  loadSample(ids[j]);
+}
+
+$("clear").onclick = () => {
+  current = null;
+  document.querySelectorAll("button.sample").forEach(b => b.classList.remove("active"));
+  $("e2e").value = "";
+  $("input").value = JSON.stringify(TEMPLATE, null, 2); expected = null; $("expected").textContent = "";
+};
+
+async function post(body) {
+  const t0 = performance.now();
+  const res = await fetch("/api/requests", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const text = await res.text();
+  let json; try { json = JSON.parse(text); } catch { json = text; }
+  return { res, json, secs: (performance.now() - t0) / 1000 };
+}
+
+$("send").onclick = async () => {
+  let body;
+  try { body = JSON.parse($("input").value); } catch (e) { $("error").textContent = "Invalid JSON: " + e.message; return; }
+  $("error").textContent = ""; $("send").disabled = true; $("status").textContent = "running…";
+  try {
+    const { res, json, secs } = await post(body);
+    $("status").textContent = `${res.status} in ${secs.toFixed(1)} s`;
+    $("raw").textContent = typeof json === "string" ? json : JSON.stringify(json, null, 2);
+    if (!res.ok) { $("error").textContent = typeof json === "string" ? json : JSON.stringify(json.detail ?? json, null, 2); $("summary").innerHTML = ""; return; }
+    if (current) lastResults[current] = json;
+    render(json);
+  } catch (e) {
+    $("error").textContent = "Request failed: " + e.message; $("status").textContent = "";
+  } finally { $("send").disabled = false; }
+};
+
+function esc(s) { return String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); }
+
+// --- comparison against the expected outcome (same rules as tests/fixtures/e2e/run.py)
+const r1 = v => Math.round(Number(v) * 10 + Number.EPSILON) / 10;
+function sameValue(e, a) {
+  if (typeof e === "string" || typeof a === "string") return e === a;
+  if (typeof e !== "number" || typeof a !== "number") return false;
+  return Number.isInteger(e) ? a === e : r1(a) === r1(e);
+}
+function compare(exp, r) {
+  const problems = [];
+  if (r.decision !== exp.decision) problems.push(`decision ${r.decision} (expected ${exp.decision})`);
+  const sa = x => [...x].sort().join(",");
+  if (sa(r.articles) !== sa(exp.articles)) problems.push(`articles ${r.articles.join(",")} (expected ${exp.articles.join(",")})`);
+  if (exp.decision === "REJECT" || r.decision === "REJECT") return problems;
+  const ans = exp.answer;
+  if (ans == null) return problems;
+  if (ans.error === true) {
+    const hasData = r.data && Object.keys(r.data).length;
+    if (hasData || !(r.flags || []).some(f => f.startsWith("not_interpreted"))) problems.push("answer: expected not_interpreted");
+    return problems;
+  }
+  const d = r.data || {};
+  if (exp.decision === "APPROVE_SPE") {
+    if (d.cohort_size !== ans.cohort_size || sa(d.record_types || []) !== sa(ans.record_types)) problems.push("answer wrong-values");
+    return problems;
+  }
+  // R-samples store {group: {name: value}}; E-cases store {group: [values]}
+  const expRows = Object.fromEntries(Object.entries(ans).map(([k, v]) => [k, Array.isArray(v) ? v : (v && typeof v === "object" ? Object.values(v) : [v])]));
+  if (sa(Object.keys(d)) !== sa(Object.keys(expRows))) { problems.push("answer wrong-groups"); return problems; }
+  for (const [k, ev] of Object.entries(expRows)) {
+    const av = d[k];
+    if (!Array.isArray(av) || av.length !== ev.length || !ev.every((e, i) => sameValue(e, av[i]))) { problems.push(`answer wrong-values (${k})`); return problems; }
+  }
+  return problems;
+}
+
+function render(r) {
+  let html = `<p><span class="badge ${r.decision}">${r.decision}</span> &nbsp; Art. ${r.articles.join(", ")}`;
+  if (r.route) html += ` &nbsp; <span class="muted">route: ${r.route}</span>`;
+  if (r.needs_review) html += ` &nbsp; <span class="bad">needs review</span>`;
+  html += `</p>`;
+  if (expected) {
+    const problems = compare(expected, r);
+    html += problems.length
+      ? `<p class="bad">MISMATCH: ${esc(problems.join("; "))}</p>`
+      : `<p class="ok">matches expected (decision, articles${expected.answer ? ", answer" : ""})</p>`;
+  }
+  html += `<p>${esc(r.reason)}</p>`;
+  if (r.flags?.length) html += `<p class="muted">flags: ${esc(r.flags.join(", "))}</p>`;
+  if (r.evidence?.length) {
+    html += `<details open><summary>Evidence (${r.evidence.length})</summary><table><tr><th>Point</th><th>Label</th><th>Phrase</th><th>Source</th></tr>`
+          + r.evidence.map(e => `<tr><td>${esc(e.point)}</td><td>${esc(e.label)}</td><td>${esc(e.phrase)}</td><td>${esc(e.source)}${e.score != null ? " " + e.score.toFixed(2) : ""}</td></tr>`).join("")
+          + `</table></details>`;
+  }
+  if (r.data && Object.keys(r.data).length) html += `<details open><summary>Data</summary>${dataTable(r.data)}</details>`;
+  if (expected?.answer && r.decision !== "REJECT") html += `<details><summary>Expected answer</summary><pre>${esc(JSON.stringify(expected.answer, null, 2))}</pre></details>`;
+  if (r.queries?.length) html += `<details><summary>SQL (${r.queries.length})</summary><pre>${esc(r.queries.map(q => `-- ${q.name}\n${q.sql}\n-- params: ${JSON.stringify(q.params)}`).join("\n\n"))}</pre></details>`;
+  $("summary").innerHTML = html;
+}
+
+function dataTable(data) {
+  const entries = Object.entries(data);
+  if (entries.every(([, v]) => v && typeof v === "object" && !Array.isArray(v))) {
+    const cols = [...new Set(entries.flatMap(([, v]) => Object.keys(v)))];
+    return `<table><tr><th></th>${cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr>`
+         + entries.map(([k, v]) => `<tr><td>${esc(k)}</td>${cols.map(c => `<td>${esc(v[c] ?? "")}</td>`).join("")}</tr>`).join("") + `</table>`;
+  }
+  if (entries.every(([, v]) => Array.isArray(v))) {
+    return `<table>` + entries.map(([k, v]) => `<tr><td>${esc(k)}</td>${v.map(x => `<td>${esc(x)}</td>`).join("")}</tr>`).join("") + `</table>`;
+  }
+  return `<pre>${esc(JSON.stringify(data, null, 2))}</pre>`;
+}
+
+// --- batch
+function parseRange(text) {
+  const ids = samples.map(s => s.id), out = [];
+  for (const tok of text.trim().split(/[\s,]+/).filter(Boolean)) {
+    const m = tok.match(/^([RE])(\d+)-([RE])(\d+)$/);
+    if (m) { const lo = +m[2], hi = +m[4]; ids.filter(i => i[0] === m[1] && +i.slice(1) >= lo && +i.slice(1) <= hi).forEach(i => out.push(i)); }
+    else if (ids.includes(tok)) out.push(tok);
+  }
+  return [...new Set(out)];
+}
+
+async function runBatch(ids) {
+  if (!ids.length) { $("tally").textContent = "no matching case ids"; return; }
+  stopFlag = false; $("runBatch").disabled = $("runFailed").disabled = true; $("stopBatch").disabled = false;
+  const table = $("batchTable");
+  table.innerHTML = `<tr><th>Case</th><th>Expected</th><th>Got</th><th>Result</th><th>Time</th></tr>`;
+  const rows = {};
+  for (const id of ids) {
+    const tr = table.insertRow(); tr.id = "row-" + id; tr.style.cursor = "pointer";
+    tr.onclick = () => loadSample(id);
+    tr.innerHTML = `<td>${id}</td><td></td><td></td><td class="muted">queued</td><td></td>`;
+    rows[id] = tr;
+  }
+  let pass = 0, fail = 0, done = 0;
+  const t0 = performance.now();
+  for (const id of ids) {
+    if (stopFlag) break;
+    const tr = rows[id]; tr.className = "RUN"; tr.cells[3].textContent = "running…";
+    tr.scrollIntoView({ block: "nearest" });
+    try {
+      const s = await (await fetch(`/api/samples/${id}`)).json();
+      const { res, json, secs } = await post(s.request);
+      tr.cells[1].textContent = `${s.expected.decision} ${s.expected.articles.join(",")}`;
+      tr.cells[4].textContent = secs.toFixed(0) + " s";
+      if (!res.ok) { tr.className = "FAIL"; tr.cells[3].textContent = `HTTP ${res.status}`; fail++; }
+      else {
+        lastResults[id] = json;
+        const problems = compare(s.expected, json);
+        tr.cells[2].textContent = `${json.decision} ${json.articles.join(",")}` + (json.flags?.length ? ` [${json.flags.join("; ").slice(0, 60)}]` : "");
+        tr.className = problems.length ? "FAIL" : "PASS";
+        tr.cells[3].innerHTML = problems.length ? `<span class="bad">${esc(problems.join("; "))}</span>` : `<span class="ok">PASS</span>`;
+        problems.length ? fail++ : pass++;
+      }
+    } catch (e) { tr.className = "FAIL"; tr.cells[3].textContent = e.message; fail++; }
+    done++;
+    const avg = (performance.now() - t0) / 1000 / done;
+    $("tally").textContent = `${done}/${ids.length} done — pass ${pass}, fail ${fail} — avg ${avg.toFixed(0)} s/case, ~${Math.round(avg * (ids.length - done) / 60)} min left`;
+  }
+  if (stopFlag) $("tally").textContent += " — stopped";
+  $("runBatch").disabled = $("runFailed").disabled = false; $("stopBatch").disabled = true;
+}
+
+$("runBatch").onclick = () => runBatch(parseRange($("range").value));
+$("runFailed").onclick = () => runBatch([...document.querySelectorAll("#batchTable tr.FAIL")].map(tr => tr.cells[0].textContent));
+$("stopBatch").onclick = () => { stopFlag = true; $("stopBatch").disabled = true; };
+
+loadSamples().catch(e => $("samples").textContent = "could not load samples: " + e.message);
+$("clear").click();
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "request": {
+    "id": "E135",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Sophie Lechner",
+      "organisation": "Austrian social health insurance fund, disease management programmes",
+      "country": "IT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "We evaluate whether our prevention programme reduced hospital admissions, to decide whether to extend it to all regions.",
+    "question": "What is the mean BMI of women with breast cancer, by region?",
+    "definitions": [
+      "Breast cancer = any condition with an ICD-10 code starting with C50.",
+      "Women = sex 'female'.",
+      "Use the latest BMI (LOINC 39156-5) per patient; patients without a BMI are left out.",
+      "Report per region: number of women with a BMI and mean BMI with one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        "<10",
+        "suppressed"
+      ],
+      "Kärnten": [
+        "<10",
+        "suppressed"
+      ],
+      "Niederösterreich": [
+        15,
+        27.2
+      ],
+      "Oberösterreich": [
+        11,
+        27.5
+      ],
+      "Salzburg": [
+        "<10",
+        "suppressed"
+      ],
+      "Steiermark": [
+        13,
+        26.3
+      ],
+      "Tirol": [
+        "<10",
+        "suppressed"
+      ],
+      "Vorarlberg": [
+        "<10",
+        "suppressed"
+      ],
+      "Wien": [
+        14,
+        26.6
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B005"
+}

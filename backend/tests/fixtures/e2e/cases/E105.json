@@ -1,0 +1,40 @@
+{
+  "request": {
+    "id": "E105",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Sophie Lechner",
+      "organisation": "Health technology assessment agency (AIHTA)",
+      "country": "IT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Health technology assessment: we estimate the number of patients eligible for a new treatment to inform reimbursement policy.",
+    "question": "How many patients had an inpatient stay with atrial fibrillation as main diagnosis, per hospital?",
+    "definitions": [
+      "AF stay = inpatient stay whose main diagnosis (primary_icd10) starts with I48.",
+      "Report per hospital: patients with at least one AF stay."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(b)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Klinikum Nord": [
+        19
+      ],
+      "Klinikum Süd": [
+        17
+      ],
+      "Klinikum West": [
+        18
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B050"
+}

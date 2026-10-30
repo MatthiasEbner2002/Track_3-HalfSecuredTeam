@@ -1,0 +1,59 @@
+{
+  "request": {
+    "id": "E102",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Nina Hofer",
+      "organisation": "Public health agency, tobacco control unit",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We evaluate our anti-smoking campaign and want to see whether diagnoses among younger age groups are declining.",
+    "question": "How many children have asthma in each region?",
+    "definitions": [
+      "Child = aged under 18 on 31 December 2025.",
+      "Asthma = any condition with an ICD-10 code starting with J45.",
+      "Report per region: children with asthma."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        "<10"
+      ],
+      "Kärnten": [
+        10
+      ],
+      "Niederösterreich": [
+        55
+      ],
+      "Oberösterreich": [
+        25
+      ],
+      "Salzburg": [
+        17
+      ],
+      "Steiermark": [
+        27
+      ],
+      "Tirol": [
+        15
+      ],
+      "Vorarlberg": [
+        "<10"
+      ],
+      "Wien": [
+        49
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B056"
+}

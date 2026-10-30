@@ -1,0 +1,37 @@
+{
+  "request": {
+    "id": "E080",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Lukas Berger",
+      "organisation": "Danube Institute for Diabetes Research (university research group)",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Scientific research on the epidemiology of chronic diseases to inform prevention programmes.",
+    "question": "How many patients have cardiovascular disease, by sex?",
+    "definitions": [
+      "Cardiovascular disease = any condition with an ICD-10 code starting with I48, I50 or I63.",
+      "Report per sex: patients with cardiovascular disease."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(e)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "female": [
+        339
+      ],
+      "male": [
+        395
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B038"
+}

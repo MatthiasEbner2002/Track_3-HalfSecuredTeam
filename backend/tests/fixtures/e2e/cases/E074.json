@@ -1,0 +1,78 @@
+{
+  "request": {
+    "id": "E074",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Julia Brandstätter",
+      "organisation": "National statistics office, population statistics",
+      "country": "CZ"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Official statistics on the prevalence of chronic diseases for the national health report.",
+    "question": "What is the prevalence of obesity among adults in each region?",
+    "definitions": [
+      "Adult = aged 18 or older on 31 December 2025.",
+      "Obesity = any condition with an ICD-10 code starting with E66.",
+      "Prevalence = adults with obesity / all adults in the region × 100, one decimal.",
+      "Report per region: adults, adults with obesity and the prevalence."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(c)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        532,
+        92,
+        17.3
+      ],
+      "Kärnten": [
+        885,
+        126,
+        14.2
+      ],
+      "Niederösterreich": [
+        2740,
+        447,
+        16.3
+      ],
+      "Oberösterreich": [
+        2473,
+        400,
+        16.2
+      ],
+      "Salzburg": [
+        908,
+        151,
+        16.6
+      ],
+      "Steiermark": [
+        2052,
+        329,
+        16.0
+      ],
+      "Tirol": [
+        1240,
+        200,
+        16.1
+      ],
+      "Vorarlberg": [
+        639,
+        115,
+        18.0
+      ],
+      "Wien": [
+        3247,
+        576,
+        17.7
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B013"
+}

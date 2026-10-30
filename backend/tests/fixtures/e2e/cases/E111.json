@@ -1,0 +1,49 @@
+{
+  "request": {
+    "id": "E111",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "Istituto Superiore di Sanità",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Public health surveillance of non-communicable diseases for the European health monitoring network.",
+    "question": "Among patients with atrial fibrillation aged 65 and over, how many have no active oral anticoagulant, by age band?",
+    "definitions": [
+      "Atrial fibrillation = any condition with an ICD-10 code starting with I48.",
+      "Age bands on 31 December 2025: 65-74, 75-84, 85+.",
+      "Oral anticoagulant = ATC code starting with B01AA or B01AF.",
+      "A medication is active on 31 December 2025 if start_date is on or before that day and end_date is empty or on or after that day.",
+      "Report per band: patients with atrial fibrillation, how many of them have no active oral anticoagulant and that share in %, one decimal."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "65-74": [
+        81,
+        30,
+        37.0
+      ],
+      "75-84": [
+        154,
+        37,
+        24.0
+      ],
+      "85+": [
+        78,
+        22,
+        28.2
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B002"
+}

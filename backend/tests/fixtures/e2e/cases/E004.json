@@ -1,0 +1,29 @@
+{
+  "request": {
+    "id": "E004",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Elena Rossi",
+      "organisation": "Brightline Health Marketing GmbH",
+      "country": "CZ"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Our client launches a new drug for this condition. We want to focus our physician advertising campaign on the regions where it is most common.",
+    "question": "How many patients have the type 2 diabetes code E11.6x (with complications), by region?",
+    "definitions": [
+      "Complicated type 2 diabetes = any condition with an ICD-10 code starting with E11.6.",
+      "Report per region: patients with complicated type 2 diabetes."
+    ]
+  },
+  "expected": {
+    "point": "54(c)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B039"
+}

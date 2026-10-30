@@ -1,0 +1,60 @@
+{
+  "request": {
+    "id": "E152",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Anna Kowalska",
+      "organisation": "Austrian Public Health Institute (GÖG)",
+      "country": "AT"
+    },
+    "requested_as": "health data access application",
+    "requested_format": "pseudonymised data in a secure processing environment",
+    "purpose": "Public health monitoring of chronic disease burden for the regional health authorities.",
+    "question": "How many patients had at least one inpatient stay in 2025, by region?",
+    "definitions": [
+      "Inpatient stay = encounter with type 'inpatient'.",
+      "Hospitalised patient = patient with at least one inpatient stay whose start_date is in 2025.",
+      "Report per region: hospitalised patients."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(a)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "66",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        26
+      ],
+      "Kärnten": [
+        64
+      ],
+      "Niederösterreich": [
+        171
+      ],
+      "Oberösterreich": [
+        180
+      ],
+      "Salzburg": [
+        61
+      ],
+      "Steiermark": [
+        127
+      ],
+      "Tirol": [
+        79
+      ],
+      "Vorarlberg": [
+        55
+      ],
+      "Wien": [
+        221
+      ]
+    }
+  },
+  "note": "allowed purpose, no reason why statistics are not enough: downgrade",
+  "source": "B047"
+}

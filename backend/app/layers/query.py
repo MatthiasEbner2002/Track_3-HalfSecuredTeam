@@ -5,12 +5,15 @@ column name. Opted-out patients are always excluded. Percentages and means are
 computed in Python with Decimal (half up), never with SQLite round().
 
 Answer shapes:
-  statistics: {group_key: [value per metric]}; group_key is the group value,
-              "A|B" for two dimensions, "all" without grouping
+  statistics: {group_key: {metric_key: value}}; group_key is the group value,
+              "A|B" for two dimensions, "all" without grouping; metric_key is
+              the phrase from the "Report per" line as a snake_case slug, in
+              that order
   spe:        {"cohort_size": n, "record_types": [...]}
 """
 
 import itertools
+import re
 import sqlite3
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
@@ -251,6 +254,19 @@ def _half_up(value: Decimal) -> float:
     return float(value.quantize(Decimal("0.1"), rounding=ROUND_HALF_UP))
 
 
+def metric_keys(spec: QuerySpec) -> list[str]:
+    """One snake_case key per metric from its label ("% with an active ARB" -> "pct_with_an_active_arb")."""
+    keys: list[str] = []
+    for m in spec.metrics:
+        key = re.sub(r"[^a-z0-9]+", "_", m.label.lower().replace("%", " pct ")).strip("_")
+        key = re.sub(r"^the_", "", key) or "value"
+        base, n = key, 2
+        while key in keys:
+            key, n = f"{base}_{n}", n + 1
+        keys.append(key)
+    return keys
+
+
 def _group_values(spec: QuerySpec, conn: sqlite3.Connection) -> list[list[str]]:
     out = []
     for dim in spec.group_by:
@@ -273,6 +289,7 @@ def answer(spec: QuerySpec, plan: QueryPlan, rows: dict[str, list[dict]], conn: 
             key = tuple(row.get(f"g{i}") for i in range(len(spec.group_by)))
             by_group.setdefault(key, {}).update(row)
 
+    keys = metric_keys(spec)
     result = {}
     for key in itertools.product(*_group_values(spec, conn)):
         row = by_group.get(key, {})
@@ -288,7 +305,7 @@ def answer(spec: QuerySpec, plan: QueryPlan, rows: dict[str, list[dict]], conn: 
                 n, total = row.get(f"m{i}_n") or 0, row.get(f"m{i}_sum") or 0
                 mean = _half_up(Decimal(total) / SCALE / n) if n else None
                 values.append(small_cell.derived(mean, n))
-        result["|".join(key) if key else "all"] = values
+        result["|".join(key) if key else "all"] = dict(zip(keys, values))
     return result
 
 

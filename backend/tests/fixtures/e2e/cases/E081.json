@@ -1,0 +1,68 @@
+{
+  "request": {
+    "id": "E081",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Marie Dubois",
+      "organisation": "Austrian social health insurance fund, disease management programmes",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "We evaluate whether our prevention programme reduced hospital admissions, to decide whether to extend it to all regions.",
+    "question": "How many people with depression were prescribed an SSRI at any time, per region?",
+    "definitions": [
+      "Depression = any condition with an ICD-10 code starting with F32.",
+      "SSRI ever = any prescription with an ATC code starting with N06AB, regardless of start or end date.",
+      "Report per region: patients with depression and how many of them have SSRI ever."
+    ]
+  },
+  "expected": {
+    "point": "53(1)(f)",
+    "decision": "APPROVE_STATISTICAL",
+    "articles": [
+      "53",
+      "69"
+    ],
+    "answer": {
+      "Burgenland": [
+        32,
+        20
+      ],
+      "Kärnten": [
+        74,
+        45
+      ],
+      "Niederösterreich": [
+        201,
+        133
+      ],
+      "Oberösterreich": [
+        195,
+        110
+      ],
+      "Salzburg": [
+        70,
+        45
+      ],
+      "Steiermark": [
+        125,
+        73
+      ],
+      "Tirol": [
+        90,
+        57
+      ],
+      "Vorarlberg": [
+        53,
+        31
+      ],
+      "Wien": [
+        239,
+        144
+      ]
+    }
+  },
+  "note": "allowed purpose, statistics",
+  "source": "B071"
+}

@@ -1,0 +1,29 @@
+{
+  "request": {
+    "id": "E042",
+    "submitted": "2026-10-30T09:00:00+01:00",
+    "applicant": {
+      "name": "Dr. Nina Hofer",
+      "organisation": "Securitas Personalservice GmbH, staffing",
+      "country": "AT"
+    },
+    "requested_as": "health data request",
+    "requested_format": "anonymised statistics",
+    "purpose": "Before we place temporary workers we want to know which age groups carry this disease, so we can offer those groups only short-term contracts.",
+    "question": "How many patients had an inpatient stay whose main diagnosis was diabetes in 2023 or later, by region?",
+    "definitions": [
+      "Diabetes stay = inpatient stay whose main diagnosis (primary_icd10) starts with E11.",
+      "Report per region: patients with at least one diabetes stay."
+    ]
+  },
+  "expected": {
+    "point": "54(b)",
+    "decision": "REJECT",
+    "articles": [
+      "54"
+    ],
+    "answer": null
+  },
+  "note": "prohibited purpose, health data request",
+  "source": "B074"
+}
