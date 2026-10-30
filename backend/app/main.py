@@ -3,12 +3,15 @@
 import sqlite3
 from collections.abc import Iterator
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
+from fastapi.responses import JSONResponse
 
-from app import db, pipeline
+from app import db, pipeline, submissions
 from app.models import DataRequest, PipelineResult
+from app.rag.ollama import OllamaUnavailable
 
 app = FastAPI(title="EHDS Health Data Access Body", version="0.1.0")
+app.include_router(submissions.router)
 
 
 def get_conn() -> Iterator[sqlite3.Connection]:
@@ -17,6 +20,11 @@ def get_conn() -> Iterator[sqlite3.Connection]:
         yield conn
     finally:
         conn.close()
+
+
+@app.exception_handler(OllamaUnavailable)
+def ollama_unavailable(request: Request, exc: OllamaUnavailable) -> JSONResponse:
+    return JSONResponse(status_code=503, content={"detail": str(exc)})
 
 
 @app.get("/health")

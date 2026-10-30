@@ -8,7 +8,7 @@ os.environ.setdefault("EHDS_LLM", "off")
 
 from app import db
 from app.config import LAW_DB_PATH, REQUESTS_DIR
-from app.layers import decision
+from app.layers import decision, routing
 from app.models import DataRequest
 from app.rag import ollama
 from app.rag.store import Retriever
@@ -47,6 +47,8 @@ def fake_decision_backend(request, monkeypatch, tmp_path_factory):
     retriever = Retriever.from_chunks(CHUNKS, FakeEmbedder(), tmp_path_factory.mktemp("law") / "law.db")
     monkeypatch.setattr(decision, "_default_retriever", lambda: retriever)
     monkeypatch.setattr(decision, "_default_llm", lambda: FakeLLM())
+    decision.clear_cache()
+    routing.clear_cache()
 
 
 @pytest.fixture(scope="session")

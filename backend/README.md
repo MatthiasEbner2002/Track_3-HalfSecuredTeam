@@ -15,8 +15,8 @@ Request -> decision -> REJECT (articles)
 
 | Layer | File | State |
 |---|---|---|
-| Decision system | `app/layers/decision.py` | two engines, `EHDS_DECISION_ENGINE=rag` (default, [below](#decision-layer-grounded-rag)) or `purpose` ([purpose check](#purpose-check-decision--routing-layers)) |
-| Statistics vs SPE | `app/layers/routing.py` | purpose check's SPE justification; adds Art. 66/68/69/73 |
+| Decision system | `app/layers/decision.py` | grounded RAG with a local LLM ([below](#decision-layer-grounded-rag)) |
+| Statistics vs SPE | `app/layers/routing.py` | RAG check of Art. 66(3) with a verified quote; adds Art. 66/68/69/73 |
 | Statistics spec | `app/layers/statistics.py` | stub, passes request through |
 | SPE spec | `app/layers/spe.py` | stub, asks for all tables |
 | Code mapping | `app/layers/mapping.py` | rule parser, IBM Bob fallback ([data extraction](#data-extraction-mapping--query-layers)) |
@@ -43,11 +43,25 @@ The interfaces between layers live in `app/models.py`; `app/pipeline.py` wires t
       competing, plus the words of the point that cover the use. If those words are
       not in the law text, `needs_review` is set for staff.
 4. **Rules** in code: an Art. 54 point rejects, an Art. 53 point accepts. The reason
-   quotes the matched point verbatim. Articles: `54` on reject, `53` on accept;
-   routing adds `69`, `66`+`69` (downgraded access application) or `66`, `68`, `73` (SPE).
+   quotes the matched point verbatim. Articles: `54` on reject, `53` on accept.
+5. **Routing** (`app/layers/routing.py`): a health data request gets statistics
+   (`69`). For an access application, Art. 66(2) and 66(3) are fetched from the store
+   and the LLM decides whether the application shows that its purpose cannot be met
+   with anonymised statistics, quoting the sentence that says so. Quote found in the
+   request → SPE (`66`, `68`, `73`); otherwise downgrade to statistics (`66`, `69`),
+   flagged `spe_quote_unverified` when the model claimed a justification it could not quote.
 
 LLM: `qwen2.5:7b` via Ollama, temperature 0, fixed seed. Only the request text
-reaches it, never patient data. Recitals are in the store but not used yet.
+reaches it, never patient data. Decisions and routes are cached per request content,
+so a resubmitted request gets the identical answer instantly. If Ollama is down the API
+answers 503 with how to fix it. Recitals are in the store but not used yet.
+
+Full decision (decision + route + articles) on the 10 task requests and the evaluation set:
+
+```bash
+.venv/bin/python scripts/evaluate.py --set tasks --runs 3
+.venv/bin/python scripts/evaluate.py --split test --failures
+```
 
 ```bash
 brew install ollama && ollama serve &
@@ -89,11 +103,10 @@ curl -X POST localhost:8000/api/requests -H 'Content-Type: application/json' -d 
 `tests/test_expected.py` compares against `requests/expected.json` and is marked
 `xfail` while the decision layer is a stub; `XPASS` lines show what already works.
 
-## Purpose check (decision + routing layers)
+## Purpose check (not used by the pipeline)
 
-`app/purpose/` decides which article points apply to a request. It is used by
-`app/layers/decision.py` (Art. 54 reject, Art. 53 accept) and
-`app/layers/routing.py` (statistics or SPE, plus the route's articles).
+`app/purpose/` is an earlier, standalone purpose check (IBM Bob / NLI model / rules).
+The pipeline no longer calls it; decisions and routing use the RAG engine above.
 
 Three engines, tried in order (`engines` in `app/purpose/config.yaml`); the first
 one that is available and answers decides:

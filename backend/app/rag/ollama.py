@@ -1,25 +1,43 @@
 """Minimal Ollama client (stdlib only) for embeddings and JSON-constrained chat."""
 
 import json
+import urllib.error
 import urllib.request
 from typing import Any
 
 from app.config import EMBED_MODEL, LLM_MODEL, LLM_SEED, OLLAMA_URL
 
 
+class OllamaUnavailable(RuntimeError):
+    """Ollama is down, unreachable, or the model is not pulled."""
+
+
 def _post(path: str, body: dict[str, Any], timeout: float = 120) -> dict[str, Any]:
     request = urllib.request.Request(
         OLLAMA_URL + path, json.dumps(body).encode(), {"Content-Type": "application/json"}
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        return json.load(response)
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            model = body.get("model", LLM_MODEL)
+            raise OllamaUnavailable(
+                f"model {model!r} is not available in Ollama at {OLLAMA_URL} "
+                f"(pull it with `ollama pull {model}`)"
+            ) from e
+        raise
+    except (urllib.error.URLError, OSError) as e:
+        raise OllamaUnavailable(
+            f"Ollama is not reachable at {OLLAMA_URL} (start it with `ollama serve`)"
+        ) from e
 
 
 def is_available() -> bool:
     try:
         _post("/api/show", {"model": LLM_MODEL}, timeout=2)
         return True
-    except OSError:
+    except (OSError, OllamaUnavailable):
         return False
 
 

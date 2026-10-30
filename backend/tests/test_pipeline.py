@@ -38,7 +38,11 @@ def test_reject_branch_stops_before_data(conn, r01, monkeypatch):
 
 
 def test_spe_branch(conn, r01, monkeypatch):
-    monkeypatch.setattr(routing, "choose_route", lambda req, verdict: "spe")
+    choice = routing.RouteChoice(
+        route="spe", articles=["66", "68", "73"], reason="spe justified",
+        grounding=[], evidence=[], flags=[],
+    )
+    monkeypatch.setattr(routing, "choose", lambda req: choice)
     result = pipeline.run(r01, conn)
     assert result.decision == "APPROVE_SPE"
     assert result.route == "spe"

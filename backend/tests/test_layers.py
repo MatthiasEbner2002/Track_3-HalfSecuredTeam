@@ -12,7 +12,7 @@ def test_decision_returns_decision(r01):
 
 
 def test_routing_returns_known_route(r01):
-    assert routing.choose_route(r01, decision.decide(r01)) in ("statistics", "spe")
+    assert routing.choose(r01).route in ("statistics", "spe")
 
 
 def test_statistics_spec(r01):

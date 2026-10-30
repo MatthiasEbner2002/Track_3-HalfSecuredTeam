@@ -8,7 +8,7 @@ import os
 
 import pytest
 
-from app.layers import decision, routing
+from app.layers import decision
 from app.purpose import assess, nli
 from app.purpose.assess import clear_cache, config
 
@@ -41,18 +41,6 @@ def test_rule_floor_lets_allowed_samples_pass(rules_only, request_id):
 def test_rules_detect_spe_justification(rules_only):
     assert assess(load_request("R05")).spe_justification is not None
     assert assess(load_request("R09")).spe_justification is None
-
-
-def test_route_articles():
-    r01, r05, r09 = load_request("R01"), load_request("R05"), load_request("R09")
-    assert routing.explain(r01, "statistics")[0] == ["69"]
-    assert routing.explain(r05, "spe")[0] == ["66", "68", "73"]
-    assert routing.explain(r09, "statistics")[0] == ["66", "69"]
-
-
-def test_health_data_request_never_goes_to_spe():
-    r01 = load_request("R01")
-    assert routing.choose_route(r01, decision.decide(r01)) == "statistics"
 
 
 @needs_model

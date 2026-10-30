@@ -9,7 +9,6 @@ import sqlite3
 from app import db
 from app.layers import decision, mapping, query, routing
 from app.models import CodeMapping, DataRequest, PipelineResult, QueryPlan
-from app.purpose import assess
 
 _DECISIONS = {"statistics": "APPROVE_STATISTICAL", "spe": "APPROVE_SPE"}
 
@@ -28,11 +27,11 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
             flags=verdict.flags,
         )
 
-    route = routing.choose_route(request, verdict)
-    route_articles, route_reason = routing.explain(request, route)
-    articles = list(dict.fromkeys(verdict.articles + route_articles))
-    reason = f"{verdict.reason} {route_reason}".strip()
-    flags = list(verdict.flags)
+    choice = routing.choose(request)
+    route = choice.route
+    articles = list(dict.fromkeys(verdict.articles + choice.articles))
+    reason = f"{verdict.reason} {choice.reason}".strip()
+    flags = verdict.flags + choice.flags
     codes, plan, data = CodeMapping(), QueryPlan(), {}
     try:
         query_spec, source = query.interpret(request, route, conn)
@@ -50,9 +49,9 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
         decision=_DECISIONS[route],
         articles=articles,
         reason=reason,
-        grounding=verdict.grounding,
-        needs_review=verdict.needs_review,
-        evidence=verdict.evidence + ([spe_why] if (spe_why := assess(request).spe_justification) and route == "spe" else []),
+        grounding=verdict.grounding + choice.grounding,
+        needs_review=verdict.needs_review or choice.needs_review,
+        evidence=verdict.evidence + choice.evidence,
         flags=flags,
         route=route,
         mapping=codes,

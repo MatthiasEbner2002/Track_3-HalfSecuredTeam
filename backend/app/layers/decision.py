@@ -1,10 +1,7 @@
 """Decision system: accept or reject a request and cite the law.
 
-Two engines, chosen with EHDS_DECISION_ENGINE (config.DECISION_ENGINE):
-- "rag" (default): grounded RAG over the regulation with a local LLM, below.
-- "purpose": the purpose check in app/purpose (IBM Bob / local NLI model / rules).
-
-The "rag" engine takes three small steps instead of one big question:
+One engine: grounded RAG over the regulation with a local LLM, in three small
+steps instead of one big question:
 
 1. Extract (LLM): who is asking and what they will do with the results (the
    end use, as opposed to the analysis itself), read
@@ -28,13 +25,11 @@ ones that depend on the request type and route (66, 68, 69, 73).
 
 import re
 from dataclasses import dataclass
-from functools import cache
+from functools import cache, lru_cache
 from typing import Protocol
 
-from app.config import DECISION_ENGINE, RETRIEVAL_TOP_K
+from app.config import RETRIEVAL_TOP_K
 from app.models import DataRequest, Decision, LawParagraph
-from app.purpose import assess
-from app.purpose.assess import config
 from app.rag.ollama import OllamaEmbedder, OllamaLLM
 from app.rag.store import Retriever
 
@@ -86,8 +81,11 @@ def _default_llm() -> LLM:
     return OllamaLLM()
 
 
-def _normalise(text: str) -> str:
+def normalise(text: str) -> str:
     return " ".join(re.sub(r"[^a-z0-9]+", " ", text.lower()).split())
+
+
+_normalise = normalise
 
 
 def _points_of(paragraph_id: str):
@@ -171,38 +169,20 @@ def decide_rag(
     )
 
 
-def _join(labels: list[str]) -> str:
-    labels = list(dict.fromkeys(labels))
-    return labels[0] if len(labels) == 1 else ", ".join(labels[:-1]) + " and " + labels[-1]
-
-
-def decide_purpose(request: DataRequest) -> Decision:
-    """Purpose check engine: reject prohibited purposes (Art. 54), otherwise accept under Art. 53."""
-    result = assess(request)
-    reasons = config()["reasons"]
-
-    if result.prohibited:
-        return Decision(
-            accepted=False,
-            articles=["54"],
-            reason=reasons["reject"].format(labels=_join([e.label for e in result.prohibited])),
-            evidence=result.prohibited,
-            flags=result.flags,
-        )
-
-    if result.allowed:
-        labels = _join([e.label for e in result.allowed])
-        verb = "are allowed purposes" if len(result.allowed) > 1 else "is an allowed purpose"
-        text = reasons["allowed"].format(labels=labels, verb=verb)
-        reason = text[0].upper() + text[1:]
-    else:
-        reason = reasons["no_allowed_purpose"]
-    return Decision(accepted=True, articles=["53"], reason=reason, evidence=result.allowed, flags=result.flags)
+@lru_cache(maxsize=512)
+def _decide(request_json: str) -> Decision:
+    return decide_rag(DataRequest.model_validate_json(request_json))
 
 
 def decide(
     request: DataRequest, retriever: Retriever | None = None, llm: LLM | None = None
 ) -> Decision:
-    if DECISION_ENGINE == "purpose":
-        return decide_purpose(request)
+    """Decide a request. With default backends the result is cached per request content;
+    pass a retriever or llm explicitly (tests, eval) to bypass the cache."""
+    if retriever is None and llm is None:
+        return _decide(request.model_dump_json())
     return decide_rag(request, retriever, llm)
+
+
+def clear_cache() -> None:
+    _decide.cache_clear()

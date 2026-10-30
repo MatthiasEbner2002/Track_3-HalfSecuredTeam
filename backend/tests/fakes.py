@@ -17,7 +17,12 @@ CHUNKS = [
                  text="(b) placeholder decisions on insurance premiums or job offers;"),
     LawParagraph(id="Art. 54(c)", kind="point", article="54", lead_in="placeholder prohibited:",
                  text="(c) placeholder advertising or marketing activities;"),
+    LawParagraph(id="Art. 66(2)", article="66", text="placeholder access only when the purpose cannot be achieved with anonymised data"),
+    LawParagraph(id="Art. 66(3)", article="66", text="placeholder pseudonymised data when the applicant justifies patient-level data"),
+    LawParagraph(id="Art. 68(1)(c)", kind="point", article="68", lead_in="placeholder data permit:",
+                 text="(c) placeholder access in a secure processing environment;"),
     LawParagraph(id="Art. 69(1)", article="69", text="placeholder anonymised statistical format request"),
+    LawParagraph(id="Art. 73(1)", article="73", text="placeholder secure processing environment, no download"),
     LawParagraph(id="Recital 62", kind="recital", article="", text="placeholder recital on prohibited uses"),
 ]
 
@@ -41,12 +46,16 @@ class FakeEmbedder:
 class FakeLLM:
     """Answers the extract call with fixed facts and the match call with a fixed rule."""
 
-    def __init__(self, rule_id: str = "Art. 53(1)(e)", words: str = "scientific research"):
+    def __init__(self, rule_id: str = "Art. 53(1)(e)", words: str = "scientific research",
+                 spe_quote: str | None = None):
         self.match_answer = {"rule_id": rule_id, "matching_words": words}
+        self.spe_quote = spe_quote
         self.calls: list[tuple[str, str, dict]] = []
 
     def complete_json(self, system: str, user: str, schema: dict) -> dict:
         self.calls.append((system, user, schema))
+        if "justified" in schema["properties"]:
+            return {"quote": self.spe_quote or "", "justified": self.spe_quote is not None}
         if "end_use" in schema["properties"]:
             return {"actor": "a research group", "analysis": "count patients",
                     "end_use": "study diabetes", "affected_people": "nobody"}

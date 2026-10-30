@@ -59,7 +59,9 @@ The first request takes ~15 s while Ollama loads the model; later ones take 5–
 
 ```bash
 pytest -m "not real_llm"            # fast unit tests, no Ollama needed (~5 s)
-python -m app.eval_decisions        # decisions on the 10 task requests + 16 held-out ones (~3 min)
+python -m app.eval_decisions        # accept/reject on the 10 task requests + 16 held-out ones (~3 min)
+python scripts/evaluate.py --set tasks --runs 3   # full decision + articles on R01-R10, 3 runs
+python scripts/evaluate.py --split test --failures # full decision on the 36 held-out eval requests
 pytest                              # everything, including the real-LLM tests (slow)
 ```
 
@@ -78,36 +80,33 @@ Environment variables, all optional:
 
 | Variable | Default | Use |
 |---|---|---|
-| `EHDS_DECISION_ENGINE` | `rag` | `purpose` switches to the purpose check (NLI model / IBM Bob / rules) |
 | `EHDS_LLM_MODEL` | `qwen2.5:7b` | e.g. `qwen2.5:3b` on a small laptop (less accurate) |
 | `EHDS_EMBED_MODEL` | `nomic-embed-text` | rebuild `law.db` after changing it |
 | `EHDS_OLLAMA_URL` | `http://localhost:11434` | Ollama on another machine |
 
 ## Troubleshooting
 
-- **A request returns `Internal Server Error`**: look at the uvicorn log.
-  `Connection refused` means Ollama is not running (`ollama serve`);
-  `HTTP Error 404` means a model is missing (run the `ollama pull` commands from step 2).
+- **A request returns `503`**: the message says what is wrong. Ollama is not running
+  (`ollama serve`) or a model is missing (run the `ollama pull` commands from step 2).
 - **Real-LLM tests are skipped**: same cause, Ollama or a model is missing.
 
 ## Architecture
 
 ```
-request JSON ─▶ decision ─────────────────▶ routing ─▶ data extraction ─▶ answer + reason
-                 Art. 54 / 53:                statistics   rules, then IBM Bob,
-                 RAG + local LLM (default)    or SPE       QuerySpec → SQLite
-                 or purpose check
+request JSON ─▶ decision ─────────────▶ routing ───────────────▶ data extraction ─▶ answer + reason
+                 Art. 54 / 53:            statistics (Art. 69),    rules, then IBM Bob,
+                 RAG + local LLM          SPE (Art. 66(3), 68, 73) QuerySpec → SQLite
+                                          or downgrade (66(2), 69):
+                                          RAG + local LLM
 ```
 
 | Component | Where | How |
 |---|---|---|
-| Decision | `backend/app/layers/decision.py` | Two engines, `EHDS_DECISION_ENGINE`: **`rag`** (default) |
-| ↳ RAG engine | `backend/app/rag/` | Regulation parsed into points and recitals, embedded in `data/law.db`; a local LLM (Ollama `qwen2.5:7b`) extracts the end use, picks the matching Art. 53/54 point and the reason quotes it verbatim |
-| ↳ Purpose check | `backend/app/purpose/` | `purpose`: rules for clear cases; optional local NLI model scores the purpose against each point of Art. 54 / 53 |
-| Routing | `backend/app/layers/routing.py` | Statistics, SPE, or an access application downgraded to statistics (R09) |
+| Decision (steps 1–2) | `backend/app/layers/decision.py`, `backend/app/rag/` | Regulation parsed into points and recitals, embedded in `data/law.db`; a local LLM (Ollama `qwen2.5:7b`) extracts the end use, picks the matching Art. 53/54 point and the reason quotes it verbatim |
+| Routing (steps 3–4) | `backend/app/layers/routing.py` | Health data request → statistics (Art. 69). Access application → the local LLM reads Art. 66(2)/66(3) from `data/law.db` and judges whether the application shows that statistics are not enough; its quote must appear verbatim in the request, otherwise the result is downgraded to statistics and flagged for staff |
 | Data extraction | `backend/app/layers/mapping.py`, `query.py`, `llm_mapping.py` | See below |
 | Small-cell rule | `backend/app/layers/small_cell.py` | `<10`, `suppressed`, one decimal half up, every group listed |
-| API | `backend/app/main.py` | FastAPI, `POST /api/requests` |
+| API | `backend/app/main.py`, `submissions.py` | FastAPI, `POST /api/requests` (pipeline); `/api/submissions` (list/view/download, still placeholder results) |
 
 ![Data extraction: request text to numbers](docs/data-extraction.svg)
 
@@ -124,31 +123,62 @@ turns the `QuerySpec` into SQLite SQL. Nothing is written per request.
 | `eulex.html` | Regulation (EU) 2025/327 as saved from EUR-Lex |
 | `docs/` | diagrams and demos |
 
-## Checkpoint — 29.10.2026
+## Current state — 30.10.2026
 
 ### Metrics on the 10 requests (through `pipeline.run`, what the API returns)
 
 | Metric | Target | Now |
 |---|---|---|
-| Correct decisions | 10 of 10 | **10 of 10** |
+| Correct decisions | 10 of 10 | **10 of 10** (decision + articles) |
 | Correct numbers | 6 of 6 | **6 of 6** |
 | Privacy leaks | 0 | **0** |
-| Consistency (3 runs) | 10 of 10 | **10 of 10** |
-| Slowest answer | under 60 s | **0.2 s** (up to ~20 s when Bob is needed) |
+| Consistency (3 runs) | 10 of 10 | **10 of 10** (uncached model calls) |
+| Slowest answer | under 60 s | **13.9 s** (RAG decision + routing + query, `qwen2.5:7b`, cache cleared) |
 
-Measured with the purpose check, rules only (local NLI model not installed).
-The RAG engine (default) also gets 10 of 10 decisions, plus 16 of 16 on held-out requests
-(`python -m app.eval_decisions`), consistent over 3 runs; with `qwen2.5:7b` a decision takes
-5–10 s (~15 s for the first request while the model loads).
+Held-out evaluation set, `test` split (36 requests, `scripts/evaluate.py --split test`):
+**31 of 36** full decisions correct. Routing: SPE 4/5, downgrade 4/4. Misses: three
+prohibited purposes accepted (two nicotine/vape products, one of them in German, and a
+subsidy cut that disadvantages a group), one study *about* insurance premiums rejected,
+one SPE request with a bare "requires patient-level data" downgraded.
 
-Done:
-- Decision and routing (Art. 54 rejects, statistics, SPE, downgrade): 10/10 on the samples.
-- Data extraction: 6/6 numbers; black-box set of 100 new requests 100/100 with the rules alone
-  (IBM Bob as fallback for wordings the rules do not know).
-- Small-cell rule and opt-outs in the API answer: 0 leaks.
+### Done
 
-To do:
-- SPE: copy the selected records into a separate schema, block downloads.
-- Pages for applicants and staff (only the JSON API exists).
-- Decision engines: compare `rag` and `purpose` on the held-out requests and pick one.
-- Independent test set; demo video.
+- **Decision, all four steps, RAG only** (no IBM Bob, no NLI model in the decision path):
+  Art. 54 / 53 point picked by the local LLM from retrieved law text and quoted in the
+  reason; SPE vs. downgrade judged against Art. 66(2)/66(3) with a quote that must appear
+  verbatim in the request (otherwise downgrade + staff flag). Route articles (69, 66, 68, 73)
+  grounded in the law text. Decisions cached per request content. 503 with a fix-it
+  message when Ollama is down.
+- **Data extraction**: regex rule parser → `QuerySpec` → SQLite SQL; 6/6 numbers on the
+  samples, 100/100 on the black-box set with the rules alone. Covers grouping by hospital,
+  main diagnosis (`primary_icd10`) and stays vs. patients.
+- **Small-cell rule and opt-outs** in every statistical answer: `<10`, `suppressed`, one
+  decimal half up, every group listed, opted-out patients excluded in the base query.
+- **SPE cohort**: exact patient count (R05: 1,152) and the requested record types.
+- **Tests**: 102 fast tests on fakes; real-LLM tests and both eval scripts.
+- The frontend was removed; only the JSON API exists.
+
+### To do
+
+1. **SPE provisioning**: copy the selected patients' requested record types (with their
+   patient IDs) into a separate schema or folder per request, with a manifest holding the
+   exact count.
+2. **Download block**: an endpoint that refuses patient-level downloads from the SPE
+   (Art. 73), shown in the demo.
+3. **Applicant and staff views**: decision, reason and articles for the applicant;
+   evidence, grounding, flags (`needs_review`, `spe_quote_unverified`), generated SQL and
+   code mapping for staff. Either a new minimal UI or a documented API flow for the demo.
+4. **`/api/submissions`**: return `pipeline.run` instead of placeholder results (or
+   remove it if the demo uses `/api/requests` only).
+5. **Step 1 hardening**: the misses above. Deterministic Art. 54 floor for unambiguous
+   wording (nicotine, vape, e-liquid, tobacco, alcohol products, also in German) and a
+   tighter end-use prompt; tune on the `dev` split only.
+6. **Data-extraction fallback without Bob**: `llm_mapping.py` still calls the `bob` CLI,
+   which is not installed, so a sentence the rules cannot read gives no numbers. Fill the
+   same `QuerySpec` with the local Ollama model instead.
+7. **Cleanup**: delete or archive the unused `app/purpose/` (Bob/NLI purpose check) and the
+   stubs `layers/statistics.py`, `layers/spe.py`, `small_cell.apply`.
+8. **Persistence**: submissions and SPE environments survive a restart.
+9. **Submission**: rerun all metrics after the changes, final README architecture section,
+   public repository, demo video (≤ 2 min: R02 reject, R01 statistics, R05 SPE with the
+   blocked download).
