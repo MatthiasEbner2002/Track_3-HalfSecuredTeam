@@ -1,177 +1,106 @@
-# Track 3 — EHDS Health Data Access Body (HalfSecuredTeam)
+# EHDS Health Data Access Body — HalfSecuredTeam (Track 3)
 
-Takes a health-data request as JSON, decides `REJECT`, `APPROVE_STATISTICAL` or `APPROVE_SPE`
-with the articles of Regulation (EU) 2025/327 and computes the answer under the small-cell rule.
-Task: [`Task_desc.md`](Task_desc.md). Details: [`backend/README.md`](backend/README.md).
+**An app that decides health-data requests the way an EU Health Data Access Body must — and
+proves every decision with the law.**
 
-## Status — 30.10.2026
+A researcher, agency or company sends a request in plain English. The app checks it against
+Regulation (EU) 2025/327, then either rejects it with the article that forbids it, answers it
+with anonymised statistics, or opens a locked room where the records can be studied but never
+taken out. Patient data never leaves the app — not even to the AI.
 
-Done:
+![How a request is handled](docs/how-it-works.png)
 
-- [x] Decision, all four steps, grounded RAG: Claude Haiku 5.5 via OpenRouter, local embeddings:
-  Art. 54 / 53 point picked by the LLM from retrieved law text and
-  quoted; SPE vs. downgrade judged against Art. 66(2)/66(3) with a quote that must appear verbatim
-  in the request (otherwise downgrade + staff flag); route articles (69, 66, 68, 73) grounded in
-  the law text; `503` with a fix-it message when Ollama or OpenRouter fails
-- [x] Data extraction from the definitions: 6/6 numbers, black-box 100/100 with the rules alone
-  (hospital grouping, main diagnosis `primary_icd10`, stays vs. patients covered)
-- [x] Small-cell rule and opt-outs in every statistical answer
-- [x] SPE cohort: exact patient count (R05: 1,152) and the requested record types
-- [x] Test console in the frontend (<http://localhost:5173/#/console>): pick one of the 10 task
-  requests or the 200 end-to-end cases (E001..E200), run it, compare with the expected answer
-- [x] SPE provisioning: one SQLite file per permit with only the cohort and the named tables,
-  patient IDs kept, opt-outs out; the decision returns an access key, opened together with the
-  applicant's name (see below)
-- [x] Download block: `/api/spe/download` answers `403` with Art. 73 and logs the attempt; the
-  file has no URL; query results reach the browser only as rendered images
-- [x] SPE frontend (`frontend/`, Vue 3 + Vuetify + Vite): key + name entry, browse inside, SQL,
-  blocked download
-- [x] Data-extraction fallback via the OpenRouter LLM (IBM Bob removed)
+## Results on the 10 task requests
 
-To do, in priority order:
+| What the jury measures | Target | Our result |
+|---|---|---|
+| Correct decisions and articles | 10 of 10 | **10 of 10** |
+| Correct numbers | 6 of 6 | **6 of 6** |
+| Privacy leaks | 0 | **0** |
+| Same result across 3 runs | 10 of 10 | **10 of 10** |
+| Slowest answer | under 60 s | **5.7 s** |
 
-1. [ ] **Applicant and staff views for statistics**: decision, reason, articles for the applicant;
-   evidence, grounding, flags (`needs_review`, `spe_quote_unverified`), SQL and code mapping for
-   staff (the SPE frontend covers the SPE branch; the console at `/` is a test tool)
-2. [ ] **`/api/submissions`**: return `pipeline.run` instead of placeholder results, or remove it
-3. [ ] **Step 1 hardening** (misses on the held-out set, below): deterministic Art. 54 floor for
-   unambiguous wording (nicotine, vape, e-liquid, tobacco, alcohol products, also German) and a
-   tighter end-use prompt; tune on the `dev` split only
-4. [ ] **Cleanup**: delete the stubs `layers/statistics.py`, `layers/spe.py`, `small_cell.apply`
-5. [ ] **Persistence**: submissions survive a restart (SPE files already do, in `backend/spe/`)
-6. [ ] **Submission**: rerun all metrics, final architecture section, public repo, demo video
-   (≤ 2 min: R02 reject, R01 statistics, R05 SPE with the blocked download)
+Measured 30 Oct 2026 with `anthropic/claude-haiku-5.5`, no caching: every run asks the model
+again. On 36 further requests we had never seen while building (including 6 in German),
+34 decisions were right; every prohibited purpose was caught.
 
-## Quick start
+## What it looks like
 
-Needs Python 3.12+, an OpenRouter API key and [Ollama](https://ollama.com/download) for local
-embeddings (~300 MB).
+### 1. A prohibited purpose is rejected — with the rule quoted from the law
+
+An insurer wants diabetes statistics to adjust premiums. The app finds Art. 54(b), quotes it,
+and the applicant sees exactly why.
+
+![Rejected request](docs/ui-reject.png)
+
+### 2. A research request gets anonymised numbers
+
+The plain-English definitions ("Adult = aged 18 or older …") are turned into a database query
+automatically — nothing is written by hand per request. Small groups are hidden (`<10`,
+`suppressed`), and patients who opted out are never counted.
+
+![Approved statistics](docs/ui-statistics.png)
+
+### 3. Records only in a secure room — and the door is locked
+
+An application that explains why statistics are not enough gets pseudonymised records inside a
+secure processing environment: exactly 1,152 patients here, only the record types asked for,
+opened with a one-day access key. Inside, results are shown only as watermarked images.
+**Download is refused every time (Art. 73) and the attempt is logged.**
+
+![Download blocked inside the SPE](docs/ui-spe-blocked.png)
+
+## Why an access body could trust it
+
+- **The AI never decides alone.** We retrieve the relevant points of Art. 53 and 54 from the
+  actual law text; the AI only picks one of them and must quote the words that apply. If the
+  quote is not found in the law, the case is flagged for staff review.
+- **Numbers come from code, not from the AI.** The definitions are parsed by fixed rules into
+  SQL; the AI is only a fallback for sentences the rules cannot read, under the same checks.
+  That is why results are identical on every run.
+- **Privacy is enforced, not promised.** Small-cell rule and opt-outs are applied in the query
+  layer, so no answer can bypass them. Records in the SPE have no download endpoint at all.
+- **The AI sees text, not patients.** Only the request text and law text are sent to the model
+  (Claude via OpenRouter). The database is local; law retrieval runs on a local embedding model.
+- **Abuse is slowed down.** More than 20 requests in 10 s from one address → blocked for a minute.
+
+## What does not work yet
+
+- The law check is sometimes too strict: on the held-out set it rejected two allowed studies
+  because they *mention* a prohibited topic (a study *about* insurance premiums, hospital bed
+  planning). A rejected applicant always sees the quoted rule and can reword and resubmit.
+- The cited point within Art. 53 can vary between runs (e.g. 53(1)(e) vs 53(1)(f)); the
+  decision and the articles do not.
+- The submissions list for staff is a placeholder and is lost on restart.
+- Like every SPE, it cannot stop someone photographing the screen.
+
+## Technology
+
+| Part | Built with |
+|---|---|
+| Backend | Python 3.12, FastAPI, SQLite (one central database from the five CSVs) |
+| Decision | Claude Haiku 5.5 via OpenRouter, grounded in the law text (RAG); embeddings `nomic-embed-text` on local Ollama |
+| Data extraction | Rule parser → query specification → SQL compiler; LLM fallback under the same validation |
+| Frontend | Vue 3 + Vuetify + Vite: request page, secure processing environment, test console |
+| Tests | 109 unit tests, 10 task requests, 36 held-out decisions, 100 black-box and 200 end-to-end cases |
+
+How the pieces fit together, with diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Configuration: [backend/README.md](backend/README.md). The task: [Task_desc.md](Task_desc.md).
+
+## Run it
+
+Needs Python 3.12+, Node 20+, an OpenRouter API key and [Ollama](https://ollama.com/download).
 
 ```bash
-echo 'OPENROUTER_API_KEY=sk-or-...' > backend/.env   # decisions: anthropic/claude-haiku-5.5 via OpenRouter
-ollama serve &   # or the Ollama desktop app
-ollama pull nomic-embed-text   # local embeddings for law retrieval
+echo 'OPENROUTER_API_KEY=sk-or-...' > backend/.env
+ollama serve &
+ollama pull nomic-embed-text
 cd backend && python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/uvicorn app.main:app --port 8000
-curl -X POST localhost:8000/api/requests -H 'Content-Type: application/json' -d @../requests/R02.json
-.venv/bin/pytest -m "not real_llm"
-cd ../frontend && npm install && npm run dev   # pages: http://localhost:5173/#/apply, #/spe, #/console
+.venv/bin/uvicorn app.main:app --port 8000 --no-proxy-headers
+cd ../frontend && npm install && npm run dev
 ```
 
-API docs: <http://localhost:8000/docs>. A `503` means Ollama is not running, the embedding model is missing, or the OpenRouter key is
-missing/invalid.
+Open <http://localhost:5173>, click **R02** and **Submit request** for the rejection, **R01**
+for statistics, **R05** for the secure room. Tests: `cd backend && .venv/bin/pytest -m "not real_llm"`.
 
-## Architecture
-
-```
-                 ┌──────────────── decision (steps 1–4) ────────────────┐
-request JSON ─▶  │ 1. Art. 54 / 53   RAG: retrieve points, LLM picks one │ ─▶ REJECT (Art. 54) ─▶ reason
-                 │ 2–4. route        health data request → statistics   │
-                 │                   access application → LLM checks    │
-                 │                   Art. 66(3) justification → SPE     │
-                 │                   or downgrade to statistics         │
-                 └───────────────────────────────────────────────────────┘
-                                      │ APPROVE_STATISTICAL / APPROVE_SPE
-                                      ▼
-                 definitions ─▶ rule parser ─▶ QuerySpec ─▶ SQL compiler ─▶ SQLite (data/ehds.db)
-                                                                              │
-                     statistics: aggregates ─▶ small-cell rule ─▶ answer ◀────┤
-                     SPE: cohort patient IDs ─▶ backend/spe/<id>.db (cohort + named ◀──┘
-                          tables) + access key ─▶ SPE frontend: queries as images,
-                          download 403
-```
-
-The backend is one FastAPI app (`backend/app/main.py`) on one central SQLite database built
-from the five CSVs; the SPE has its own Vue frontend (`frontend/`). The only external call is the LLM on OpenRouter, and it only ever
-receives request text and law text, never patient data.
-
-### Components
-
-| Component | Where | Approach |
-|---|---|---|
-| Law corpus | `app/rag/corpus.py`, `app/rag/store.py`, `data/law.db` | `eulex.html` (Regulation (EU) 2025/327) parsed into 406 chunks: each paragraph and each lettered point of Chapter IV (Art. 50–81) on its own, plus the recitals. Embedded once with `nomic-embed-text` (local Ollama) and committed; retrieval is cosine similarity over the chunks |
-| Decision, steps 1–2 | `app/layers/decision.py` | Three small steps instead of one big question. **Extract** (LLM): actor, analysis and *end use* of the results, from organisation and purpose only. **Retrieve**: the end use is the query for the 3 closest points of Art. 53(1) and of Art. 54. **Match** (LLM): one of those 6 points by id (enum in the schema, so no invented articles), plus the words of the point that cover the use. **Code decides**: Art. 54 point → `REJECT`, Art. 53 point → accept; the reason quotes the point verbatim from `law.db`; words not found in the point → `needs_review` |
-| Routing, steps 3–4 | `app/layers/routing.py` | Health data request → statistics (Art. 69(1)). Access application → Art. 66(2)/66(3) fetched by id, the LLM judges whether the application shows that anonymised statistics are not enough and quotes the sentence. Quote found verbatim in the request → `APPROVE_SPE` (66, 68, 73); otherwise downgrade to `APPROVE_STATISTICAL` (66, 69), flagged `spe_quote_unverified` when a justification was claimed but could not be quoted. Route articles come with their law text as grounding |
-| LLM client | `app/rag/openrouter.py` | `anthropic/claude-haiku-5.5` via OpenRouter, strict JSON schema, routed only to endpoints that enforce it. No local cache: every request calls the model afresh; consistency comes from the strict JSON schema, the enum of retrieved points and the verbatim-quote checks |
-| Data extraction | `app/layers/mapping.py`, `app/models.py` | Each definition sentence must fully match an ordered regex rule; named concepts (diagnosis → ICD-10 prefix, drug → ATC prefix and "active on 31.12.2025", measurement → LOINC with "latest value", age, sex, region, hospital, inpatient stay / main diagnosis, composites with AND/OR/NOT) become a `QuerySpec` (pydantic, the contract). Plain-English names are bound to the codes the definitions give; measurements also resolve from a built-in name → LOINC table. The "Report per …" line is read by finding the defined names and the operation (count, %, mean, negation). Any sentence not understood raises an error instead of being skipped; codes that match nothing in the data are rejected. Nothing is written per request |
-| Fallback interpretation | `app/layers/llm_mapping.py` | Where the rules give up, the OpenRouter LLM fills the same `QuerySpec` under the same validation (request text only, codes must come from the request, flagged `llm_interpreted`, no local cache) |
-| SQL compiler | `app/layers/query.py` | `QuerySpec` → SQLite SQL: a base view without opted-out patients, age on 31.12.2025, one patient-ID CTE per concept, one 0/1 flag per patient, grouping by region / hospital / sex / age band (or two of them), patients or stays as the unit |
-| Small-cell rule | `app/layers/query.py`, `app/layers/small_cell.py` | Every requested group listed, also empty ones; counts below 10 → `<10`; percentages with numerator or denominator below 10 and means over fewer than 10 patients → `suppressed`; rounding in Python with `Decimal`, one decimal, half up. Answers name each value by its metric |
-| SPE | `app/spe.py`, `app/spe_api.py` | The cohort query gives the exact patient count; the cohort and only the named record types are copied into one SQLite file per permit, opened with an access key + applicant name; read-only queries returned as watermarked images, download always `403`, audit log ([details below](#secure-processing-environment-art-73)) |
-| API | `app/main.py` | `POST /api/requests` runs the whole pipeline and returns decision, articles, reason, grounding, evidence, flags and the answer (generated SQL and code mapping only with `?debug=1`); `/api/samples` serves the sample requests to the console; `/` redirects to the frontend; `/api/submissions` keeps submissions in memory (placeholder results) |
-| SPE frontend | `frontend/` (`#/spe`, Vue 3 + Vuetify + Vite) | The applicant's workspace inside the SPE: key + name entry, tables, SQL, blocked download |
-| Request page | `frontend/` (`#/apply`) | What the applicant sees: form (prefill with R01–R10), "Suggest definitions with AI" (`POST /api/requests/suggest-definitions`: the Art. 54/53 check first, then the LLM drafts definitions in the task's wording and the parser confirms they are computable), the decision with reason and articles, statistics table or SPE access key; raw JSON tab |
-| Test console | `frontend/` (`#/console`) | Pick a task request or an end-to-end case, run it, see decision, reason, evidence, flags and SQL next to the expected answer, or run a batch |
-
-![Data extraction: request text to numbers](docs/data-extraction.svg)
-
-### Test and evaluation assets
-
-| Set | Where | Checks |
-|---|---|---|
-| Unit tests | `backend/tests/` | Layers on fakes (no network); `-m real_llm` runs against OpenRouter and Ollama |
-| Task requests | `requests/R01–R10`, `expected.json` | Decision, articles and numbers |
-| Held-out decisions | `tests/data/heldout_requests.json`, `tests/fixtures/eval/requests.json` | Accept/reject and full decision on requests not used for development (`dev` / `test` split) |
-| Black-box extraction | `tests/fixtures/blackbox/` | 100 requests written separately, numbers computed independently of the parser |
-| End-to-end | `tests/fixtures/e2e/` | 200 cases through the whole pipeline (`run.py`, `--no-llm` for routing and data only) |
-
-### Secure processing environment (Art. 73)
-
-An `APPROVE_SPE` decision creates `backend/spe/<request_id>.db` — a SQLite file with a `cohort`
-table (the selected patient IDs, opted-out patients already excluded) and only the record types
-the request names, joined to that cohort — and returns an **access key** in `data.spe.access_key`
-(shown once; only its SHA-256 is stored; valid for 24 hours, `EHDS_SPE_KEY_TTL_HOURS`). Nothing serves the file.
-
-The applicant opens the SPE in the separate frontend (`frontend/`, Vue 3 + Vuetify + Vite,
-<http://localhost:5173>) by entering the **key and their name as on the application**; both
-have to match. Everything the page does goes through `/api/spe/*` with
-`Authorization: Bearer <key>` and `X-Applicant: <name>` (percent-encoded):
-
-| Endpoint | What it does |
-|---|---|
-| `POST /api/spe/access` | key + name → permit, cohort size, tables with row counts and columns |
-| `POST /api/spe/query` | one read-only statement; the first 50 rows come back as a **PNG** with a watermark, never as text. Writes, `ATTACH`, `PRAGMA`, the bookkeeping tables and runaway queries are refused |
-| `GET /api/spe/download` | always `403`, Art. 73(1)(e), logged |
-
-There is no other endpoint: nothing returns records as a file or as text, the on-screen table is
-an image, and every query, blocked download and failed login (with the name tried) is written to
-the SPE's `audit_log`. It does not prevent photographing the screen, which no SPE does. In
-production the same contract would be run by a trusted research environment (Findata Kapseli, an
-Azure TRE airlock, OpenSAFELY), which would add a checked output channel (e.g.
-[ACRO](https://pypi.org/project/acro/)) — out of scope here.
-
-Run the frontend: `cd frontend && npm install && npm run dev` (proxies `/api` to
-`http://localhost:8000`; set `EHDS_API_URL` for another backend).
-
-### Rate limit
-
-Every `/api/*` call counts per client IP: more than 20 within 10 s blocks the address for 60 s
-with `429 Too Many Requests` and a `Retry-After` header, so one machine cannot flood the
-LLM-backed endpoints (`EHDS_RATE_LIMIT_REQUESTS`, `_WINDOW_S`, `_BLOCK_S`). The check runs
-before CORS and before any route. `X-Forwarded-For` is ignored unless `EHDS_TRUST_PROXY=1`,
-because a client can set that header itself; without a reverse proxy start uvicorn with
-`--no-proxy-headers`, since its own proxy-header handling trusts `127.0.0.1` by default.
-
-`backend/scripts/flood.py` sends a burst from one address and checks the behaviour; below the
-uvicorn log (top) and the script (bottom) for 30 requests:
-
-![Rate limit: 20 allowed, then 429 with Retry-After](docs/rate-limit.png)
-
-## Metrics
-
-On the 10 requests, through `pipeline.run` (what the API returns), `anthropic/claude-haiku-5.5`
-via OpenRouter (no cache; every run calls the model):
-
-| Metric | Target | Now |
-|---|---|---|
-| Correct decisions | 10 of 10 | 10 of 10 (decision + articles) |
-| Correct numbers | 6 of 6 | 6 of 6 |
-| Privacy leaks | 0 | 0 |
-| Consistency (3 runs) | 10 of 10 | 10 of 10 with `qwen2.5:7b`; to be re-measured with Haiku 5.5 |
-| Slowest answer | under 60 s | 6.0 s |
-
-Held-out evaluation set, `test` split (36 requests, `scripts/evaluate.py --split test`), measured
-with local `qwen2.5:7b` before the switch, to be re-measured with Haiku 5.5: 31 of 36 full decisions correct; routing SPE 4/5, downgrade 4/4. Misses: three prohibited
-purposes accepted (two nicotine/vape products, one in German, and a subsidy cut that
-disadvantages a group), one study *about* insurance premiums rejected, one SPE request with a
-bare "requires patient-level data" downgraded.
+*Synthetic data only: 20,000 made-up patients from three Austrian hospitals.*

@@ -25,7 +25,6 @@ from app.models import (
     Filter,
     Metric,
     QuerySpec,
-    ResultSpec,
     Route,
     Term,
 )
@@ -803,15 +802,3 @@ def to_code_mapping(spec: QuerySpec) -> CodeMapping:
         name: {columns[c.kind]: c.codes} for name, c in spec.concepts.items() if c.codes
     })
 
-
-def map_codes(spec: ResultSpec) -> CodeMapping:
-    """Pipeline hook: codes of the concepts the request defines (empty if not understood)."""
-    from app import db
-
-    conn = db.connect()
-    try:
-        return to_code_mapping(parse(spec.request, spec.route, conn))
-    except InterpretError:
-        return CodeMapping()
-    finally:
-        conn.close()

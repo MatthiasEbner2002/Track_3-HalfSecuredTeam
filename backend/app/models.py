@@ -90,14 +90,6 @@ class Decision(BaseModel):
     flags: list[str] = Field(default_factory=list)  # e.g. "needs_review", "rules_only"
 
 
-class ResultSpec(BaseModel):
-    """'Result needed': what the statistics or SPE branch asks the data layers for."""
-
-    route: Route
-    request: DataRequest
-    record_types: list[str] = Field(default_factory=list)  # tables to copy into an SPE
-
-
 ConceptKind = Literal[
     "diagnosis",  # conditions.icd10 prefix
     "drug",  # medications.atc prefix
@@ -228,10 +220,6 @@ class QueryPlan(BaseModel):
     queries: list[Query] = Field(default_factory=list)
 
 
-# name of a query -> its rows
-QueryResults = dict[str, list[dict[str, Any]]]
-
-
 class PipelineResult(BaseModel):
     """What the applicant and staff get back."""
 
@@ -247,3 +235,5 @@ class PipelineResult(BaseModel):
     mapping: CodeMapping | None = None
     queries: list[Query] = Field(default_factory=list)
     data: dict[str, Any] | None = None  # statistics: {group: [values]}; spe: cohort_size, record_types
+    language: str = "en"  # ISO 639-1 of the submitted text
+    translated: dict[str, Any] | None = None  # the English text that was judged, when language != en

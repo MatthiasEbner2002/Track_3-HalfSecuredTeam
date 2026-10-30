@@ -10,13 +10,13 @@
 | SPE | `app/spe.py`, `app/spe_api.py` | per-permit SQLite copy, access key + applicant name, queries rendered as PNG, `403` download, audit log; UI in `../frontend` |
 
 Interfaces: `app/models.py`. Wiring: `app/pipeline.py`. API: `app/main.py`
-(`POST /api/requests`; `/api/spe/...` see the root README; `/api/submissions` still returns placeholder results).
+(`POST /api/requests`; `/api/spe/...` see [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md); `/api/submissions` still returns placeholder results).
 
 ## Setup and run
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/uvicorn app.main:app --reload --port 8000
+.venv/bin/uvicorn app.main:app --reload --port 8000 --no-proxy-headers
 .venv/bin/pytest -m "not real_llm"                          # fast, no Ollama
 .venv/bin/python -m app.eval_decisions                      # accept/reject: 10 samples + 16 held-out
 .venv/bin/python scripts/evaluate.py --set tasks --runs 3   # full decision + articles on R01-R10

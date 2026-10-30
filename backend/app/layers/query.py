@@ -31,7 +31,6 @@ from app.models import (
     Query,
     QueryPlan,
     QuerySpec,
-    ResultSpec,
     Route,
 )
 
@@ -330,11 +329,3 @@ def extract(request: DataRequest, mode: Route, conn: sqlite3.Connection) -> dict
     rows = {q.name: db.execute(conn, q.sql, q.params) for q in plan.queries}
     return answer(spec, plan, rows, conn)
 
-
-def generate(spec: ResultSpec, mapping: CodeMapping) -> QueryPlan:
-    """Pipeline hook: the SQL for an approved request."""
-    conn = db.connect()
-    try:
-        return compile_spec(interpret(spec.request, spec.route, conn)[0])
-    finally:
-        conn.close()
