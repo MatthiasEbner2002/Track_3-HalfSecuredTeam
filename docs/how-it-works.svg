@@ -1,79 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="1200" height="640" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="1200" height="440" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b6472"/>
-    </marker>
-    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#c62828"/>
-    </marker>
-    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2e7d32"/>
-    </marker>
-    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1565c0"/>
-    </marker>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#5b6472"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#c62828"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2e7d32"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1565c0"/></marker>
   </defs>
-  <rect width="1200" height="640" fill="#ffffff"/>
+  <rect width="1200" height="440" fill="#ffffff"/>
 
-  <text x="40" y="48" font-size="26" font-weight="700" fill="#1f2a37">How a request is handled</text>
-  <text x="40" y="76" font-size="15" fill="#5b6472">The applicant writes in plain English. The app checks the law, then either answers with numbers or opens a locked room for the records.</text>
+  <!-- request -->
+  <rect x="40" y="150" width="230" height="140" rx="14" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="2"/>
+  <text x="155" y="200" font-size="22" font-weight="700" fill="#1f2a37" text-anchor="middle">Request</text>
+  <text x="155" y="232" font-size="15" fill="#5b6472" text-anchor="middle">plain English</text>
+  <text x="155" y="256" font-size="15" fill="#5b6472" text-anchor="middle">who · why · what</text>
 
-  <!-- 1. request -->
-  <rect x="40" y="130" width="200" height="150" rx="12" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="1.5"/>
-  <text x="60" y="160" font-size="17" font-weight="700" fill="#1f2a37">1  The request</text>
-  <text x="60" y="188" font-size="13.5" fill="#333">Who is asking</text>
-  <text x="60" y="208" font-size="13.5" fill="#333">What they want to do</text>
-  <text x="60" y="228" font-size="13.5" fill="#333">Which numbers or records</text>
-  <text x="60" y="258" font-size="12" fill="#8a94a3">JSON or the web form</text>
+  <line x1="270" y1="220" x2="332" y2="220" stroke="#5b6472" stroke-width="2.5" marker-end="url(#a)"/>
 
-  <line x1="240" y1="205" x2="292" y2="205" stroke="#5b6472" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- 2. law check -->
-  <rect x="296" y="110" width="270" height="190" rx="12" fill="#fff8e6" stroke="#f0b429" stroke-width="2"/>
-  <text x="316" y="142" font-size="17" font-weight="700" fill="#7a4f00">2  Law check (AI + law text)</text>
-  <text x="316" y="170" font-size="13.5" fill="#333">What will the results be used for?</text>
-  <text x="316" y="192" font-size="13.5" fill="#333">The AI picks the matching rule out of</text>
-  <text x="316" y="210" font-size="13.5" fill="#333">the regulation and quotes it verbatim.</text>
-  <text x="316" y="238" font-size="13.5" fill="#333">Records only if the applicant explains</text>
-  <text x="316" y="256" font-size="13.5" fill="#333">why statistics are not enough.</text>
-  <text x="316" y="284" font-size="12" fill="#a06b00">Art. 54 · 53 · 66 of Regulation (EU) 2025/327</text>
+  <!-- law check -->
+  <rect x="336" y="150" width="260" height="140" rx="14" fill="#fff8e6" stroke="#f0b429" stroke-width="2.5"/>
+  <text x="466" y="200" font-size="22" font-weight="700" fill="#7a4f00" text-anchor="middle">Law check</text>
+  <text x="466" y="232" font-size="15" fill="#7a4f00" text-anchor="middle">AI picks the rule from the law</text>
+  <text x="466" y="256" font-size="15" fill="#7a4f00" text-anchor="middle">and quotes it</text>
 
   <!-- branches -->
-  <line x1="566" y1="150" x2="650" y2="150" stroke="#c62828" stroke-width="2" marker-end="url(#arrow-red)"/>
-  <line x1="566" y1="205" x2="650" y2="330" stroke="#2e7d32" stroke-width="2" marker-end="url(#arrow-green)"/>
-  <line x1="566" y1="260" x2="650" y2="510" stroke="#1565c0" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <line x1="596" y1="190" x2="690" y2="90" stroke="#c62828" stroke-width="2.5" marker-end="url(#r)"/>
+  <line x1="596" y1="220" x2="690" y2="220" stroke="#2e7d32" stroke-width="2.5" marker-end="url(#g)"/>
+  <line x1="596" y1="250" x2="690" y2="350" stroke="#1565c0" stroke-width="2.5" marker-end="url(#b)"/>
 
-  <!-- REJECT -->
-  <rect x="654" y="110" width="506" height="86" rx="12" fill="#fdecea" stroke="#c62828" stroke-width="2"/>
-  <text x="674" y="140" font-size="17" font-weight="700" fill="#8e1b1b">REJECTED — prohibited use (Art. 54)</text>
-  <text x="674" y="164" font-size="13.5" fill="#333">e.g. an insurer that wants to raise premiums for people with diabetes.</text>
-  <text x="674" y="184" font-size="13.5" fill="#333">The applicant sees the rule that forbids it, quoted from the law.</text>
+  <!-- outcomes -->
+  <rect x="694" y="40" width="466" height="100" rx="14" fill="#fdecea" stroke="#c62828" stroke-width="2.5"/>
+  <text x="720" y="82" font-size="22" font-weight="700" fill="#8e1b1b">Rejected</text>
+  <text x="720" y="112" font-size="15" fill="#8e1b1b">Prohibited use, e.g. insurance pricing · Art. 54</text>
 
-  <!-- STATISTICS -->
-  <rect x="654" y="290" width="506" height="150" rx="12" fill="#eaf6ec" stroke="#2e7d32" stroke-width="2"/>
-  <text x="674" y="320" font-size="17" font-weight="700" fill="#1b5e20">APPROVED — anonymised statistics (Art. 53, 69)</text>
-  <text x="674" y="346" font-size="13.5" fill="#333">The plain-English definitions are translated into a database query —</text>
-  <text x="674" y="366" font-size="13.5" fill="#333">nothing is written by hand per request. Rules first, AI only as a fallback.</text>
-  <text x="674" y="394" font-size="13.5" fill="#333">Small groups are hidden: counts under 10 show as “&lt;10”, a percentage or</text>
-  <text x="674" y="414" font-size="13.5" fill="#333">mean on fewer than 10 people is “suppressed”. Opted-out patients never count.</text>
+  <rect x="694" y="170" width="466" height="100" rx="14" fill="#eaf6ec" stroke="#2e7d32" stroke-width="2.5"/>
+  <text x="720" y="212" font-size="22" font-weight="700" fill="#1b5e20">Anonymised statistics</text>
+  <text x="720" y="242" font-size="15" fill="#1b5e20">Small groups hidden, opt-outs excluded · Art. 53, 69</text>
 
-  <!-- SPE -->
-  <rect x="654" y="470" width="506" height="150" rx="12" fill="#e8f1fb" stroke="#1565c0" stroke-width="2"/>
-  <text x="674" y="500" font-size="17" font-weight="700" fill="#0d3c78">APPROVED — records in a secure room (Art. 66, 68, 73)</text>
-  <text x="674" y="526" font-size="13.5" fill="#333">Only the selected patients and only the record types asked for are copied</text>
-  <text x="674" y="546" font-size="13.5" fill="#333">into a separate environment, opened with a one-day access key.</text>
-  <text x="674" y="574" font-size="13.5" fill="#333">Inside: browse and query. Results appear only as watermarked images.</text>
-  <text x="674" y="594" font-size="13.5" fill="#333">Download is always refused (403) and every attempt is logged.</text>
+  <rect x="694" y="300" width="466" height="100" rx="14" fill="#e8f1fb" stroke="#1565c0" stroke-width="2.5"/>
+  <text x="720" y="342" font-size="22" font-weight="700" fill="#0d3c78">Records in a secure room</text>
+  <text x="720" y="372" font-size="15" fill="#0d3c78">View and query inside, no download · Art. 66, 68, 73</text>
 
-  <!-- privacy note -->
-  <rect x="40" y="330" width="526" height="290" rx="12" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="60" y="362" font-size="17" font-weight="700" fill="#1f2a37">What never leaves the app</text>
-  <text x="60" y="392" font-size="13.5" fill="#333">• Patient data stays in one local database. The AI (Claude via OpenRouter)</text>
-  <text x="60" y="412" font-size="13.5" fill="#333">  only ever sees the request text and the law text — never a patient record.</text>
-  <text x="60" y="442" font-size="13.5" fill="#333">• The AI never decides alone: it chooses from rules we retrieved and must</text>
-  <text x="60" y="462" font-size="13.5" fill="#333">  quote them; if the quote is not in the law text, staff review the case.</text>
-  <text x="60" y="492" font-size="13.5" fill="#333">• Numbers are computed by code, not by the AI, so they are the same every run.</text>
-  <text x="60" y="522" font-size="13.5" fill="#333">• Patients who opted out are excluded from every answer and every room.</text>
-  <text x="60" y="552" font-size="13.5" fill="#333">• A flooding client is blocked for a minute (rate limit per address).</text>
-  <text x="60" y="596" font-size="12" fill="#8a94a3">20,000 synthetic patients from three Austrian hospitals · no real data</text>
+  <!-- footer -->
+  <text x="40" y="412" font-size="14" fill="#8a94a3">Patient data never leaves the app. The AI only ever sees the request and the law.</text>
 </svg>
