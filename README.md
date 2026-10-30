@@ -143,6 +143,20 @@ Azure TRE airlock, OpenSAFELY), which would add a checked output channel (e.g.
 Run the frontend: `cd frontend && npm install && npm run dev` (proxies `/api` to
 `http://localhost:8000`; set `EHDS_API_URL` for another backend).
 
+### Rate limit
+
+Every `/api/*` call counts per client IP: more than 20 within 10 s blocks the address for 60 s
+with `429 Too Many Requests` and a `Retry-After` header, so one machine cannot flood the
+LLM-backed endpoints (`EHDS_RATE_LIMIT_REQUESTS`, `_WINDOW_S`, `_BLOCK_S`). The check runs
+before CORS and before any route. `X-Forwarded-For` is ignored unless `EHDS_TRUST_PROXY=1`,
+because a client can set that header itself; without a reverse proxy start uvicorn with
+`--no-proxy-headers`, since its own proxy-header handling trusts `127.0.0.1` by default.
+
+`backend/scripts/flood.py` sends a burst from one address and checks the behaviour; below the
+uvicorn log (top) and the script (bottom) for 30 requests:
+
+![Rate limit: 20 allowed, then 429 with Retry-After](docs/rate-limit.png)
+
 ## Metrics
 
 On the 10 requests, through `pipeline.run` (what the API returns), `anthropic/claude-haiku-5.5`
