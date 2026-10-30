@@ -18,7 +18,8 @@ Done:
   (hospital grouping, main diagnosis `primary_icd10`, stays vs. patients covered)
 - [x] Small-cell rule and opt-outs in every statistical answer
 - [x] SPE cohort: exact patient count (R05: 1,152) and the requested record types
-- [x] Frontend removed; only the JSON API exists
+- [x] Staff UI at <http://localhost:8000/> (`backend/app/static/index.html`): pick one of the
+  10 task requests or the 200 end-to-end cases (E001..E200), run it, compare with the expected answer
 
 To do, in priority order:
 
@@ -26,9 +27,8 @@ To do, in priority order:
    patient IDs) into a separate schema or folder per request, manifest with the exact count
 2. [ ] **Download block**: an endpoint that refuses patient-level downloads from the SPE
    (Art. 73), shown in the demo
-3. [ ] **Applicant and staff views**: decision, reason, articles for the applicant; evidence,
+3. [ ] **Applicant view, and staff details in the UI**: decision, reason, articles for the applicant; evidence,
    grounding, flags (`needs_review`, `spe_quote_unverified`), SQL and code mapping for staff
-   (minimal UI or a documented API flow)
 4. [ ] **`/api/submissions`**: return `pipeline.run` instead of placeholder results, or remove it
 5. [ ] **Step 1 hardening** (misses on the held-out set, below): deterministic Art. 54 floor for
    unambiguous wording (nicotine, vape, e-liquid, tobacco, alcohol products, also German) and a
