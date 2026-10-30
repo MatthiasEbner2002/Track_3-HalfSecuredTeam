@@ -138,36 +138,28 @@ notes(s, "Researchers know the medicine and what they want to find out, but not 
          "allowed. And the access body in between has to check every request against the regulation and "
          "protect patients. Today that takes weeks. We sit at the intersection of all three. (≈20 s)")
 
-# ---------------------------------------------------------------- 2b what we did about it
+# ---------------------------------------------------------------- 2b our approach
 s = prs.slides.add_slide(BLANK)
-header(s, "What we did about it", "the same three people, one app")
-cw, ch, top = Inches(3.8), Inches(3.9), Inches(1.5)
-for i, (title, body, col) in enumerate([
-    ("Researchers", ["write the request in plain words, in any EU language",
-                     "one click: the AI drafts the definitions they could not phrase",
-                     "the answer comes back in seconds, with the reason"], BLUE),
-    ("Engineers", ["no one writes a query per request",
-                   "fixed rules turn the definitions into SQL; codes come from the request",
-                   "an LLM steps in only where the rules give up, under the same checks"], AMBER),
-    ("The access body", ["the law check quotes the article, verbatim from the regulation",
-                         "small-cell rule and opt-outs enforced inside the query",
-                         "records only in a secure room: images, no download, audit log"], RED),
-]):
-    x = Inches(0.6) + i * (cw + Inches(0.35))
-    card(s, x, top, cw, ch, LIGHT, col)
-    text(s, x + Inches(0.25), top + Inches(0.2), cw - Inches(0.5), Inches(0.5), title, 20, True, col)
-    bullets(s, x + Inches(0.25), top + Inches(0.8), cw - Inches(0.5), ch - Inches(1), body, 15, INK, 8)
-card(s, Inches(0.6), Inches(5.7), Inches(12.1), Inches(1.0), NAVY)
-text(s, Inches(0.9), Inches(5.7), Inches(11.5), Inches(1.0),
-     "Decisions in seconds instead of weeks — every one of them explained, and identical on every run.",
-     18, True, WHITE, PP_ALIGN.LEFT, MSO_ANCHOR.MIDDLE)
+header(s, "Our approach", "four ideas")
+tiles = [
+    ("Law-grounded AI", "picks the article and quotes it", AMBER),
+    ("Words → SQL by rules", "no query written per request", GREEN),
+    ("Privacy inside the query", "small cells and opt-outs cannot leak", BLUE),
+    ("Secure room, no exit", "records viewed as images, never downloaded", RED),
+]
+tw, th = Inches(5.9), Inches(2.3)
+for i, (title, line, col) in enumerate(tiles):
+    x = Inches(0.6) + (i % 2) * (tw + Inches(0.35))
+    y = Inches(1.55) + (i // 2) * (th + Inches(0.3))
+    card(s, x, y, tw, th, LIGHT, col)
+    card(s, x, y, Inches(0.18), th, col)
+    text(s, x + Inches(0.5), y + Inches(0.45), tw - Inches(0.8), Inches(0.8), title, 28, True, col)
+    text(s, x + Inches(0.5), y + Inches(1.3), tw - Inches(0.8), Inches(0.6), line, 17, False, GREY)
 footer(s)
-notes(s, "So what did we do about it? Researchers write the request in plain words, in any EU language, and "
-         "if they cannot phrase the definitions, one click drafts them. Engineers are out of the loop: fixed "
-         "rules turn the definitions into SQL, and an AI only steps in where the rules give up, under the "
-         "same checks. And the access body gets a decision that quotes the article from the regulation, with "
-         "the privacy rules enforced inside the query and records locked in a secure room. Seconds instead "
-         "of weeks, and the same answer every time. (≈25 s)")
+notes(s, "Four ideas. The AI does not decide on its own: it picks the article from the regulation and has "
+         "to quote it. Definitions become SQL through fixed rules, so no one writes a query per request and "
+         "the numbers are the same every run. Privacy lives inside the query: small cells and opt-outs cannot "
+         "leak. And records never leave the secure room: viewed as images, never downloaded. (≈20 s)")
 
 # ---------------------------------------------------------------- 3 how it works
 s = prs.slides.add_slide(BLANK)
