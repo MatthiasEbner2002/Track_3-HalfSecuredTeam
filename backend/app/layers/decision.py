@@ -1,10 +1,10 @@
 """Decision system: accept or reject a request and cite the law.
 
-Two engines, chosen with EHDS_DECISION_ENGINE (config.DECISION_ENGINE):
-- "rag" (default): grounded RAG over the regulation with a local LLM, below.
-- "purpose": the purpose check in app/purpose (IBM Bob / local NLI model / rules).
+`decide` always uses the grounded RAG engine over the regulation with a local
+LLM, below. `decide_purpose` (the purpose check in app/purpose) is kept as a
+standalone function but is no longer wired into the pipeline.
 
-The "rag" engine takes three small steps instead of one big question:
+The RAG engine takes three small steps instead of one big question:
 
 1. Extract (LLM): who is asking and what they will do with the results (the
    end use, as opposed to the analysis itself), read
@@ -31,7 +31,7 @@ from dataclasses import dataclass
 from functools import cache
 from typing import Protocol
 
-from app.config import DECISION_ENGINE, RETRIEVAL_TOP_K
+from app.config import RETRIEVAL_TOP_K
 from app.models import DataRequest, Decision, LawParagraph
 from app.purpose import assess
 from app.purpose.assess import config
@@ -203,6 +203,4 @@ def decide_purpose(request: DataRequest) -> Decision:
 def decide(
     request: DataRequest, retriever: Retriever | None = None, llm: LLM | None = None
 ) -> Decision:
-    if DECISION_ENGINE == "purpose":
-        return decide_purpose(request)
     return decide_rag(request, retriever, llm)
