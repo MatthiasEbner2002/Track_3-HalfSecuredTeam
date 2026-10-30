@@ -53,32 +53,41 @@ async function tryDownload() {
   <v-container fluid class="pa-4">
     <v-row>
       <v-col cols="12">
-        <v-card elevation="1">
-          <v-card-title class="d-flex align-center ga-3 flex-wrap">
-            <v-chip color="secondary" variant="flat" label>APPROVE_SPE</v-chip>
-            <span>Art. {{ permit.articles.join(", ") }}</span>
-            <span class="text-caption text-medium-emphasis">created {{ permit.created }} · key valid until {{ permit.key_expires }}</span>
-          </v-card-title>
+        <v-card elevation="1" rounded="lg">
+          <v-sheet color="secondary" class="pa-4 text-white d-flex align-center flex-wrap ga-4">
+            <v-icon icon="mdi-shield-check-outline" size="32" />
+            <div class="flex-grow-1">
+              <div class="text-subtitle-1 font-weight-medium lh-1">Data permit {{ permit.id }} — pseudonymised records in a secure processing environment</div>
+              <div class="text-caption">Art. {{ permit.articles.join(", ") }} Regulation (EU) 2025/327 · issued {{ permit.created }} · key valid until {{ permit.key_expires }}</div>
+            </div>
+            <div class="text-center px-3">
+              <div class="text-h5 font-weight-bold lh-1">{{ permit.cohort_size.toLocaleString() }}</div>
+              <div class="text-caption">patients</div>
+            </div>
+          </v-sheet>
           <v-card-text>
-            <p class="mb-2">{{ permit.reason }}</p>
-            <p class="mb-2">
-              <strong>Applicant:</strong> {{ permit.applicant.name }}, {{ permit.applicant.organisation }} ({{ permit.applicant.country }})<br />
-              <strong>Purpose:</strong> {{ permit.purpose }}
-            </p>
-            <p class="mb-0">
-              <strong>Cohort:</strong> {{ permit.cohort_size.toLocaleString() }} patients (opted-out patients excluded, Art. 71).
-              <strong>Records inside:</strong>{{ " " }}
-              <span v-for="([t, n], i) in tables" :key="t">{{ i ? ", " : "" }}{{ t }} ({{ n.toLocaleString() }} rows)</span>.
-              Patient IDs are pseudonyms and stay inside.
-            </p>
+            <p class="mb-3">{{ permit.reason }}</p>
+            <v-row dense class="text-body-2">
+              <v-col cols="12" md="6">
+                <div class="text-overline">Applicant</div>
+                {{ permit.applicant.name }}, {{ permit.applicant.organisation }} ({{ permit.applicant.country }})
+                <div class="text-overline mt-2">Purpose</div>
+                {{ permit.purpose }}
+              </v-col>
+              <v-col cols="12" md="6">
+                <div class="text-overline">Records inside</div>
+                <v-chip v-for="[t, n] in tables" :key="t" size="small" variant="tonal" color="primary" class="mr-1 mb-1" prepend-icon="mdi-table">{{ t }} · {{ n.toLocaleString() }} rows</v-chip>
+                <div class="text-caption text-medium-emphasis mt-1">Opted-out patients are excluded (Art. 71). Patient IDs are pseudonyms and stay inside.</div>
+              </v-col>
+            </v-row>
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="12">
-        <v-card elevation="1">
+        <v-card elevation="1" rounded="lg">
           <v-card-title class="d-flex align-center flex-wrap ga-2">
-            <span>Work with the data — inside the SPE</span>
+            <v-icon icon="mdi-database-search-outline" color="primary" class="mr-1" /><span>Work with the data — inside the SPE</span>
             <v-spacer />
             <v-btn color="error" variant="outlined" size="small" prepend-icon="mdi-download-off" @click="tryDownload">
               Download records
@@ -125,6 +134,7 @@ async function tryDownload() {
 
 <style scoped>
 .font-mono :deep(textarea), .font-mono :deep(input) { font-family: ui-monospace, monospace; font-size: 13px; }
+.lh-1 { line-height: 1.25; }
 .result-frame { max-height: 520px; overflow: auto; border: 1px solid #ddd; border-radius: 4px; user-select: none; background: #fff; }
 .result-frame img { display: block; max-width: none; pointer-events: none; }
 </style>

@@ -55,7 +55,7 @@ cd backend && python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/uvicorn app.main:app --port 8000
 curl -X POST localhost:8000/api/requests -H 'Content-Type: application/json' -d @../requests/R02.json
 .venv/bin/pytest -m "not real_llm"
-cd ../frontend && npm install && npm run dev   # pages: http://localhost:5173/#/console and #/spe
+cd ../frontend && npm install && npm run dev   # pages: http://localhost:5173/#/apply, #/spe, #/console
 ```
 
 API docs: <http://localhost:8000/docs>. A `503` means Ollama is not running, the embedding model is missing, or the OpenRouter key is
@@ -100,6 +100,7 @@ receives request text and law text, never patient data.
 | SPE | `app/spe.py`, `app/spe_api.py` | The cohort query gives the exact patient count; the cohort and only the named record types are copied into one SQLite file per permit, opened with an access key + applicant name; read-only queries returned as watermarked images, download always `403`, audit log ([details below](#secure-processing-environment-art-73)) |
 | API | `app/main.py` | `POST /api/requests` runs the whole pipeline and returns decision, articles, reason, grounding, evidence, flags, generated SQL and the answer; `/api/samples` serves the sample requests to the console; `/` redirects to the frontend; `/api/submissions` keeps submissions in memory (placeholder results) |
 | SPE frontend | `frontend/` (`#/spe`, Vue 3 + Vuetify + Vite) | The applicant's workspace inside the SPE: key + name entry, tables, SQL, blocked download |
+| Request page | `frontend/` (`#/apply`) | What the applicant sees: form (prefill with R01–R10), the decision with reason and articles, statistics table or SPE access key; raw JSON tab |
 | Test console | `frontend/` (`#/console`) | Pick a task request or an end-to-end case, run it, see decision, reason, evidence, flags and SQL next to the expected answer, or run a batch |
 
 ![Data extraction: request text to numbers](docs/data-extraction.svg)
