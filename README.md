@@ -17,8 +17,8 @@ Done:
   (hospital grouping, main diagnosis `primary_icd10`, stays vs. patients covered)
 - [x] Small-cell rule and opt-outs in every statistical answer
 - [x] SPE cohort: exact patient count (R05: 1,152) and the requested record types
-- [x] Staff UI at <http://localhost:8000/> (`backend/app/static/index.html`): pick one of the
-  10 task requests or the 200 end-to-end cases (E001..E200), run it, compare with the expected answer
+- [x] Test console in the frontend (<http://localhost:5173/#/console>): pick one of the 10 task
+  requests or the 200 end-to-end cases (E001..E200), run it, compare with the expected answer
 - [x] SPE provisioning: one SQLite file per permit with only the cohort and the named tables,
   patient IDs kept, opt-outs out; the decision returns an access key, opened together with the
   applicant's name (see below)
@@ -55,7 +55,7 @@ cd backend && python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/uvicorn app.main:app --port 8000
 curl -X POST localhost:8000/api/requests -H 'Content-Type: application/json' -d @../requests/R02.json
 .venv/bin/pytest -m "not real_llm"
-cd ../frontend && npm install && npm run dev   # SPE frontend, http://localhost:5173
+cd ../frontend && npm install && npm run dev   # pages: http://localhost:5173/#/console and #/spe
 ```
 
 API docs: <http://localhost:8000/docs>. A `503` means Ollama is not running, the embedding model is missing, or the OpenRouter key is
@@ -98,9 +98,9 @@ receives request text and law text, never patient data.
 | SQL compiler | `app/layers/query.py` | `QuerySpec` → SQLite SQL: a base view without opted-out patients, age on 31.12.2025, one patient-ID CTE per concept, one 0/1 flag per patient, grouping by region / hospital / sex / age band (or two of them), patients or stays as the unit |
 | Small-cell rule | `app/layers/query.py`, `app/layers/small_cell.py` | Every requested group listed, also empty ones; counts below 10 → `<10`; percentages with numerator or denominator below 10 and means over fewer than 10 patients → `suppressed`; rounding in Python with `Decimal`, one decimal, half up. Answers name each value by its metric |
 | SPE | `app/spe.py`, `app/spe_api.py` | The cohort query gives the exact patient count; the cohort and only the named record types are copied into one SQLite file per permit, opened with an access key + applicant name; read-only queries returned as watermarked images, download always `403`, audit log ([details below](#secure-processing-environment-art-73)) |
-| API | `app/main.py` | `POST /api/requests` runs the whole pipeline and returns decision, articles, reason, grounding, evidence, flags, generated SQL and the answer; `/api/samples` serves the sample requests to the UI; `/api/submissions` keeps submissions in memory (placeholder results) |
-| SPE frontend | `frontend/` (Vue 3 + Vuetify + Vite) | The applicant's workspace inside the SPE: key + name entry, tables, SQL, blocked download |
-| Staff UI | `app/static/index.html` | Single page served at `/`: pick a task request or an end-to-end case, run it, see decision, reason, evidence, flags and SQL next to the expected answer, or run a batch |
+| API | `app/main.py` | `POST /api/requests` runs the whole pipeline and returns decision, articles, reason, grounding, evidence, flags, generated SQL and the answer; `/api/samples` serves the sample requests to the console; `/` redirects to the frontend; `/api/submissions` keeps submissions in memory (placeholder results) |
+| SPE frontend | `frontend/` (`#/spe`, Vue 3 + Vuetify + Vite) | The applicant's workspace inside the SPE: key + name entry, tables, SQL, blocked download |
+| Test console | `frontend/` (`#/console`) | Pick a task request or an end-to-end case, run it, see decision, reason, evidence, flags and SQL next to the expected answer, or run a batch |
 
 ![Data extraction: request text to numbers](docs/data-extraction.svg)
 
