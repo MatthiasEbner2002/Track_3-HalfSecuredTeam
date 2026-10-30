@@ -7,16 +7,19 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
 from app import db, pipeline, spe, spe_api, submissions
-from app.config import REQUESTS_DIR
+from app.config import CORS_ORIGINS, REQUESTS_DIR
 from app.models import DataRequest, PipelineResult
 from app.rag.errors import ServiceUnavailable
 
 app = FastAPI(title="EHDS Health Data Access Body", version="0.1.0")
 app.include_router(submissions.router)
 app.include_router(spe_api.router)
+# the SPE frontend (frontend/, Vite) runs on its own origin
+app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
 STATIC_DIR = Path(__file__).parent / "static"
 E2E_DIR = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "e2e" / "cases"

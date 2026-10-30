@@ -1,9 +1,14 @@
-"""The secure processing environment: only the cohort, only the named tables, no way out but the airlock."""
+"""The secure processing environment: key in, only the cohort and named tables inside, images out, airlock for aggregates."""
 
+import base64
+import io
 import sqlite3
+
+from urllib.parse import quote
 
 import pytest
 from fastapi.testclient import TestClient
+from PIL import Image
 
 from app import config, pipeline, spe
 from app.layers import routing
@@ -20,21 +25,36 @@ def spe_dir(tmp_path, monkeypatch):
     return tmp_path / "spe"
 
 
-@pytest.fixture
-def r05(conn):
-    """R05 run through the pipeline: creates <SPE_DIR>/R05.db."""
+def _run_r05(conn):
     choice = routing.RouteChoice(route="spe", articles=["66", "68", "73"], reason="spe", grounding=[], evidence=[], flags=[])
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(routing, "choose", lambda req: choice)
         return pipeline.run(load_request("R05"), conn)
 
 
-def test_pipeline_creates_spe_with_exact_cohort(r05, spe_dir, expected):
+@pytest.fixture
+def r05(conn):
+    """R05 run through the pipeline: creates <SPE_DIR>/R05.db and returns the result."""
+    return _run_r05(conn)
+
+
+NAME = quote("Dr. Amir Hadžić")  # R05's applicant, percent-encoded as the frontend sends it
+
+
+@pytest.fixture
+def auth(r05):
+    return {"Authorization": f"Bearer {r05.data['spe']['access_key']}", "X-Applicant": NAME}
+
+
+def test_pipeline_creates_spe_and_returns_the_key_once(r05, spe_dir, expected):
     assert r05.decision == "APPROVE_SPE"
     assert r05.data["cohort_size"] == expected["R05"]["answer"]["cohort_size"] == 1152
-    assert r05.data["spe"] == {"id": "R05", "url": "/spe/R05", "tables": r05.data["spe"]["tables"]}
-    assert set(r05.data["spe"]["tables"]) == {"conditions", "medications", "observations"}
+    s = r05.data["spe"]
+    assert s["id"] == "R05" and set(s["tables"]) == {"conditions", "medications", "observations"}
+    assert s["access_key"].startswith("R05.") and len(s["access_key"]) > 20
+    assert s["url"] == config.SPE_FRONTEND_URL
     assert (spe_dir / "R05.db").is_file()
+    assert s["access_key"] not in (spe_dir / "R05.db").read_bytes().decode("latin1")  # only the hash is stored
 
 
 def test_spe_holds_only_named_tables_and_selected_patients(r05, spe_dir, conn):
@@ -45,91 +65,109 @@ def test_spe_holds_only_named_tables_and_selected_patients(r05, spe_dir, conn):
     for t in ("conditions", "medications", "observations"):
         stray = s.execute(f"SELECT COUNT(*) FROM {t} WHERE patient_id NOT IN (SELECT patient_id FROM cohort)").fetchone()[0]
         assert stray == 0, t
-    # patient IDs are kept (pseudonymised, not anonymised) and opted-out patients are not inside
     ids = [p for (p,) in s.execute("SELECT patient_id FROM cohort")]
-    assert all(spe.PATIENT_ID.match(p) for p in ids)
+    assert all(spe.PATIENT_ID.match(p) for p in ids)  # pseudonyms kept
     opted = conn.execute(
         f"SELECT COUNT(*) FROM patients WHERE opted_out = 1 AND patient_id IN ({','.join('?' * len(ids))})", ids
     ).fetchone()[0]
     assert opted == 0
 
 
-def test_rebuild_is_idempotent(r05, conn):
-    before = spe.info("R05")["tables"]
-    choice = routing.RouteChoice(route="spe", articles=["66", "68", "73"], reason="spe", grounding=[], evidence=[], flags=[])
-    with pytest.MonkeyPatch.context() as mp:
-        mp.setattr(routing, "choose", lambda req: choice)
-        again = pipeline.run(load_request("R05"), conn)
-    assert again.data["spe"]["tables"] == before
-    assert spe.info("R05")["audit_entries"] == 1  # a rebuild starts a fresh log
+def test_rebuild_rotates_the_key(r05, conn):
+    old = r05.data["spe"]["access_key"]
+    again = _run_r05(conn)
+    assert again.data["spe"]["tables"] == r05.data["spe"]["tables"]
+    assert again.data["spe"]["access_key"] != old
+    assert client.post("/api/spe/access", headers={"Authorization": f"Bearer {old}", "X-Applicant": NAME}).status_code == 401
 
 
-def test_download_is_refused_and_logged(r05):
-    for url in ("/api/spe/R05/download", "/api/spe/R05/download/conditions.csv"):
-        res = client.get(url)
+def test_key_and_name_are_both_required(r05, auth):
+    key = auth["Authorization"]
+    assert client.post("/api/spe/access").status_code == 401
+    assert client.post("/api/spe/access", headers={"Authorization": key}).status_code == 401  # key without name
+    assert client.post("/api/spe/access", headers={"X-Applicant": NAME}).status_code == 401  # name without key
+    assert client.post("/api/spe/access", headers={"Authorization": key, "X-Applicant": "Dr. Someone Else"}).status_code == 401
+    assert client.post("/api/spe/access", headers={"Authorization": "Bearer nonsense", "X-Applicant": NAME}).status_code == 401
+    assert client.post("/api/spe/access", headers={"Authorization": "Bearer R05.wrongsecret", "X-Applicant": NAME}).status_code == 401
+    assert client.post("/api/spe/access", headers={"Authorization": "Bearer NOPE.secret", "X-Applicant": NAME}).status_code == 401
+    # case and spacing of the name do not matter
+    assert client.post("/api/spe/access", headers={"Authorization": key, "X-Applicant": quote("  dr.  amir HADŽIĆ ")}).status_code == 200
+    info = client.post("/api/spe/access", headers=auth).json()
+    assert info["cohort_size"] == 1152 and info["articles"] == ["53", "66", "68", "73"]
+    assert "key_hash" not in info and "patients" not in info["tables"]
+    assert info["columns"]["conditions"] == ["patient_id", "icd10", "description", "onset_date"]
+    rejected = [a["detail"] for a in spe.audit_log("R05") if a["action"] == "access_rejected"]
+    assert len(rejected) == 2  # wrong name, wrong secret; "nonsense" never names an SPE, so nothing to log it in
+    assert {"key_ok": True, "name_ok": False, "name_given": "Dr. Someone Else"} in rejected
+
+
+def test_download_is_refused_and_logged(r05, auth):
+    for url in ("/api/spe/download", "/api/spe/download/conditions.csv"):
+        res = client.get(url, headers=auth)
         assert res.status_code == 403
         assert "Art. 73" in res.json()["detail"]
-    actions = [a["action"] for a in client.get("/api/spe/R05/audit").json()]
-    assert actions.count("download_blocked") == 2
-    # the file itself has no URL
-    assert client.get("/spe/R05.db").status_code == 404
-    assert client.get("/api/spe/R05.db").status_code == 404
+    assert client.get("/api/spe/download").status_code == 401
+    assert [a["action"] for a in spe.audit_log("R05")].count("download_blocked") == 2
+    assert client.get("/spe/R05.db").status_code == 404  # the file has no URL
+    assert client.get("/spe/R05").status_code == 404  # no server-side page either
 
 
-def test_query_is_read_only_and_capped(r05):
-    res = client.post("/api/spe/R05/query", json={"sql": "SELECT * FROM observations"})
+def test_query_returns_an_image_not_rows(r05, auth):
+    res = client.post("/api/spe/query", json={"sql": "SELECT * FROM observations"}, headers=auth)
     assert res.status_code == 200
     body = res.json()
-    assert len(body["rows"]) == config.SPE_PAGE_ROWS and body["truncated"] is True
-    assert body["columns"][0] == "patient_id"  # pseudonyms are visible inside the SPE
+    assert "rows" not in body and body["rows_shown"] == config.SPE_PAGE_ROWS and body["truncated"] is True
+    assert body["columns"][0] == "patient_id"
+    assert body["image"].startswith("data:image/png;base64,")
+    img = Image.open(io.BytesIO(base64.b64decode(body["image"].split(",", 1)[1])))
+    assert img.format == "PNG" and img.height > 50 * 15
+    assert "p-" not in res.text.split('"image"')[0]  # no patient id anywhere in the JSON
 
-    agg = client.post("/api/spe/R05/query", json={"sql": "SELECT icd10, COUNT(*) AS n FROM conditions GROUP BY icd10 ORDER BY n DESC LIMIT 3"}).json()
-    assert agg["rows"][0]["icd10"].startswith("E11") and not agg["truncated"]
+    agg = client.post("/api/spe/query", json={"sql": "SELECT icd10, COUNT(*) AS n FROM conditions GROUP BY icd10 ORDER BY n DESC LIMIT 3"}, headers=auth).json()
+    assert agg["rows_shown"] == 3 and not agg["truncated"]
 
+
+def test_query_is_read_only(r05, auth):
     for sql in ("ATTACH 'x' AS y", "PRAGMA table_info(conditions)", "INSERT INTO cohort VALUES ('p-00000000')",
-                "DROP TABLE cohort", "SELECT * FROM audit_log", "SELECT 1; SELECT 2"):
-        assert client.post("/api/spe/R05/query", json={"sql": sql}).status_code == 400, sql
+                "DROP TABLE cohort", "SELECT * FROM audit_log", "SELECT * FROM manifest", "SELECT 1; SELECT 2"):
+        assert client.post("/api/spe/query", json={"sql": sql}, headers=auth).status_code == 400, sql
     assert sqlite3.connect(spe.path("R05")).execute("SELECT COUNT(*) FROM cohort").fetchone()[0] == 1152
 
 
-def test_runaway_query_is_interrupted(r05):
+def test_runaway_query_is_interrupted(r05, auth):
     sql = "WITH RECURSIVE c(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM c) SELECT COUNT(*) FROM c"
-    res = client.post("/api/spe/R05/query", json={"sql": sql})
+    res = client.post("/api/spe/query", json={"sql": sql}, headers=auth)
     assert res.status_code == 400 and "interrupted" in res.json()["detail"]
 
 
-def test_airlock_blocks_records_and_small_cells_and_passes_aggregates(r05):
-    records = client.post("/api/spe/R05/query", json={"sql": "SELECT * FROM conditions LIMIT 5"}).json()["rows"]
-    refused = client.post("/api/spe/R05/outputs", json={"name": "raw", "rows": records}).json()
-    assert refused["status"] == "refused"
+def test_airlock_runs_the_sql_server_side_and_checks_it(r05, auth):
+    refused = client.post("/api/spe/outputs", json={"name": "raw", "sql": "SELECT * FROM conditions LIMIT 5"}, headers=auth).json()
+    assert refused["status"] == "refused" and "content" not in refused
     assert any("patient IDs" in c for c in refused["checks"]) and any("record-level" in c for c in refused["checks"])
 
-    small = client.post("/api/spe/R05/outputs", json={"name": "small", "rows": [{"icd10": "I10", "n": 517}, {"icd10": "Z99", "n": 3}]}).json()
-    assert small["status"] == "refused" and "below 10" in small["checks"][0]
+    small = client.post("/api/spe/outputs", json={"name": "small", "sql": "SELECT icd10, substr(onset_date, 1, 4) AS yr, COUNT(*) AS n FROM conditions GROUP BY 1, 2"}, headers=auth).json()
+    assert small["status"] == "refused" and any("below 10" in c for c in small["checks"])
 
-    ok = client.post("/api/spe/R05/outputs", json={"name": "by_icd", "rows": [{"icd10": "E11.9", "n": 869}]}).json()
-    assert ok["status"] == "pending" and ok["checks"] == []
-    # the applicant sees no content until staff approve
-    assert "content" not in client.get(f"/api/spe/R05/outputs/{ok['id']}").json()
-    assert client.get(f"/api/spe/R05/outputs/{ok['id']}", headers={"X-Role": "staff"}).json()["content"] == [{"icd10": "E11.9", "n": 869}]
-    approved = client.post(f"/api/spe/R05/outputs/{ok['id']}/review", json={"status": "approved", "note": "aggregate"}).json()
-    assert approved["status"] == "approved"
-    assert client.get(f"/api/spe/R05/outputs/{ok['id']}").json()["content"] == [{"icd10": "E11.9", "n": 869}]
-    assert client.post(f"/api/spe/R05/outputs/{ok['id']}/review", json={"status": "rejected"}).status_code == 409
+    ok = client.post("/api/spe/outputs", json={"name": "by_icd", "sql": "SELECT icd10, COUNT(*) AS n FROM conditions GROUP BY icd10 HAVING n >= 10 ORDER BY n DESC"}, headers=auth).json()
+    assert ok["status"] == "released" and ok["checks"] == []
+    assert ok["content"][0]["icd10"].startswith("E11") and all(r["n"] >= 10 for r in ok["content"])
+    assert client.get(f"/api/spe/outputs/{ok['id']}", headers=auth).json()["content"] == ok["content"]
+    assert [o["id"] for o in client.get("/api/spe/outputs", headers=auth).json()] == [ok["id"], small["id"], refused["id"]]
 
-
-def test_text_output_with_patient_ids_is_refused(r05):
-    pid = client.post("/api/spe/R05/query", json={"sql": "SELECT patient_id FROM cohort LIMIT 1"}).json()["rows"][0]["patient_id"]
-    leak = client.post("/api/spe/R05/outputs", json={"name": "notes", "content": f"worst case was {pid}"}).json()
-    assert leak["status"] == "refused"
-    fine = client.post("/api/spe/R05/outputs", json={"name": "metrics", "content": '{"auc": 0.81}'}).json()
-    assert fine["status"] == "pending"
+    big = client.post("/api/spe/outputs", json={"name": "big", "sql": "SELECT onset_date AS d, COUNT(*) AS n FROM conditions GROUP BY d"}, headers=auth).json()
+    assert big["status"] == "refused" and any("record-level dates in: d" in c for c in big["checks"])
 
 
-def test_info_and_page(r05):
-    info = client.get("/api/spe/R05").json()
-    assert info["cohort_size"] == 1152 and info["articles"] == ["53", "66", "68", "73"]
-    assert info["tables"]["conditions"] > 0 and "patients" not in info["tables"]
-    assert client.get("/spe/R05").status_code == 200
-    assert client.get("/spe/NOPE").status_code == 404
-    assert client.get("/api/spe/NOPE").status_code == 404
+def test_text_output_with_patient_ids_is_refused(r05, auth):
+    pid = sqlite3.connect(spe.path("R05")).execute("SELECT patient_id FROM cohort LIMIT 1").fetchone()[0]
+    leak = client.post("/api/spe/outputs", json={"name": "notes", "content": f"worst case was {pid}"}, headers=auth).json()
+    assert leak["status"] == "refused" and "content" not in leak
+    fine = client.post("/api/spe/outputs", json={"name": "metrics", "content": '{"auc": 0.81}'}, headers=auth).json()
+    assert fine["status"] == "released" and fine["content"] == '{"auc": 0.81}'
+
+
+def test_render_png_handles_empty_and_odd_values():
+    png = spe.render_png(["a", "b"], [], "mark")
+    assert Image.open(io.BytesIO(png)).format == "PNG"
+    png = spe.render_png(["x"], [{"x": None}, {"x": 1.23456789}, {"x": "y" * 100}], "mark")
+    assert Image.open(io.BytesIO(png)).width < 800  # long cells are cut

@@ -20,10 +20,12 @@ Done:
 - [x] Staff UI at <http://localhost:8000/> (`backend/app/static/index.html`): pick one of the
   10 task requests or the 200 end-to-end cases (E001..E200), run it, compare with the expected answer
 - [x] SPE provisioning: one SQLite file per permit with only the cohort and the named tables,
-  patient IDs kept, opt-outs out; reachable only through `/api/spe/<id>` (see below)
-- [x] Download block: `/api/spe/<id>/download` answers `403` with Art. 73 and logs the attempt;
-  the file has no URL
-- [x] SPE page for applicant and staff: browse inside, blocked download, output airlock, audit log
+  patient IDs kept, opt-outs out; the decision returns an access key, opened together with the
+  applicant's name (see below)
+- [x] Download block: `/api/spe/download` answers `403` with Art. 73 and logs the attempt; the
+  file has no URL; query results reach the browser only as rendered images
+- [x] SPE frontend (`frontend/`, Vue 3 + Vuetify + Vite): key + name entry, browse inside, SQL,
+  blocked download, output airlock with the small-cell check
 
 To do, in priority order:
 
@@ -113,26 +115,33 @@ receives request text and law text, never patient data.
 
 ### Secure processing environment (Art. 73)
 
-An `APPROVE_SPE` decision creates `backend/spe/<request_id>.db`: a SQLite file with a `cohort`
+An `APPROVE_SPE` decision creates `backend/spe/<request_id>.db` — a SQLite file with a `cohort`
 table (the selected patient IDs, opted-out patients already excluded) and only the record types
-the request names, joined to that cohort. Nothing serves the file. The SPE is used through
-`/spe/<id>` (applicant view; `?role=staff` for staff), which talks to:
+the request names, joined to that cohort — and returns an **access key** in `data.spe.access_key`
+(shown once; only its SHA-256 is stored). Nothing serves the file.
+
+The applicant opens the SPE in the separate frontend (`frontend/`, Vue 3 + Vuetify + Vite,
+<http://localhost:5173>) by entering the **key and their name as on the application**; both
+have to match. Everything the page does goes through `/api/spe/*` with
+`Authorization: Bearer <key>` and `X-Applicant: <name>` (percent-encoded):
 
 | Endpoint | What it does |
 |---|---|
-| `GET /api/spe/<id>` | permit, cohort size, tables with row counts |
-| `POST /api/spe/<id>/query` | one read-only statement, at most 50 rows on screen; writes, `ATTACH`, `PRAGMA` and runaway queries are refused |
-| `GET /api/spe/<id>/download` | always `403`, Art. 73(1)(e), logged |
-| `POST /api/spe/<id>/outputs` | the airlock: a table has to pass the small-cell check (no patient IDs, no record-level columns, no count below 10), then waits for staff |
-| `POST /api/spe/<id>/outputs/<n>/review` | staff approve or reject; the applicant receives the content only when approved |
-| `GET /api/spe/<id>/audit` | every query, output and blocked download |
+| `POST /api/spe/access` | key + name → permit, cohort size, tables with row counts and columns |
+| `POST /api/spe/query` | one read-only statement; the first 50 rows come back as a **PNG** with a watermark, never as text. Writes, `ATTACH`, `PRAGMA`, the bookkeeping tables and runaway queries are refused |
+| `GET /api/spe/download` | always `403`, Art. 73(1)(e), logged |
+| `POST /api/spe/outputs` | the airlock: the server runs the SQL itself and releases the table only if it has no patient IDs, no record-level columns or date values, no count below 10 and at most 500 rows; free text is released if it has no patient IDs |
+| `GET /api/spe/outputs` | released outputs with content; refused ones with the reasons only |
 
-What this prevents is bulk export: there is no endpoint that returns records as a file or
-beyond the page size, and every page view is logged with the name at the keyboard. It does not
-prevent reading the screen, which no SPE does. In production the same contract would be run by
-a trusted research environment (Findata Kapseli, an Azure TRE airlock, OpenSAFELY); the output
-check could use [ACRO](https://pypi.org/project/acro/). There is no login: `X-Role` / `X-Actor`
-headers stand in for it.
+What this prevents is bulk export and copy-paste: no endpoint returns records as a file or as
+text, the on-screen table is an image, and every query, output and blocked download is written
+to the SPE's `audit_log` (with the rejected name on failed logins). It does not prevent
+photographing the screen, which no SPE does. In production the same contract would be run by a
+trusted research environment (Findata Kapseli, an Azure TRE airlock, OpenSAFELY); the output
+check could use [ACRO](https://pypi.org/project/acro/).
+
+Run the frontend: `cd frontend && npm install && npm run dev` (proxies `/api` to
+`http://localhost:8000`; set `EHDS_API_URL` for another backend).
 
 ## Metrics
 

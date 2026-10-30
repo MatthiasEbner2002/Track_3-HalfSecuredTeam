@@ -7,7 +7,7 @@
 | Mapping | `app/layers/mapping.py`, `llm_mapping.py` | definitions → `QuerySpec` (rules, then IBM Bob) |
 | Query | `app/layers/query.py` | `QuerySpec` → SQLite SQL → answer |
 | Small-cell rule | `app/layers/small_cell.py` | `<10`, `suppressed`, one decimal half up |
-| SPE | `app/spe.py`, `app/spe_api.py`, `static/spe.html` | per-permit SQLite copy, read-only queries, `403` download, output airlock, audit log |
+| SPE | `app/spe.py`, `app/spe_api.py` | per-permit SQLite copy, access key + applicant name, queries rendered as PNG, `403` download, output airlock, audit log; UI in `../frontend` |
 
 Interfaces: `app/models.py`. Wiring: `app/pipeline.py`. API: `app/main.py`
 (`POST /api/requests`; `/api/spe/...` see the root README; `/api/submissions` still returns placeholder results).
@@ -36,6 +36,8 @@ Rebuild the committed databases only after changing their sources:
 | `EHDS_OLLAMA_URL` | `http://localhost:11434` | Ollama for the embeddings |
 | `EHDS_LLM` | `on` | `off` disables IBM Bob in data extraction |
 | `EHDS_SPE_DIR` | `backend/spe` | where the per-permit SPE files are written (gitignored) |
+| `EHDS_SPE_FRONTEND_URL` | `http://localhost:5173` | link returned with the access key |
+| `EHDS_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | origins allowed to call the API |
 
 ## Decision and routing (RAG)
 
