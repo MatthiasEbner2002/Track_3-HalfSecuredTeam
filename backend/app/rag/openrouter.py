@@ -96,22 +96,11 @@ class OpenRouterLLM:
         with urllib.request.urlopen(request, timeout=LLM_TIMEOUT_S) as response:
             return json.load(response)
 
-    def _call(self, key: str, system: str, user: str, schema: dict) -> dict:
-        body = {
-            "model": self.model,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {"name": "answer", "strict": True, "schema": schema},
-            },
-            "provider": {"require_parameters": True},
-        }
+    def _post(self, key: str, body: dict[str, Any]) -> dict[str, Any]:
+        """One chat completion; 429 and 5xx get one retry after 2 s."""
         for attempt in range(2):
             try:
-                payload = self._http(key, body)
+                return self._http(key, body)
             except urllib.error.HTTPError as e:
                 if e.code in (401, 403):
                     raise OpenRouterUnavailable(
@@ -129,8 +118,32 @@ class OpenRouterLLM:
                 raise OpenRouterUnavailable(
                     f"OpenRouter is not reachable at {OPENROUTER_URL}"
                 ) from e
+        raise OpenRouterUnavailable("unreachable")
+
+    def _messages(self, system: str, user: str) -> dict[str, Any]:
+        return {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+        }
+
+    def complete_json(self, system: str, user: str, schema: dict) -> dict:
+        """Return the model's answer parsed as JSON matching schema."""
+        key = self._key()
+        strict = _strict_schema(schema)
+        body = self._messages(system, user) | {
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {"name": "answer", "strict": True, "schema": strict},
+            },
+            "provider": {"require_parameters": True},
+        }
+        for attempt in range(2):
+            payload = self._post(key, body)
             try:
-                return _parse_answer(payload["choices"][0]["message"]["content"], schema)
+                return _parse_answer(payload["choices"][0]["message"]["content"], strict)
             except (ValueError, KeyError, TypeError) as e:
                 if attempt == 0:
                     continue
@@ -139,7 +152,14 @@ class OpenRouterLLM:
                 ) from e
         raise ValueError("unreachable")
 
-    def complete_json(self, system: str, user: str, schema: dict) -> dict:
-        """Return the model's answer parsed as JSON matching schema."""
+    def complete_text(self, system: str, user: str) -> str:
+        """Return the model's answer as raw text (no JSON schema, any endpoint)."""
         key = self._key()
-        return self._call(key, system, user, _strict_schema(schema))
+        payload = self._post(key, self._messages(system, user))
+        try:
+            content = payload["choices"][0]["message"]["content"]
+        except (KeyError, TypeError) as e:
+            raise ValueError("OpenRouter returned an answer without content") from e
+        if not isinstance(content, str):
+            raise ValueError("OpenRouter returned an answer without content")
+        return content

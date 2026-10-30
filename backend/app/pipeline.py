@@ -36,7 +36,7 @@ def run(request: DataRequest, conn: sqlite3.Connection) -> PipelineResult:
     try:
         query_spec, source = query.interpret(request, route, conn)
         if source == "llm":
-            flags.append("llm_interpreted")  # rules could not read it; Bob's reading, staff should check
+            flags.append("llm_interpreted")  # rules could not read it; LLM reading, staff should check
         codes = mapping.to_code_mapping(query_spec)
         plan = query.compile_spec(query_spec)
         rows = {q.name: db.execute(conn, q.sql, q.params) for q in plan.queries}

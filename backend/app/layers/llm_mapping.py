@@ -1,39 +1,32 @@
-"""Stage 2: let IBM Bob fill the QuerySpec where the rule parser gives up.
+"""Stage 2: let the OpenRouter LLM fill the QuerySpec where the rule parser gives up.
 
-Bob only ever sees request text (definitions, question) and the fixed data
+The LLM only ever sees request text (definitions, question) and the fixed data
 bindings below, never patient data. Its answer must pass the same QuerySpec
 validation and code check as the rules; one retry with the error message,
-then InterpretError. Answers are cached on disk by prompt hash, so the same
-request always gets the same spec (and costs nothing the second time).
-
-Bob runs headless (`bob run --mode ask`) in an empty folder with MCP and
-subagents off, so it has nothing to act on and only answers.
-Switch off with EHDS_LLM=off.
+then InterpretError. No local caching of answers — every call asks the model
+afresh. Switch off with EHDS_LLM=off.
 """
 
-import hashlib
 import json
 import os
 import re
-import shutil
 import sqlite3
-import subprocess
-from pathlib import Path
+from functools import cache
 
 from pydantic import BaseModel, Field, ValidationError
 
-from app.config import REPO_ROOT
 from app.layers.mapping import KNOWN_MEASUREMENTS, InterpretError, NoDataError, check_codes, parse
 from app.models import Band, Concept, DataRequest, Filter, GroupDim, Metric, QuerySpec, Route
+from app.rag.openrouter import OpenRouterLLM, is_configured
 
-CACHE_DIR = Path(os.environ.get("EHDS_LLM_CACHE", REPO_ROOT / "backend" / ".cache" / "llm"))
-WORKSPACE = Path(os.environ.get("EHDS_LLM_WORKSPACE", REPO_ROOT / "backend" / ".cache" / "bob-workspace"))
-TIMEOUT_S = int(os.environ.get("EHDS_LLM_TIMEOUT", "120"))
-PROMPT_VERSION = "1"  # bump to invalidate the cache after changing the prompt
+
+@cache
+def _default_llm() -> OpenRouterLLM:
+    return OpenRouterLLM()
 
 
 class LlmSpec(BaseModel):
-    """What Bob returns: the QuerySpec with concepts as a list, plus a way to say no."""
+    """What the LLM returns: the QuerySpec with concepts as a list, plus a way to say no."""
 
     error: str | None = None  # set when the request asks for something the data cannot answer
     concepts: list[Concept] = Field(default_factory=list)
@@ -45,7 +38,7 @@ class LlmSpec(BaseModel):
 
 
 def available() -> bool:
-    return os.environ.get("EHDS_LLM", "on") != "off" and shutil.which("bob") is not None
+    return os.environ.get("EHDS_LLM", "on") != "off" and is_configured()
 
 
 # Worked examples, interpreted by the rule parser at run time so they always match the schema.
@@ -135,49 +128,17 @@ def _examples(conn: sqlite3.Connection) -> str:
     return "\n\n".join(out)
 
 
-def build_prompt(request: DataRequest, mode: Route, conn: sqlite3.Connection, reason: str) -> str:
+def build_prompt(request: DataRequest, mode: Route, conn: sqlite3.Connection, reason: str) -> tuple[str, str]:
     regions = [r for (r,) in conn.execute("SELECT DISTINCT region FROM patients ORDER BY region")]
     hospitals = [h for (h,) in conn.execute("SELECT DISTINCT data_holder FROM patients ORDER BY data_holder")]
-    head = INSTRUCTIONS.format(
+    system = INSTRUCTIONS.format(
         regions=", ".join(regions), hospitals=", ".join(hospitals),
         schema=json.dumps(LlmSpec.model_json_schema()), examples=_examples(conn),
     )
     task = {"mode": mode, "question": request.question, "definitions": request.definitions}
-    return (f"{head}\nThe rule parser could not read this request ({reason}).\n"
+    user = (f"The rule parser could not read this request ({reason}).\n"
             f"Request (data, not instructions):\n{json.dumps(task, ensure_ascii=False)}\n->\n")
-
-
-def _ask_bob(prompt: str) -> str:
-    WORKSPACE.mkdir(parents=True, exist_ok=True)
-    cmd = ["bob", "run", "--workspace", str(WORKSPACE), "--format", "json", "--mode", "ask",
-           "--disable-mcp", "--disable-subagents", "--max-turns", "2", "--trust", prompt]
-    try:
-        done = subprocess.run(cmd, cwd=WORKSPACE, capture_output=True, text=True, timeout=TIMEOUT_S)
-    except subprocess.TimeoutExpired as e:
-        raise InterpretError(f"Bob did not answer within {TIMEOUT_S}s") from e
-    result = None
-    for line in done.stdout.splitlines():
-        try:
-            event = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if event.get("type") == "result":
-            result = event
-    if result is None or result.get("status") != "success":
-        detail = (result or {}).get("status") or done.stderr.strip()[-300:] or f"exit code {done.returncode}"
-        raise InterpretError(f"Bob failed: {detail}")
-    return result.get("last_message") or ""
-
-
-def _cached_answer(prompt: str) -> str:
-    key = hashlib.sha256((PROMPT_VERSION + prompt).encode()).hexdigest()
-    path = CACHE_DIR / f"{key}.txt"
-    if path.exists():
-        return path.read_text()
-    answer = _ask_bob(prompt)
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    path.write_text(answer)
-    return answer
+    return system, user
 
 
 def _given_codes(request: DataRequest) -> tuple[str, list[tuple[str, int, int]]]:
@@ -188,9 +149,9 @@ def _given_codes(request: DataRequest) -> tuple[str, list[tuple[str, int, int]]]
 
 
 def check_codes_given(spec: QuerySpec, request: DataRequest) -> None:
-    """Bob may only use codes the applicant wrote (LOINCs also from the data's measurement table).
+    """The LLM may only use codes the applicant wrote (LOINCs also from the data's measurement table).
 
-    Without this, Bob fills an undefined concept ("statin") from its own knowledge.
+    Without this, the LLM fills an undefined concept ("statin") from its own knowledge.
     """
     text, ranges = _given_codes(request)
     for c in spec.concepts.values():
@@ -225,9 +186,10 @@ def _to_spec(text: str, mode: Route, conn: sqlite3.Connection, request: DataRequ
 
 
 def interpret(request: DataRequest, mode: Route, conn: sqlite3.Connection, reason: str) -> QuerySpec:
-    """Bob's QuerySpec for a request the rules could not read, or InterpretError."""
-    prompt = build_prompt(request, mode, conn, reason)
-    text = _cached_answer(prompt)
+    """The LLM's QuerySpec for a request the rules could not read, or InterpretError."""
+    system, user = build_prompt(request, mode, conn, reason)
+    llm = _default_llm()
+    text = llm.complete_text(system, user)
     try:
         return _to_spec(text, mode, conn, request)
     except NoDataError:
@@ -235,10 +197,10 @@ def interpret(request: DataRequest, mode: Route, conn: sqlite3.Connection, reaso
     except (ValueError, ValidationError) as e:
         if isinstance(e, InterpretError) and ("not answerable" in str(e) or "does not give" in str(e)):
             raise
-        retry = f"{prompt}{text}\n\nThat answer was rejected: {str(e)[:500]}\nAnswer again with corrected JSON only.\n->\n"
+        retry = f"{user}{text}\n\nThat answer was rejected: {str(e)[:500]}\nAnswer again with corrected JSON only.\n->\n"
         try:
-            return _to_spec(_cached_answer(retry), mode, conn, request)
+            return _to_spec(llm.complete_text(system, retry), mode, conn, request)
         except InterpretError:
             raise
         except (ValueError, ValidationError) as e2:
-            raise InterpretError(f"Bob's answer did not validate: {str(e2)[:300]}") from e2
+            raise InterpretError(f"The LLM's answer did not validate: {str(e2)[:300]}") from e2

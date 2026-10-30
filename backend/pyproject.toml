@@ -7,14 +7,10 @@ dependencies = [
     "fastapi",
     "uvicorn[standard]",
     "pydantic>=2",
-    "pyyaml",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest", "httpx"]
-# Local NLI model for the purpose check. Install the CPU build of torch first:
-#   .venv/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu
-nli = ["torch", "transformers", "sentencepiece", "protobuf"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

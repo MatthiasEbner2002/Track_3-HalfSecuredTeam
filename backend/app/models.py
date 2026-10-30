@@ -58,7 +58,7 @@ class Evidence(BaseModel):
     point: str  # e.g. "54(1)(b)", "53(1)(e)" or "spe_justification"
     label: str  # readable name of the point
     phrase: str  # quoted from the request
-    source: str  # "llm" (IBM Bob), "model" (local NLI) or "rule"
+    source: str  # "llm" or "rule"
     score: float | None = None  # model confidence 0..1; None for rules
 
 

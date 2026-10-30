@@ -310,7 +310,7 @@ def answer(spec: QuerySpec, plan: QueryPlan, rows: dict[str, list[dict]], conn: 
 
 
 def interpret(request: DataRequest, mode: Route, conn: sqlite3.Connection) -> tuple[QuerySpec, str]:
-    """Rules first; where they give up, Bob (stage 2). Returns the spec and who made it ("rules" / "llm")."""
+    """Rules first; where they give up, the LLM (stage 2). Returns the spec and who made it ("rules" / "llm")."""
     try:
         spec = parse(request, mode, conn)
         check_codes(spec, conn)

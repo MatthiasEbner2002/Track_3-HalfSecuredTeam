@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-# Unit tests never call Bob (slow, costs money, needs the network); test_llm_mapping fakes it.
+# Unit tests never call the extraction LLM (costs money, needs the network); test_llm_mapping fakes it.
 os.environ.setdefault("EHDS_LLM", "off")
 
 from app import db

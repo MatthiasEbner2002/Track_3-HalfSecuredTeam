@@ -8,8 +8,8 @@ Task: [`Task_desc.md`](Task_desc.md). Details: [`backend/README.md`](backend/REA
 
 Done:
 
-- [x] Decision, all four steps, grounded RAG: Claude Haiku 5.5 via OpenRouter, local embeddings
-  (no IBM Bob, no NLI model): Art. 54 / 53 point picked by the LLM from retrieved law text and
+- [x] Decision, all four steps, grounded RAG: Claude Haiku 5.5 via OpenRouter, local embeddings:
+  Art. 54 / 53 point picked by the LLM from retrieved law text and
   quoted; SPE vs. downgrade judged against Art. 66(2)/66(3) with a quote that must appear verbatim
   in the request (otherwise downgrade + staff flag); route articles (69, 66, 68, 73) grounded in
   the law text; `503` with a fix-it message when Ollama or OpenRouter fails
@@ -23,6 +23,7 @@ Done:
   patient IDs kept, opt-outs out; reachable only through `/api/spe/<id>` (see below)
 - [x] Download block: `/api/spe/<id>/download` answers `403` with Art. 73 and logs the attempt;
   the file has no URL
+- [x] Data-extraction fallback via the OpenRouter LLM (IBM Bob removed)
 - [x] SPE page for applicant and staff: browse inside, blocked download, output airlock, audit log
 
 To do, in priority order:
@@ -34,13 +35,9 @@ To do, in priority order:
 3. [ ] **Step 1 hardening** (misses on the held-out set, below): deterministic Art. 54 floor for
    unambiguous wording (nicotine, vape, e-liquid, tobacco, alcohol products, also German) and a
    tighter end-use prompt; tune on the `dev` split only
-4. [ ] **Data-extraction fallback without Bob**: `llm_mapping.py` still calls the `bob` CLI, which
-   is not installed, so a sentence the rules cannot read gives no numbers; fill the same
-   `QuerySpec` with the OpenRouter LLM instead (same validation)
-5. [ ] **Cleanup**: delete or archive the unused `app/purpose/` and the stubs
-   `layers/statistics.py`, `layers/spe.py`, `small_cell.apply`
-6. [ ] **Persistence**: submissions survive a restart (SPE files already do, in `backend/spe/`)
-7. [ ] **Submission**: rerun all metrics, final architecture section, public repo, demo video
+4. [ ] **Cleanup**: delete the stubs `layers/statistics.py`, `layers/spe.py`, `small_cell.apply`
+5. [ ] **Persistence**: submissions survive a restart (SPE files already do, in `backend/spe/`)
+6. [ ] **Submission**: rerun all metrics, final architecture section, public repo, demo video
    (≤ 2 min: R02 reject, R01 statistics, R05 SPE with the blocked download)
 
 ## Quick start
@@ -92,7 +89,7 @@ receives request text and law text, never patient data.
 | Routing, steps 3–4 | `app/layers/routing.py` | Health data request → statistics (Art. 69(1)). Access application → Art. 66(2)/66(3) fetched by id, the LLM judges whether the application shows that anonymised statistics are not enough and quotes the sentence. Quote found verbatim in the request → `APPROVE_SPE` (66, 68, 73); otherwise downgrade to `APPROVE_STATISTICAL` (66, 69), flagged `spe_quote_unverified` when a justification was claimed but could not be quoted. Route articles come with their law text as grounding |
 | LLM client | `app/rag/openrouter.py` | `anthropic/claude-haiku-5.5` via OpenRouter, strict JSON schema, routed only to endpoints that enforce it. No local cache: every request calls the model afresh; consistency comes from the strict JSON schema, the enum of retrieved points and the verbatim-quote checks |
 | Data extraction | `app/layers/mapping.py`, `app/models.py` | Each definition sentence must fully match an ordered regex rule; named concepts (diagnosis → ICD-10 prefix, drug → ATC prefix and "active on 31.12.2025", measurement → LOINC with "latest value", age, sex, region, hospital, inpatient stay / main diagnosis, composites with AND/OR/NOT) become a `QuerySpec` (pydantic, the contract). Plain-English names are bound to the codes the definitions give; measurements also resolve from a built-in name → LOINC table. The "Report per …" line is read by finding the defined names and the operation (count, %, mean, negation). Any sentence not understood raises an error instead of being skipped; codes that match nothing in the data are rejected. Nothing is written per request |
-| Fallback interpretation | `app/layers/llm_mapping.py` | Where the rules give up, an LLM may fill the same `QuerySpec` under the same validation. Currently wired to IBM Bob, which is not installed, so it is inactive (todo 6) |
+| Fallback interpretation | `app/layers/llm_mapping.py` | Where the rules give up, the OpenRouter LLM fills the same `QuerySpec` under the same validation (request text only, codes must come from the request, flagged `llm_interpreted`, no local cache) |
 | SQL compiler | `app/layers/query.py` | `QuerySpec` → SQLite SQL: a base view without opted-out patients, age on 31.12.2025, one patient-ID CTE per concept, one 0/1 flag per patient, grouping by region / hospital / sex / age band (or two of them), patients or stays as the unit |
 | Small-cell rule | `app/layers/query.py`, `app/layers/small_cell.py` | Every requested group listed, also empty ones; counts below 10 → `<10`; percentages with numerator or denominator below 10 and means over fewer than 10 patients → `suppressed`; rounding in Python with `Decimal`, one decimal, half up. Answers name each value by its metric |
 | SPE | `app/layers/query.py` (cohort query) | The cohort's patient IDs give the exact patient count and the requested record types. Copying them into a separate environment and blocking downloads are todos 1–2 |

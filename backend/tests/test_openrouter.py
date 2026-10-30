@@ -119,6 +119,14 @@ def test_invalid_json_twice_raises_value_error(api_key, http):
     assert len(http.requests) == 2
 
 
+def test_complete_text_sends_no_schema_and_returns_raw_content(api_key, http):
+    raw = {"choices": [{"message": {"content": "free text answer"}}]}
+    http.queue = [io.BytesIO(json.dumps(raw).encode())]
+    assert OpenRouterLLM().complete_text("sys", "user") == "free text answer"
+    body = body_of(http.requests[0])
+    assert "response_format" not in body and "provider" not in body
+
+
 def test_identical_calls_hit_the_network_twice(api_key, http):
     llm = OpenRouterLLM()
     http.queue = [_payload(ANSWER), _payload(ANSWER)]

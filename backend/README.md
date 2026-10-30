@@ -4,7 +4,7 @@
 |---|---|---|
 | Decision | `app/layers/decision.py` | RAG engine: Art. 54 rejects, Art. 53 accepts, see below |
 | Routing | `app/layers/routing.py` | statistics, SPE or downgrade (RAG check of Art. 66); adds Art. 66/68/69/73 |
-| Mapping | `app/layers/mapping.py`, `llm_mapping.py` | definitions → `QuerySpec` (rules, then IBM Bob) |
+| Mapping | `app/layers/mapping.py`, `llm_mapping.py` | definitions → `QuerySpec` (rules, then the OpenRouter LLM) |
 | Query | `app/layers/query.py` | `QuerySpec` → SQLite SQL → answer |
 | Small-cell rule | `app/layers/small_cell.py` | `<10`, `suppressed`, one decimal half up |
 | SPE | `app/spe.py`, `app/spe_api.py`, `static/spe.html` | per-permit SQLite copy, read-only queries, `403` download, output airlock, audit log |
@@ -34,7 +34,7 @@ Rebuild the committed databases only after changing their sources:
 | `EHDS_OPENROUTER_TIMEOUT` | `60` | seconds per OpenRouter call |
 | `EHDS_EMBED_MODEL` | `nomic-embed-text` | embeddings; rebuild `law.db` after changing it |
 | `EHDS_OLLAMA_URL` | `http://localhost:11434` | Ollama for the embeddings |
-| `EHDS_LLM` | `on` | `off` disables IBM Bob in data extraction |
+| `EHDS_LLM` | `on` | `off` disables the LLM fallback in data extraction |
 | `EHDS_SPE_DIR` | `backend/spe` | where the per-permit SPE files are written (gitignored) |
 
 ## Decision and routing (RAG)
@@ -52,7 +52,6 @@ Rebuild the committed databases only after changing their sources:
   app, never patient data. No local cache: every request calls the model afresh; consistency
   comes from the strict JSON schema, the enum of retrieved points and the verbatim-quote checks.
   Embeddings: local `nomic-embed-text` via Ollama.
-- `app/purpose/` (IBM Bob / NLI / rules purpose check) is no longer used by the pipeline.
 - Evaluation set: `tests/fixtures/eval/requests.json` (100 requests, tune on `dev`, report `test`).
 
 ## Data extraction
@@ -61,8 +60,8 @@ Rebuild the committed databases only after changing their sources:
 
 - Each definition must fully match a regex rule; the report line is read via the defined names.
   Anything not understood raises `InterpretError`, never skipped.
-- Where the rules give up, IBM Bob (`bob run --mode ask`, request text only) fills the same
-  `QuerySpec`; same checks, codes must come from the request, answers cached in `.cache/llm/`,
-  result flagged `llm_interpreted`. Bob is not installed in our setup (to do: local Ollama instead).
+- Where the rules give up, the OpenRouter LLM (same model as the decision, request text only,
+  never patient data) fills the same `QuerySpec`; same checks, codes must come from the request,
+  result flagged `llm_interpreted`, no local cache.
 - One patient-ID CTE per concept, no correlated subqueries; rounding and small cells in Python.
 - Black-box set in `tests/fixtures/blackbox/`, written by a separate agent; `run.py --verbose ID` shows one case.

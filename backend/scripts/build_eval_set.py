@@ -1,4 +1,4 @@
-"""Build the purpose-check evaluation set: tests/fixtures/eval/requests.json.
+"""Build the decision evaluation set: tests/fixtures/eval/requests.json.
 
 100 labelled requests in the shape of requests/R01.json. Labels follow the decision
 table of the challenge README and Art. 53/54 of Regulation (EU) 2025/327. They were
