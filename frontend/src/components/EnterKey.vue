@@ -1,9 +1,12 @@
 <script setup>
 import { ref } from "vue";
 
-const props = defineProps({ open: { type: Function, required: true } }); // async, throws on a wrong key or name
-const key = ref("");
-const applicant = ref("");
+const props = defineProps({
+  open: { type: Function, required: true }, // async, throws on a wrong key or name
+  prefill: { type: Object, default: null }, // { key, applicant } when coming straight from an approved application
+});
+const key = ref(props.prefill?.key ?? "");
+const applicant = ref(props.prefill?.applicant ?? "");
 const showKey = ref(false);
 const error = ref("");
 const busy = ref(false);

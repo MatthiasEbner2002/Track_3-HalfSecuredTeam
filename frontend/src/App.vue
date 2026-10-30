@@ -23,11 +23,13 @@ onUnmounted(() => removeEventListener("hashchange", readHash));
 
 const client = ref(null);
 const permit = ref(null);
+const prefill = ref(null); // { key, applicant } handed over from the request page; kept in memory only
 
 async function open({ key, applicant }) {
   const c = makeClient(key, applicant);
   permit.value = await c.access(); // throws ApiError on a wrong key or name
   client.value = c;
+  prefill.value = null;
 }
 
 function leave() {
@@ -64,10 +66,10 @@ function leave() {
     </v-app-bar>
 
     <v-main class="page">
-      <Apply v-if="page === 'apply'" />
+      <Apply v-if="page === 'apply'" @open-spe="prefill = $event" />
       <Console v-else-if="page === 'console'" />
       <template v-else>
-        <EnterKey v-if="!client" :open="open" />
+        <EnterKey v-if="!client" :open="open" :prefill="prefill" />
         <Workspace v-else :client="client" :permit="permit" />
       </template>
     </v-main>
