@@ -41,9 +41,18 @@ opened with a one-day access key. Inside, results are shown only as watermarked 
 
 One address fires 30 requests in a fraction of a second. The first 20 are served; from the 21st
 on the server answers `429 Too Many Requests` and tells the client when it may try again. The
-blocked requests never reach the law check or the data. Top: the server log. Bottom: the attacker.
+blocked requests never reach the law check or the data.
 
-![Rate limit: 20 allowed, then 429](docs/rate-limit.png)
+<table>
+  <tr>
+    <th align="left">The server</th>
+    <th align="left">The attacker</th>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/rate-limit-server.png" alt="Server log: 200 OK, then 429 Too Many Requests"></td>
+    <td width="50%"><img src="docs/rate-limit-attacker.png" alt="Attacker: 20 allowed, 10 blocked, Retry-After 60 s"></td>
+  </tr>
+</table>
 
 ## Why an access body could trust it
 
