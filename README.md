@@ -3,26 +3,13 @@
 **An app that decides health-data requests the way an EU Health Data Access Body must — and
 proves every decision with the law.**
 
-A researcher, agency or company sends a request in plain English. The app checks it against
+A researcher, agency or company sends a request in plain words — in any of the 24 official EU
+languages. The app translates it to English once, checks it against
 Regulation (EU) 2025/327, then either rejects it with the article that forbids it, answers it
 with anonymised statistics, or opens a locked room where the records can be studied but never
 taken out. Patient data never leaves the app — not even to the AI.
 
 ![How a request is handled](docs/how-it-works.png)
-
-## Results on the 10 task requests
-
-| What the jury measures | Target | Our result |
-|---|---|---|
-| Correct decisions and articles | 10 of 10 | **10 of 10** |
-| Correct numbers | 6 of 6 | **6 of 6** |
-| Privacy leaks | 0 | **0** |
-| Same result across 3 runs | 10 of 10 | **10 of 10** |
-| Slowest answer | under 60 s | **5.7 s** |
-
-Measured 30 Oct 2026 with `anthropic/claude-haiku-5.5`, no caching: every run asks the model
-again. On 36 further requests we had never seen while building (including 6 in German),
-34 decisions were right; every prohibited purpose was caught.
 
 ## What it looks like
 
@@ -50,6 +37,14 @@ opened with a one-day access key. Inside, results are shown only as watermarked 
 
 ![Download blocked inside the SPE](docs/ui-spe-blocked.png)
 
+### 4. An attacker who floods the service is shut out
+
+One address fires 30 requests in a fraction of a second. The first 20 are served; from the 21st
+on the server answers `429 Too Many Requests` and tells the client when it may try again. The
+blocked requests never reach the law check or the data. Top: the server log. Bottom: the attacker.
+
+![Rate limit: 20 allowed, then 429](docs/rate-limit.png)
+
 ## Why an access body could trust it
 
 - **The AI never decides alone.** We retrieve the relevant points of Art. 53 and 54 from the
@@ -62,6 +57,11 @@ opened with a one-day access key. Inside, results are shown only as watermarked 
   layer, so no answer can bypass them. Records in the SPE have no download endpoint at all.
 - **The AI sees text, not patients.** Only the request text and law text are sent to the model
   (Claude via OpenRouter). The database is local; law retrieval runs on a local embedding model.
+- **Any EU language, one rulebook.** A request in German, Swedish or Greek is translated to
+  English first; everything after that — law check, quote checks, the rule parser — reads only
+  English. Codes, numbers and dates must survive the translation (checked in code, otherwise
+  flagged for staff), the applicant sees the English text next to the decision, and all 10
+  German held-out cases decide correctly. Sample **R11** is written in German.
 - **Abuse is slowed down.** More than 20 requests in 10 s from one address → blocked for a minute.
 
 ## What does not work yet
@@ -81,8 +81,9 @@ opened with a one-day access key. Inside, results are shown only as watermarked 
 | Backend | Python 3.12, FastAPI, SQLite (one central database from the five CSVs) |
 | Decision | Claude Haiku 5.5 via OpenRouter, grounded in the law text (RAG); embeddings `nomic-embed-text` on local Ollama |
 | Data extraction | Rule parser → query specification → SQL compiler; LLM fallback under the same validation |
+| Languages | One translation step (`app/layers/language.py`) in front of the pipeline; English passes through untouched |
 | Frontend | Vue 3 + Vuetify + Vite: request page, secure processing environment, test console |
-| Tests | 109 unit tests, 10 task requests, 36 held-out decisions, 100 black-box and 200 end-to-end cases |
+| Tests | 119 unit tests, 12 sample requests, 36 held-out decisions, 100 black-box and 200 end-to-end cases |
 
 How the pieces fit together, with diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 Configuration: [backend/README.md](backend/README.md). The task: [Task_desc.md](Task_desc.md).
@@ -101,6 +102,7 @@ cd ../frontend && npm install && npm run dev
 ```
 
 Open <http://localhost:5173>, click **R02** and **Submit request** for the rejection, **R01**
-for statistics, **R05** for the secure room. Tests: `cd backend && .venv/bin/pytest -m "not real_llm"`.
+for statistics, **R11** for a request written in German, **R12** for the secure room (123 heart
+failure patients, three record types). Tests: `cd backend && .venv/bin/pytest -m "not real_llm"`.
 
 *Synthetic data only: 20,000 made-up patients from three Austrian hospitals.*
