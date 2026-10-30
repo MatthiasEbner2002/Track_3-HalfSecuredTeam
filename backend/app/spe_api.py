@@ -22,12 +22,6 @@ class QueryBody(BaseModel):
     sql: str
 
 
-class OutputBody(BaseModel):
-    name: str
-    sql: str | None = None  # a table: the server runs it and checks the result
-    content: str | None = None  # anything else (metrics, model card), checked for IDs
-
-
 def current_spe(authorization: str | None = Header(None), x_applicant: str | None = Header(None)) -> str:
     scheme, _, key = (authorization or "").partition(" ")
     return spe.authenticate(key if scheme.lower() == "bearer" else None, unquote(x_applicant or ""))
@@ -53,18 +47,3 @@ def spe_query(body: QueryBody, spe_id: str = Depends(current_spe)) -> dict[str, 
 @router.get("/download/{what:path}")
 def spe_download(what: str = "", spe_id: str = Depends(current_spe)) -> None:
     spe.download(spe_id, what=what)
-
-
-@router.get("/outputs")
-def spe_outputs(spe_id: str = Depends(current_spe)) -> list[dict[str, Any]]:
-    return spe.list_outputs(spe_id)
-
-
-@router.post("/outputs")
-def spe_export(body: OutputBody, spe_id: str = Depends(current_spe)) -> dict[str, Any]:
-    return spe.export(spe_id, body.name, sql=body.sql, content=body.content)
-
-
-@router.get("/outputs/{output_id}")
-def spe_output(output_id: int, spe_id: str = Depends(current_spe)) -> dict[str, Any]:
-    return spe.get_output(spe_id, output_id)

@@ -23,8 +23,5 @@ export function makeClient(key, applicant) {
     access: () => call("/access", { method: "POST" }),
     query: (sql) => call("/query", { method: "POST", body: JSON.stringify({ sql }) }),
     download: () => call("/download/records"),
-    outputs: () => call("/outputs"),
-    exportSql: (name, sql) => call("/outputs", { method: "POST", body: JSON.stringify({ name, sql }) }),
-    exportText: (name, content) => call("/outputs", { method: "POST", body: JSON.stringify({ name, content }) }),
   };
 }

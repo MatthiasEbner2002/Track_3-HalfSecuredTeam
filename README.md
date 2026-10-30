@@ -25,7 +25,7 @@ Done:
 - [x] Download block: `/api/spe/download` answers `403` with Art. 73 and logs the attempt; the
   file has no URL; query results reach the browser only as rendered images
 - [x] SPE frontend (`frontend/`, Vue 3 + Vuetify + Vite): key + name entry, browse inside, SQL,
-  blocked download, output airlock with the small-cell check
+  blocked download
 - [x] Data-extraction fallback via the OpenRouter LLM (IBM Bob removed)
 
 To do, in priority order:
@@ -131,15 +131,13 @@ have to match. Everything the page does goes through `/api/spe/*` with
 | `POST /api/spe/access` | key + name → permit, cohort size, tables with row counts and columns |
 | `POST /api/spe/query` | one read-only statement; the first 50 rows come back as a **PNG** with a watermark, never as text. Writes, `ATTACH`, `PRAGMA`, the bookkeeping tables and runaway queries are refused |
 | `GET /api/spe/download` | always `403`, Art. 73(1)(e), logged |
-| `POST /api/spe/outputs` | the airlock: the server runs the SQL itself and releases the table only if it has no patient IDs, no record-level columns or date values, no count below 10 and at most 500 rows; free text is released if it has no patient IDs |
-| `GET /api/spe/outputs` | released outputs with content; refused ones with the reasons only |
 
-What this prevents is bulk export and copy-paste: no endpoint returns records as a file or as
-text, the on-screen table is an image, and every query, output and blocked download is written
-to the SPE's `audit_log` (with the rejected name on failed logins). It does not prevent
-photographing the screen, which no SPE does. In production the same contract would be run by a
-trusted research environment (Findata Kapseli, an Azure TRE airlock, OpenSAFELY); the output
-check could use [ACRO](https://pypi.org/project/acro/).
+There is no other endpoint: nothing returns records as a file or as text, the on-screen table is
+an image, and every query, blocked download and failed login (with the name tried) is written to
+the SPE's `audit_log`. It does not prevent photographing the screen, which no SPE does. In
+production the same contract would be run by a trusted research environment (Findata Kapseli, an
+Azure TRE airlock, OpenSAFELY), which would add a checked output channel (e.g.
+[ACRO](https://pypi.org/project/acro/)) — out of scope here.
 
 Run the frontend: `cd frontend && npm install && npm run dev` (proxies `/api` to
 `http://localhost:8000`; set `EHDS_API_URL` for another backend).

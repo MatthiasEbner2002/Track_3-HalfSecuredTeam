@@ -1,4 +1,4 @@
-"""The secure processing environment: key in, only the cohort and named tables inside, images out, airlock for aggregates."""
+"""The secure processing environment: key + name in, only the cohort and named tables inside, images out, nothing else."""
 
 import base64
 import io
@@ -60,7 +60,7 @@ def test_pipeline_creates_spe_and_returns_the_key_once(r05, spe_dir, expected):
 def test_spe_holds_only_named_tables_and_selected_patients(r05, spe_dir, conn):
     s = sqlite3.connect(spe_dir / "R05.db")
     tables = {t for (t,) in s.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
-    assert tables == {"cohort", "conditions", "medications", "observations", "manifest", "audit_log", "outputs"}
+    assert tables == {"cohort", "conditions", "medications", "observations", "manifest", "audit_log"}
     assert s.execute("SELECT COUNT(*) FROM cohort").fetchone()[0] == 1152
     for t in ("conditions", "medications", "observations"):
         stray = s.execute(f"SELECT COUNT(*) FROM {t} WHERE patient_id NOT IN (SELECT patient_id FROM cohort)").fetchone()[0]
@@ -140,30 +140,10 @@ def test_runaway_query_is_interrupted(r05, auth):
     assert res.status_code == 400 and "interrupted" in res.json()["detail"]
 
 
-def test_airlock_runs_the_sql_server_side_and_checks_it(r05, auth):
-    refused = client.post("/api/spe/outputs", json={"name": "raw", "sql": "SELECT * FROM conditions LIMIT 5"}, headers=auth).json()
-    assert refused["status"] == "refused" and "content" not in refused
-    assert any("patient IDs" in c for c in refused["checks"]) and any("record-level" in c for c in refused["checks"])
-
-    small = client.post("/api/spe/outputs", json={"name": "small", "sql": "SELECT icd10, substr(onset_date, 1, 4) AS yr, COUNT(*) AS n FROM conditions GROUP BY 1, 2"}, headers=auth).json()
-    assert small["status"] == "refused" and any("below 10" in c for c in small["checks"])
-
-    ok = client.post("/api/spe/outputs", json={"name": "by_icd", "sql": "SELECT icd10, COUNT(*) AS n FROM conditions GROUP BY icd10 HAVING n >= 10 ORDER BY n DESC"}, headers=auth).json()
-    assert ok["status"] == "released" and ok["checks"] == []
-    assert ok["content"][0]["icd10"].startswith("E11") and all(r["n"] >= 10 for r in ok["content"])
-    assert client.get(f"/api/spe/outputs/{ok['id']}", headers=auth).json()["content"] == ok["content"]
-    assert [o["id"] for o in client.get("/api/spe/outputs", headers=auth).json()] == [ok["id"], small["id"], refused["id"]]
-
-    big = client.post("/api/spe/outputs", json={"name": "big", "sql": "SELECT onset_date AS d, COUNT(*) AS n FROM conditions GROUP BY d"}, headers=auth).json()
-    assert big["status"] == "refused" and any("record-level dates in: d" in c for c in big["checks"])
-
-
-def test_text_output_with_patient_ids_is_refused(r05, auth):
-    pid = sqlite3.connect(spe.path("R05")).execute("SELECT patient_id FROM cohort LIMIT 1").fetchone()[0]
-    leak = client.post("/api/spe/outputs", json={"name": "notes", "content": f"worst case was {pid}"}, headers=auth).json()
-    assert leak["status"] == "refused" and "content" not in leak
-    fine = client.post("/api/spe/outputs", json={"name": "metrics", "content": '{"auc": 0.81}'}, headers=auth).json()
-    assert fine["status"] == "released" and fine["content"] == '{"auc": 0.81}'
+def test_no_endpoint_returns_rows(r05, auth):
+    """Besides the image, nothing under /api/spe hands out data."""
+    for method, url in (("get", "/api/spe/outputs"), ("post", "/api/spe/outputs"), ("get", "/api/spe/rows"), ("get", "/api/spe/export")):
+        assert getattr(client, method)(url, headers=auth).status_code in (404, 405), url
 
 
 def test_render_png_handles_empty_and_odd_values():

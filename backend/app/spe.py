@@ -9,9 +9,6 @@ functions below, which spe_api.py exposes behind `Authorization: Bearer <key>`:
 - query():    read-only SQL; the result is rendered to a PNG, at most
               SPE_PAGE_ROWS rows, so no record ever reaches the browser as text
 - download(): always refused, Art. 73(1)(e)
-- export():   the only way out; the server runs the SQL and releases the table
-              only if it passes the small-cell check (no IDs, no record-level
-              columns, no count below 10); free text is released if it has no IDs
 - Every access is written to the SPE's audit_log (for the access body; no endpoint).
 """
 
@@ -32,19 +29,16 @@ from typing import Any
 from PIL import Image, ImageDraw, ImageFont
 
 from app import config
-from app.config import SMALL_CELL_THRESHOLD, SPE_EXPORT_ROWS, SPE_PAGE_ROWS, SPE_QUERY_STEPS
+from app.config import SPE_PAGE_ROWS, SPE_QUERY_STEPS
 from app.db import TABLES
 from app.models import DataRequest
 
 PATIENT_ID = re.compile(r"^p-[0-9a-f]{8}$")
-ID_COLUMNS = {"patient_id", "encounter_id"}
-DATE_COLUMN = re.compile(r"(^|_)date$")
-DATE_VALUE = re.compile(r"^\d{4}-\d{2}-\d{2}")  # a full date in a cell is record-level however the column is named
-PRIVATE_TABLES = {"manifest", "audit_log", "outputs"}  # bookkeeping, not data; hidden from applicant SQL
+PRIVATE_TABLES = {"manifest", "audit_log"}  # bookkeeping, not data; hidden from applicant SQL
 DOWNLOAD_REFUSED = (
     "Downloads from a secure processing environment are not permitted "
-    "(Art. 73(1)(e) Regulation (EU) 2025/327). Data is only viewed inside the SPE; "
-    "the only way out is an output that passes the small-cell check. This attempt was logged."
+    "(Art. 73(1)(e) Regulation (EU) 2025/327). Data is only viewed inside the SPE. "
+    "This attempt was logged."
 )
 FONT_PATHS = ["/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", "/usr/share/fonts/TTF/DejaVuSansMono.ttf",
               "/System/Library/Fonts/Menlo.ttc", "C:/Windows/Fonts/consola.ttf"]
@@ -124,8 +118,6 @@ def create(request: DataRequest, conn: sqlite3.Connection, patient_ids: list[str
             spe.execute(f"CREATE TABLE {t} AS SELECT t.* FROM src.{t} t JOIN cohort USING (patient_id)")
             spe.execute(f"CREATE INDEX idx_{t}_patient ON {t} (patient_id)")
         spe.execute("CREATE TABLE audit_log (id INTEGER PRIMARY KEY, at TEXT, action TEXT, detail TEXT)")
-        spe.execute("CREATE TABLE outputs (id INTEGER PRIMARY KEY, at TEXT, name TEXT, kind TEXT, sql TEXT, "
-                    "content TEXT, status TEXT, checks TEXT)")
         manifest = {
             "id": request.id,
             "applicant": request.applicant.model_dump(),
@@ -190,7 +182,6 @@ def info(spe_id: str) -> dict[str, Any]:
         manifest["columns"] = {t: [r[1] for r in conn.execute(f"PRAGMA table_info({t})")] for t in manifest["record_types"]}
     manifest.pop("key_hash")
     manifest["page_rows"] = SPE_PAGE_ROWS
-    manifest["export_rows"] = SPE_EXPORT_ROWS
     return manifest
 
 
@@ -242,7 +233,7 @@ def query(spe_id: str, sql: str) -> dict[str, Any]:
         "truncated": truncated,
         "page_rows": SPE_PAGE_ROWS,
         "image": "data:image/png;base64," + base64.b64encode(png).decode(),
-        "notice": "Rendered inside the SPE. Aggregates can be released as an output; records cannot.",
+        "notice": "Rendered inside the SPE; nothing leaves it.",
     }
 
 
@@ -295,72 +286,6 @@ def download(spe_id: str, what: str = "") -> None:
     """There is no download. Logs the attempt and raises 403."""
     _audit(spe_id, "download_blocked", {"what": what or "records"})
     raise SpeError(403, DOWNLOAD_REFUSED)
-
-
-# --- outputs (the airlock) -------------------------------------------------
-
-def check_table(rows: list[dict[str, Any]]) -> list[str]:
-    """Why a table may not leave the SPE: record-level columns, patient IDs, counts below the threshold."""
-    problems = []
-    columns = list(dict.fromkeys(k for r in rows for k in r))
-    if record_cols := [c for c in columns if c in ID_COLUMNS or DATE_COLUMN.search(c)]:
-        problems.append(f"record-level columns: {', '.join(record_cols)}")
-    if any(isinstance(v, str) and PATIENT_ID.match(v) for r in rows for v in r.values()):
-        problems.append("contains patient IDs")
-    if date_cols := sorted({c for r in rows for c, v in r.items() if isinstance(v, str) and DATE_VALUE.match(v)}):
-        problems.append(f"record-level dates in: {', '.join(date_cols)}")
-    small = [f"{c}={v}" for r in rows for c, v in r.items()
-             if isinstance(v, int) and not isinstance(v, bool) and 0 <= v < SMALL_CELL_THRESHOLD]
-    if small:
-        problems.append(f"{len(small)} count(s) below {SMALL_CELL_THRESHOLD}: {', '.join(small[:5])}")
-    return problems
-
-
-def check_text(content: str) -> list[str]:
-    ids = set(re.findall(r"\bp-[0-9a-f]{8}\b", content))
-    return [f"contains {len(ids)} patient ID(s)"] if ids else []
-
-
-def export(spe_id: str, name: str, sql: str | None = None, content: str | None = None) -> dict[str, Any]:
-    """Ask for an output to leave the SPE. The server runs the SQL itself; the applicant never holds the rows."""
-    if not (sql or "").strip() and content is None:
-        raise SpeError(400, "an output needs sql (a table) or content (text)")
-    if sql:
-        _columns, rows, truncated = _run(spe_id, sql, SPE_EXPORT_ROWS)
-        problems = check_table(rows) + ([f"more than {SPE_EXPORT_ROWS} rows; aggregate further"] if truncated else [])
-        kind, payload = "table", json.dumps(rows, ensure_ascii=False)
-    else:
-        problems, kind, payload = check_text(content or ""), "text", content
-    status = "refused" if problems else "released"
-    with _db(spe_id) as conn:
-        cur = conn.execute(
-            "INSERT INTO outputs (at, name, kind, sql, content, status, checks) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (_now(), name, kind, sql, payload, status, json.dumps(problems)))
-        output_id = cur.lastrowid
-    _audit(spe_id, f"output_{status}", {"output_id": output_id, "name": name, "checks": problems})
-    return get_output(spe_id, output_id)
-
-
-def _row_to_output(row: sqlite3.Row) -> dict[str, Any]:
-    out = dict(row)
-    out["checks"] = json.loads(out["checks"] or "[]")
-    content = out.pop("content")
-    if out["status"] == "released":  # refused content stays inside
-        out["content"] = json.loads(content) if out["kind"] == "table" and content else content
-    return out
-
-
-def list_outputs(spe_id: str) -> list[dict[str, Any]]:
-    with _db(spe_id, readonly=True) as conn:
-        return [_row_to_output(r) for r in conn.execute("SELECT * FROM outputs ORDER BY id DESC")]
-
-
-def get_output(spe_id: str, output_id: int) -> dict[str, Any]:
-    with _db(spe_id, readonly=True) as conn:
-        row = conn.execute("SELECT * FROM outputs WHERE id = ?", (output_id,)).fetchone()
-    if row is None:
-        raise SpeError(404, f"no output {output_id}")
-    return _row_to_output(row)
 
 
 def audit_log(spe_id: str) -> list[dict[str, Any]]:

@@ -7,7 +7,7 @@
 | Mapping | `app/layers/mapping.py`, `llm_mapping.py` | definitions → `QuerySpec` (rules, then the OpenRouter LLM) |
 | Query | `app/layers/query.py` | `QuerySpec` → SQLite SQL → answer |
 | Small-cell rule | `app/layers/small_cell.py` | `<10`, `suppressed`, one decimal half up |
-| SPE | `app/spe.py`, `app/spe_api.py` | per-permit SQLite copy, access key + applicant name, queries rendered as PNG, `403` download, output airlock, audit log; UI in `../frontend` |
+| SPE | `app/spe.py`, `app/spe_api.py` | per-permit SQLite copy, access key + applicant name, queries rendered as PNG, `403` download, audit log; UI in `../frontend` |
 
 Interfaces: `app/models.py`. Wiring: `app/pipeline.py`. API: `app/main.py`
 (`POST /api/requests`; `/api/spe/...` see the root README; `/api/submissions` still returns placeholder results).

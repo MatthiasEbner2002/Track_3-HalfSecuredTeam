@@ -60,8 +60,7 @@ async function submit() {
         </v-form>
       </v-card-text>
       <v-card-text class="text-caption text-medium-emphasis">
-        Inside, records are shown as images and cannot be downloaded. Only results that pass the small-cell
-        check leave the environment. Every access is logged.
+        Inside, records are shown as images and cannot be downloaded. Every access is logged.
       </v-card-text>
     </v-card>
   </v-container>
