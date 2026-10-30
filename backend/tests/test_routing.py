@@ -11,7 +11,7 @@ from app.rag.openrouter import OpenRouterUnavailable
 from conftest import load_request
 from fakes import FakeLLM
 
-SPE_QUOTE = "Training needs individual-level histories; aggregates are not enough."
+SPE_QUOTE = "We will only export model weights and performance metrics."  # a sentence of R05's question
 
 
 def spe_calls(llm: FakeLLM) -> int:
@@ -35,8 +35,34 @@ def test_requested_as_is_normalised():
     assert spe_calls(llm) == 0
 
 
+def _without_floor(request):
+    """R05 with a purpose the rule floor does not recognise, so the LLM has to judge."""
+    return request.model_copy(update={"purpose": "We build a prediction model for GPs."})
+
+
+def test_rule_floor_routes_to_spe_without_the_model():
+    llm = FakeLLM()
+    choice = routing.choose(load_request("R05"), llm=llm)  # "Training needs individual-level histories; aggregates are not enough."
+    assert choice.route == "spe" and choice.articles == ["66", "68", "73"]
+    assert choice.evidence[0].source == "rule" and "aggregates are not enough" in choice.evidence[0].phrase
+    assert spe_calls(llm) == 0
+
+
+def test_rule_floor_matches_the_known_wordings_only():
+    yes = ["Scientific research that requires patient-level longitudinal records.",
+           "Students train prediction models on pseudonymised patient-level data.",
+           "Summary tables are insufficient because the algorithm scores each patient.",
+           "Aggregates are not sufficient: the prediction depends on each patient's course."]
+    no = ["We evaluate the regional screening programme and need prevalence figures by region.",
+          "Scientific research on regional differences in the quality of care, published in a journal.",
+          "Health technology assessment: we estimate the number of eligible patients."]
+    base = load_request("R09")
+    assert all(routing.spe_justification_sentence(base.model_copy(update={"purpose": p})) for p in yes)
+    assert not any(routing.spe_justification_sentence(base.model_copy(update={"purpose": p})) for p in no)
+
+
 def test_justified_spe_routes_to_spe():
-    choice = routing.choose(load_request("R05"), llm=FakeLLM(spe_quote=SPE_QUOTE))
+    choice = routing.choose(_without_floor(load_request("R05")), llm=FakeLLM(spe_quote=SPE_QUOTE))
     assert choice.route == "spe"
     assert choice.articles == ["66", "68", "73"]
     assert choice.evidence[0].phrase == SPE_QUOTE
@@ -45,7 +71,7 @@ def test_justified_spe_routes_to_spe():
 
 def test_unverified_spe_quote_downgrades_to_statistics():
     llm = FakeLLM(spe_quote="a sentence that is not in the application at all")
-    choice = routing.choose(load_request("R05"), llm=llm)
+    choice = routing.choose(_without_floor(load_request("R05")), llm=llm)
     assert choice.route == "statistics"
     assert choice.articles == ["66", "69"]
     assert choice.needs_review
@@ -62,8 +88,8 @@ def test_unjustified_access_application_gets_statistics():
 def test_choose_calls_the_model_every_time(monkeypatch):
     llm = FakeLLM()
     monkeypatch.setattr(decision, "_default_llm", lambda: llm)
-    routing.choose(load_request("R05"))
-    routing.choose(load_request("R05"))
+    routing.choose(_without_floor(load_request("R05")))
+    routing.choose(_without_floor(load_request("R05")))
     assert spe_calls(llm) == 2  # no answer caching
 
 

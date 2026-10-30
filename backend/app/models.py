@@ -21,6 +21,9 @@ class Applicant(BaseModel):
     country: str
 
 
+REQUEST_KINDS = ("health data request", "health data access application")
+
+
 class DataRequest(BaseModel):
     """A request as found in requests/R*.json."""
 
@@ -34,6 +37,19 @@ class DataRequest(BaseModel):
     purpose: str
     question: str
     definitions: list[str] = Field(default_factory=list)
+
+    def missing(self, need_definitions: bool = True) -> list[str]:
+        """Fields that are absent or blank, so the request cannot be decided. Empty list = complete."""
+        blank = lambda v: not str(v or "").strip()
+        out = [f for f in ("id", "purpose", "question") if blank(getattr(self, f))]
+        out += [f"applicant.{f}" for f in ("name", "organisation", "country") if blank(getattr(self.applicant, f))]
+        if blank(self.requested_as):
+            out.append("requested_as")
+        elif " ".join(self.requested_as.lower().split()) not in REQUEST_KINDS:
+            out.append(f"requested_as (must be one of: {', '.join(REQUEST_KINDS)})")
+        if need_definitions and not [d for d in self.definitions if not blank(d)]:
+            out.append("definitions")
+        return out
 
 
 class LawParagraph(BaseModel):

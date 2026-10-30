@@ -82,15 +82,23 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+def _require_complete(request: DataRequest, need_definitions: bool = True) -> None:
+    """Checked before any model or data is touched: a request with blank fields is not decided, it is sent back."""
+    if missing := request.missing(need_definitions):
+        raise HTTPException(status_code=422, detail=f"request incomplete, missing or empty: {', '.join(missing)}")
+
+
 @app.post("/api/requests/suggest-definitions", response_model=suggest.Suggestion)
 def suggest_definitions(request: DataRequest, conn: sqlite3.Connection = Depends(get_conn)) -> suggest.Suggestion:
     """Draft the definitions for a purpose + question. Runs the law check first; a prohibited purpose gets no draft."""
+    _require_complete(request, need_definitions=False)
     return suggest.suggest(request, conn)
 
 
 @app.post("/api/requests", response_model=PipelineResult, response_model_exclude_none=True)
 def submit_request(request: DataRequest, debug: bool = False, conn: sqlite3.Connection = Depends(get_conn)) -> PipelineResult:
     """The decision and the answer. The generated SQL and code mapping are internals: only with ?debug=1 (test console)."""
+    _require_complete(request)
     result = pipeline.run(request, conn)
     if not debug:
         result.queries, result.mapping = [], None
