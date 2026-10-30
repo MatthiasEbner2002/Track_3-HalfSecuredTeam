@@ -7,85 +7,89 @@
   </defs>
   <rect width="1400" height="620" fill="#ffffff"/>
 
-  <!-- ===== main flow (y 40..420) ===== -->
   <!-- request -->
-  <rect x="30" y="170" width="170" height="120" rx="14" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="2"/>
-  <text x="115" y="218" font-size="20" font-weight="700" fill="#1f2a37" text-anchor="middle">Request</text>
-  <text x="115" y="246" font-size="14" fill="#5b6472" text-anchor="middle">plain words,</text>
-  <text x="115" y="266" font-size="14" fill="#5b6472" text-anchor="middle">any EU language</text>
+  <rect x="30" y="200" width="170" height="120" rx="14" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="2"/>
+  <text x="115" y="248" font-size="20" font-weight="700" fill="#1f2a37" text-anchor="middle">Request</text>
+  <text x="115" y="276" font-size="14" fill="#5b6472" text-anchor="middle">plain words,</text>
+  <text x="115" y="296" font-size="14" fill="#5b6472" text-anchor="middle">any EU language</text>
 
-  <line x1="200" y1="230" x2="238" y2="230" stroke="#5b6472" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="200" y1="260" x2="238" y2="260" stroke="#5b6472" stroke-width="2.5" marker-end="url(#a)"/>
 
   <!-- translate -->
-  <rect x="242" y="170" width="150" height="120" rx="14" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="2"/>
-  <text x="317" y="218" font-size="20" font-weight="700" fill="#1f2a37" text-anchor="middle">Translate</text>
-  <text x="317" y="246" font-size="14" fill="#5b6472" text-anchor="middle">to English once</text>
-  <text x="317" y="266" font-size="14" fill="#5b6472" text-anchor="middle">codes kept</text>
+  <rect x="242" y="200" width="150" height="120" rx="14" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="2"/>
+  <text x="317" y="248" font-size="20" font-weight="700" fill="#1f2a37" text-anchor="middle">Translate</text>
+  <text x="317" y="276" font-size="14" fill="#5b6472" text-anchor="middle">to English once</text>
+  <text x="317" y="296" font-size="14" fill="#5b6472" text-anchor="middle">codes kept</text>
 
-  <line x1="392" y1="230" x2="430" y2="230" stroke="#5b6472" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="392" y1="260" x2="430" y2="260" stroke="#5b6472" stroke-width="2.5" marker-end="url(#a)"/>
 
   <!-- law check -->
-  <rect x="434" y="170" width="200" height="120" rx="14" fill="#fff8e6" stroke="#f0b429" stroke-width="2.5"/>
-  <text x="534" y="218" font-size="20" font-weight="700" fill="#7a4f00" text-anchor="middle">Law check</text>
-  <text x="534" y="246" font-size="14" fill="#7a4f00" text-anchor="middle">AI picks the rule</text>
-  <text x="534" y="266" font-size="14" fill="#7a4f00" text-anchor="middle">and quotes it</text>
+  <rect x="434" y="200" width="200" height="120" rx="14" fill="#fff8e6" stroke="#f0b429" stroke-width="2.5"/>
+  <text x="534" y="248" font-size="20" font-weight="700" fill="#7a4f00" text-anchor="middle">Law check</text>
+  <text x="534" y="276" font-size="14" fill="#7a4f00" text-anchor="middle">AI picks the rule</text>
+  <text x="534" y="296" font-size="14" fill="#7a4f00" text-anchor="middle">and quotes it</text>
 
-  <!-- branches -->
-  <line x1="634" y1="200" x2="706" y2="90" stroke="#c62828" stroke-width="2.5" marker-end="url(#r)"/>
-  <line x1="634" y1="230" x2="706" y2="230" stroke="#2e7d32" stroke-width="2.5" marker-end="url(#g)"/>
-  <line x1="634" y1="260" x2="706" y2="370" stroke="#1565c0" stroke-width="2.5" marker-end="url(#b)"/>
+  <!-- reject branch -->
+  <line x1="634" y1="225" x2="706" y2="100" stroke="#c62828" stroke-width="2.5" marker-end="url(#r)"/>
+  <rect x="710" y="40" width="660" height="110" rx="14" fill="#fdecea" stroke="#c62828" stroke-width="2.5"/>
+  <text x="736" y="84" font-size="20" font-weight="700" fill="#8e1b1b">Rejected</text>
+  <text x="736" y="114" font-size="14" fill="#8e1b1b">Prohibited use, e.g. insurance pricing · the applicant sees the quoted rule · Art. 54</text>
 
-  <!-- rejected -->
-  <rect x="710" y="40" width="660" height="100" rx="14" fill="#fdecea" stroke="#c62828" stroke-width="2.5"/>
-  <text x="736" y="82" font-size="20" font-weight="700" fill="#8e1b1b">Rejected</text>
-  <text x="736" y="112" font-size="14" fill="#8e1b1b">Prohibited use, e.g. insurance pricing · the applicant sees the quoted rule · Art. 54</text>
+  <!-- approved: shared chain -->
+  <line x1="634" y1="260" x2="706" y2="260" stroke="#5b6472" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="670" y="248" font-size="12" fill="#5b6472" text-anchor="middle">approved</text>
 
-  <!-- statistics chain -->
-  <rect x="710" y="180" width="150" height="100" rx="14" fill="#eaf6ec" stroke="#2e7d32" stroke-width="2.5"/>
-  <text x="785" y="222" font-size="18" font-weight="700" fill="#1b5e20" text-anchor="middle">Parse</text>
-  <text x="785" y="250" font-size="13" fill="#1b5e20" text-anchor="middle">definitions → rules</text>
+  <rect x="710" y="210" width="150" height="100" rx="14" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="2"/>
+  <text x="785" y="252" font-size="18" font-weight="700" fill="#1f2a37" text-anchor="middle">Parse</text>
+  <text x="785" y="280" font-size="13" fill="#5b6472" text-anchor="middle">definitions → rules</text>
 
-  <line x1="860" y1="230" x2="892" y2="230" stroke="#2e7d32" stroke-width="2.5" marker-end="url(#g)"/>
+  <line x1="860" y1="260" x2="892" y2="260" stroke="#5b6472" stroke-width="2.5" marker-end="url(#a)"/>
 
-  <rect x="896" y="180" width="150" height="100" rx="14" fill="#eaf6ec" stroke="#2e7d32" stroke-width="2.5"/>
-  <text x="971" y="222" font-size="18" font-weight="700" fill="#1b5e20" text-anchor="middle">SQL</text>
-  <text x="971" y="250" font-size="13" fill="#1b5e20" text-anchor="middle">opt-outs excluded</text>
+  <rect x="896" y="210" width="150" height="100" rx="14" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="2"/>
+  <text x="971" y="252" font-size="18" font-weight="700" fill="#1f2a37" text-anchor="middle">SQL</text>
+  <text x="971" y="280" font-size="13" fill="#5b6472" text-anchor="middle">opt-outs excluded</text>
 
-  <line x1="1046" y1="230" x2="1078" y2="230" stroke="#2e7d32" stroke-width="2.5" marker-end="url(#g)"/>
+  <!-- split -->
+  <line x1="1046" y1="245" x2="1078" y2="210" stroke="#2e7d32" stroke-width="2.5" marker-end="url(#g)"/>
+  <line x1="1046" y1="275" x2="1078" y2="310" stroke="#1565c0" stroke-width="2.5" marker-end="url(#b)"/>
 
-  <rect x="1082" y="180" width="150" height="100" rx="14" fill="#eaf6ec" stroke="#2e7d32" stroke-width="2.5"/>
-  <text x="1157" y="222" font-size="18" font-weight="700" fill="#1b5e20" text-anchor="middle">Small-cell rule</text>
-  <text x="1157" y="250" font-size="13" fill="#1b5e20" text-anchor="middle">&lt;10 · suppressed</text>
-
-  <line x1="1232" y1="230" x2="1264" y2="230" stroke="#2e7d32" stroke-width="2.5" marker-end="url(#g)"/>
-
-  <rect x="1268" y="180" width="102" height="100" rx="14" fill="#2e7d32" stroke="#2e7d32" stroke-width="2.5"/>
-  <text x="1319" y="224" font-size="17" font-weight="700" fill="#ffffff" text-anchor="middle">Numbers</text>
-  <text x="1319" y="250" font-size="13" fill="#e3f2e4" text-anchor="middle">Art. 53, 69</text>
+  <!-- statistics -->
+  <rect x="1082" y="160" width="150" height="90" rx="14" fill="#eaf6ec" stroke="#2e7d32" stroke-width="2.5"/>
+  <text x="1157" y="198" font-size="17" font-weight="700" fill="#1b5e20" text-anchor="middle">Small-cell rule</text>
+  <text x="1157" y="224" font-size="13" fill="#1b5e20" text-anchor="middle">&lt;10 · suppressed</text>
+  <line x1="1232" y1="205" x2="1264" y2="205" stroke="#2e7d32" stroke-width="2.5" marker-end="url(#g)"/>
+  <rect x="1268" y="160" width="102" height="90" rx="14" fill="#2e7d32" stroke="#2e7d32" stroke-width="2.5"/>
+  <text x="1319" y="198" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">Statistics</text>
+  <text x="1319" y="224" font-size="13" fill="#e3f2e4" text-anchor="middle">Art. 53, 69</text>
 
   <!-- secure room -->
-  <rect x="710" y="320" width="660" height="100" rx="14" fill="#e8f1fb" stroke="#1565c0" stroke-width="2.5"/>
-  <text x="736" y="362" font-size="20" font-weight="700" fill="#0d3c78">Records in a secure room</text>
-  <text x="736" y="392" font-size="14" fill="#0d3c78">Only the selected patients · view and query inside · download always refused · Art. 66, 68, 73</text>
+  <rect x="1082" y="270" width="150" height="90" rx="14" fill="#e8f1fb" stroke="#1565c0" stroke-width="2.5"/>
+  <text x="1157" y="308" font-size="17" font-weight="700" fill="#0d3c78" text-anchor="middle">Copy cohort</text>
+  <text x="1157" y="334" font-size="13" fill="#0d3c78" text-anchor="middle">only named records</text>
+  <line x1="1232" y1="315" x2="1264" y2="315" stroke="#1565c0" stroke-width="2.5" marker-end="url(#b)"/>
+  <rect x="1268" y="270" width="102" height="90" rx="14" fill="#1565c0" stroke="#1565c0" stroke-width="2.5"/>
+  <text x="1319" y="302" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">Secure room</text>
+  <text x="1319" y="322" font-size="12" fill="#dbe9f9" text-anchor="middle">no download</text>
+  <text x="1319" y="342" font-size="12" fill="#dbe9f9" text-anchor="middle">Art. 66, 68, 73</text>
 
   <!-- ===== attacker lane ===== -->
-  <line x1="30" y1="460" x2="1370" y2="460" stroke="#e3e6ea" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <line x1="30" y1="420" x2="1370" y2="420" stroke="#e3e6ea" stroke-width="1.5" stroke-dasharray="6 5"/>
 
-  <rect x="30" y="490" width="170" height="90" rx="14" fill="#fdecea" stroke="#c62828" stroke-width="2" stroke-dasharray="7 4"/>
-  <text x="115" y="528" font-size="20" font-weight="700" fill="#8e1b1b" text-anchor="middle">Attacker</text>
-  <text x="115" y="556" font-size="14" fill="#8e1b1b" text-anchor="middle">floods the API</text>
+  <rect x="30" y="460" width="170" height="90" rx="14" fill="#fdecea" stroke="#c62828" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="115" y="498" font-size="20" font-weight="700" fill="#8e1b1b" text-anchor="middle">Attacker</text>
+  <text x="115" y="526" font-size="14" fill="#8e1b1b" text-anchor="middle">floods the API</text>
 
-  <line x1="200" y1="535" x2="238" y2="535" stroke="#c62828" stroke-width="2.5" marker-end="url(#r)"/>
+  <line x1="200" y1="505" x2="238" y2="505" stroke="#c62828" stroke-width="2.5" marker-end="url(#r)"/>
 
-  <rect x="242" y="490" width="392" height="90" rx="14" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="2"/>
-  <text x="438" y="528" font-size="18" font-weight="700" fill="#1f2a37" text-anchor="middle">Rate limit</text>
-  <text x="438" y="556" font-size="14" fill="#5b6472" text-anchor="middle">more than 20 requests in 10 s from one address</text>
+  <rect x="242" y="460" width="392" height="90" rx="14" fill="#f6f7f9" stroke="#c9d0d9" stroke-width="2"/>
+  <text x="438" y="498" font-size="18" font-weight="700" fill="#1f2a37" text-anchor="middle">Rate limit</text>
+  <text x="438" y="526" font-size="14" fill="#5b6472" text-anchor="middle">more than 20 requests in 10 s from one address</text>
 
-  <line x1="634" y1="535" x2="706" y2="535" stroke="#c62828" stroke-width="2.5" marker-end="url(#r)"/>
+  <line x1="634" y1="505" x2="706" y2="505" stroke="#c62828" stroke-width="2.5" marker-end="url(#r)"/>
 
-  <rect x="710" y="490" width="660" height="90" rx="14" fill="#c62828" stroke="#c62828" stroke-width="2.5"/>
-  <text x="736" y="528" font-size="20" font-weight="700" fill="#ffffff">Blocked for 60 s — HTTP 429</text>
-  <text x="736" y="556" font-size="14" fill="#fde7e7">Nothing reaches the law check or the data. Download attempts in the secure room: 403 and logged.</text>
+  <rect x="710" y="460" width="660" height="90" rx="14" fill="#c62828" stroke="#c62828" stroke-width="2.5"/>
+  <text x="736" y="498" font-size="20" font-weight="700" fill="#ffffff">Blocked for 60 s — HTTP 429</text>
+  <text x="736" y="526" font-size="14" fill="#fde7e7">Nothing reaches the law check or the data. Download attempts in the secure room: 403 and logged.</text>
 
-  <text x="30" y="608" font-size="13" fill="#8a94a3">Patient data never leaves the app. The AI only ever sees the request text and the law.</text>
+  <text x="30" y="590" font-size="13" fill="#8a94a3">Patient data never leaves the app. The AI only ever sees the request text and the law.</text>
 </svg>
